@@ -86,6 +86,8 @@ header.site-header{
 .footer-brand .logo{margin-bottom:2px;}
 .nav-links{display:flex; gap:26px; font-weight:600; font-size:14.5px; color:var(--gray-700); flex-shrink:0;}
 .nav-links a:hover{color:var(--primary);}
+.nav-links a.nav-primary{color:var(--primary); background:var(--primary-light); padding:6px 14px; border-radius:100px; font-weight:800;}
+.nav-links a.nav-primary:hover{background:var(--primary); color:#fff;}
 .nav-search{flex:1; max-width:360px; position:relative;}
 .nav-search input{
   width:100%; padding:9px 14px 9px 36px; border:1px solid var(--gray-300); border-radius:100px; outline:none; font-size:13.5px;
