@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>결제 내역 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <h1 class="section-title" style="font-size:22px; margin-bottom:20px;">결제 내역</h1>
+
+      <div class="card pad-24" style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div>
+          <div class="text-muted" style="font-size:12.5px;">현재 에스크로 예치금</div>
+          <div style="font-size:22px; font-weight:900;" id="escrow-total"></div>
+        </div>
+        <span class="badge badge-green">🔒 안전결제로 보호되는 금액입니다</span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>결제일</th><th>프로젝트명</th><th>전문가</th><th>금액</th><th>결제수단</th><th>상태</th><th></th></tr></thead>
+          <tbody id="pay-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('client', 'mypage-cl-payments.html');
+
+  const payments = FREEWAY_PROJECTS.map(p=>({
+    date: '2026-0' + (Math.floor(Math.random()*2)+6) + '-1' + p.id.slice(-1),
+    pj: p.title, fl: FREEWAY_FREELANCERS.find(f=>f.id===p.freelancerId).name,
+    amount: p.budget, method:'신용카드', status: p.status==='done' ? '지급완료' : '예치중'
+  }));
+
+  document.getElementById('escrow-total').textContent = '₩' + payments.filter(p=>p.status==='예치중').reduce((a,b)=>a+b.amount,0).toLocaleString();
+
+  document.getElementById('pay-body').innerHTML = payments.map(p=>`
+    <tr>
+      <td>${p.date}</td><td>${p.pj}</td><td>${p.fl}</td>
+      <td>₩${p.amount.toLocaleString()}</td><td>${p.method}</td>
+      <td><span class="status ${p.status==='지급완료'?'done':'progress'}">${p.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="FreewayStore.toast('영수증을 다운로드합니다')">영수증</button></td>
+    </tr>`).join('');
+</script>
+</body>
+</html>

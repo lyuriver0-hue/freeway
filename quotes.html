@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>견적 제안 받기 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .quotes-layout{display:grid; grid-template-columns:300px 1fr; gap:24px; align-items:start;}
+  .pj-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:20px; position:sticky; top:calc(var(--header-h) + 20px);}
+  .quote-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:18px; margin-bottom:14px;}
+  .quote-top{display:flex; gap:12px; align-items:center; margin-bottom:12px;}
+  .quote-amt{font-size:19px; font-weight:900; color:var(--ink);}
+  .sort-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  @media (max-width:860px){ .quotes-layout{grid-template-columns:1fr;} .pj-card{position:static;} }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="breadcrumb"><a href="index.html">홈</a> / <span>견적 제안 받기</span></div>
+  <div class="quotes-layout">
+    <div class="pj-card" id="pj-summary"></div>
+
+    <div>
+      <div class="sort-row">
+        <span class="text-muted" id="quote-count-text"></span>
+        <select class="chip-select" id="sort-quote" style="padding:9px 14px; border:1.5px solid var(--gray-300); border-radius:9px; font-size:13px;">
+          <option value="low">낮은 견적순</option>
+          <option value="rating">평점순</option>
+          <option value="new">최신순</option>
+        </select>
+      </div>
+      <div id="quote-list"></div>
+      <div id="quote-empty" class="empty-state hidden"><div class="emoji">📭</div><p>아직 도착한 제안이 없습니다. 조금만 기다려주세요!</p></div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="accept-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('accept-modal')">✕</button>
+    <h3>제안을 수락하시겠어요?</h3>
+    <p class="text-muted" style="font-size:13.5px; margin-bottom:16px;" id="accept-detail"></p>
+    <div class="trust-strip" style="margin-bottom:16px;">
+      <span class="item">📄 표준계약서가 자동 생성됩니다</span>
+      <span class="item">🔒 안전결제(에스크로)로 대금이 예치됩니다</span>
+    </div>
+    <label class="checkbox-row" style="margin-bottom:16px;"><input type="checkbox" id="accept-agree"> 표준계약서 내용에 동의합니다</label>
+    <button class="btn btn-primary btn-block" id="confirm-accept" disabled>안전결제 진행하고 계약 확정</button>
+  </div>
+</div>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  const params = new URLSearchParams(location.search);
+  const project = FREEWAY_PROJECTS.find(p=>p.id===params.get('pid')) || FREEWAY_PROJECTS[0];
+
+  document.getElementById('pj-summary').innerHTML = `
+    <span class="badge badge-blue">${project.catName}</span>
+    <h3 style="font-size:16px; margin:10px 0 8px;">${project.title}</h3>
+    <div style="font-size:13px; color:var(--gray-500); line-height:1.9;">
+      예산 <b style="color:var(--ink);">₩${project.budget.toLocaleString()}</b><br>
+      마감일 ${project.deadline}<br>
+      상태 <span class="status progress">진행중</span>
+    </div>`;
+
+  let quotes = FREEWAY_QUOTES.filter(q=>q.projectId===project.id);
+
+  function quoteCard(q){
+    const fl = FREEWAY_FREELANCERS.find(f=>f.id===q.freelancerId);
+    return `
+    <div class="quote-card" data-quote-id="${q.id}">
+      <div class="quote-top">
+        <div class="avatar">${fl.avatar}</div>
+        <div style="flex:1;">
+          <div style="font-weight:700; font-size:14px;">${fl.name} ${fl.verified?'<span class="verified">✔</span>':''}</div>
+          <div style="font-size:12px; color:var(--gray-500);">★ ${fl.rating} (${fl.reviews}) · 응답률 ${fl.response}</div>
+        </div>
+        <div class="quote-amt">₩${q.amount.toLocaleString()}</div>
+      </div>
+      <p style="font-size:13.5px; color:var(--gray-700); margin-bottom:12px;">${q.message}</p>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span class="text-muted" style="font-size:12.5px;">예상 소요기간 ${q.days}일</span>
+        <div style="display:flex; gap:8px;">
+          <a class="btn btn-ghost btn-sm" href="freelancer.html?id=${fl.id}">상세보기</a>
+          <a class="btn btn-ghost btn-sm" href="chat.html">채팅문의</a>
+          ${q.status==='accepted'
+            ? '<span class="status done">계약 확정됨</span>'
+            : `<button class="btn btn-primary btn-sm" data-accept="${q.id}">제안 수락</button>`}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function render(){
+    const sortVal = document.getElementById('sort-quote').value;
+    const sorted = quotes.slice();
+    if(sortVal==='low') sorted.sort((a,b)=>a.amount-b.amount);
+    else if(sortVal==='rating') sorted.sort((a,b)=> FREEWAY_FREELANCERS.find(f=>f.id===b.freelancerId).rating - FREEWAY_FREELANCERS.find(f=>f.id===a.freelancerId).rating);
+    document.getElementById('quote-list').innerHTML = sorted.map(quoteCard).join('');
+    document.getElementById('quote-count-text').innerHTML = `받은 제안 <b>${quotes.length}</b>건`;
+    document.getElementById('quote-empty').classList.toggle('hidden', quotes.length>0);
+  }
+  render();
+  document.getElementById('sort-quote').addEventListener('change', render);
+
+  let pendingAcceptId = null;
+  document.getElementById('quote-list').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-accept]');
+    if(!btn) return;
+    pendingAcceptId = btn.getAttribute('data-accept');
+    const q = quotes.find(x=>x.id===pendingAcceptId);
+    const fl = FREEWAY_FREELANCERS.find(f=>f.id===q.freelancerId);
+    document.getElementById('accept-detail').textContent = `${fl.name} 전문가의 제안(₩${q.amount.toLocaleString()}, ${q.days}일)을 수락하고 계약을 진행합니다.`;
+    document.getElementById('accept-agree').checked = false;
+    document.getElementById('confirm-accept').disabled = true;
+    openModal('accept-modal');
+  });
+  document.getElementById('accept-agree').addEventListener('change', (e)=>{
+    document.getElementById('confirm-accept').disabled = !e.target.checked;
+  });
+  document.getElementById('confirm-accept').addEventListener('click', ()=>{
+    const q = quotes.find(x=>x.id===pendingAcceptId);
+    if(q) q.status = 'accepted';
+    closeModal('accept-modal');
+    FreewayStore.toast('계약이 확정되었습니다. 안전결제가 예치되었어요.');
+    render();
+  });
+</script>
+</body>
+</html>

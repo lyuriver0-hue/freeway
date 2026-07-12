@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관심 목록 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <h1 class="section-title" style="font-size:22px; margin-bottom:20px;">관심 목록</h1>
+      <div class="svc-grid" id="fav-grid"></div>
+      <div id="fav-empty" class="empty-state hidden">
+        <div class="emoji">💔</div>
+        <p>아직 찜한 서비스나 전문가가 없습니다.</p>
+        <a href="category.html" class="btn btn-primary" style="margin-top:16px;">서비스 둘러보기</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('client', 'mypage-cl-favorites.html');
+
+  function render(){
+    const favs = FreewayStore.getFavorites();
+    const items = favs.map(id=>{
+      const svc = FREEWAY_SERVICES.find(s=>s.id===id);
+      if(svc){
+        const fl = FREEWAY_FREELANCERS.find(f=>f.id===svc.freelancerId);
+        return `<a class="svc-card" href="service-detail.html?id=${svc.id}">
+          <div class="svc-thumb">${svc.thumb}<button class="svc-heart active" data-fav-id="${svc.id}">♥</button></div>
+          <div class="svc-body">
+            <div class="svc-cat">${svc.catName}</div>
+            <div class="svc-title">${svc.title}</div>
+            <div class="svc-pro"><span class="avatar" style="width:20px;height:20px;font-size:10px;border-radius:6px;">${fl.avatar}</span> ${fl.name}</div>
+            <div class="svc-foot"><span class="svc-rating">★ ${svc.rating}</span><span class="svc-price">₩${svc.price.toLocaleString()}~</span></div>
+          </div></a>`;
+      }
+      const fl = FREEWAY_FREELANCERS.find(f=>f.id===id);
+      if(fl){
+        return `<a class="svc-card" href="freelancer.html?id=${fl.id}">
+          <div class="svc-thumb" style="font-size:28px;">${fl.avatar}<button class="svc-heart active" data-fav-id="${fl.id}">♥</button></div>
+          <div class="svc-body">
+            <div class="svc-cat">전문가</div>
+            <div class="svc-title">${fl.name} · ${fl.role}</div>
+            <div class="svc-foot"><span class="svc-rating">★ ${fl.rating} (${fl.reviews})</span></div>
+          </div></a>`;
+      }
+      return '';
+    }).join('');
+    document.getElementById('fav-grid').innerHTML = items;
+    document.getElementById('fav-grid').classList.toggle('hidden', favs.length===0);
+    document.getElementById('fav-empty').classList.toggle('hidden', favs.length>0);
+  }
+  render();
+  // re-render whenever a favorite is toggled from this page (heart click removes from list)
+  document.addEventListener('click', (e)=>{
+    if(e.target.closest('[data-fav-id]')) setTimeout(render, 0);
+  });
+</script>
+</body>
+</html>

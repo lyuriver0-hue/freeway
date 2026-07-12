@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>고객센터 · FAQ | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .faq-hero{background:var(--primary-light); border-radius:var(--radius-lg); padding:40px; text-align:center; margin-bottom:32px;}
+  .faq-hero input{width:100%; max-width:460px; padding:13px 16px; border-radius:10px; border:1px solid var(--gray-300); margin-top:16px; outline:none;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container" style="max-width:800px;">
+  <div class="faq-hero">
+    <h1 class="section-title">무엇을 도와드릴까요?</h1>
+    <p class="section-sub" style="margin:0 auto;">자주 묻는 질문을 검색해보세요</p>
+    <input type="text" id="faq-search" placeholder="예: 안전결제, 표준계약서, 환불...">
+  </div>
+
+  <div id="faq-list"></div>
+  <div id="faq-empty" class="empty-state hidden"><div class="emoji">🤔</div><p>검색 결과가 없습니다.</p></div>
+
+  <div class="card pad-24" style="margin-top:32px; text-align:center;">
+    <h3 style="font-size:15px; margin-bottom:8px;">원하는 답변을 찾지 못하셨나요?</h3>
+    <p class="text-muted" style="margin-bottom:16px; font-size:13.5px;">1:1 문의를 남겨주시면 빠르게 답변드릴게요.</p>
+    <button class="btn btn-primary" onclick="FreewayStore.toast('문의가 접수되었습니다')">1:1 문의하기</button>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount('faq');
+
+  function render(filter){
+    const f = (filter||'').trim();
+    const list = FREEWAY_FAQS.filter(x=> !f || x.q.includes(f) || x.a.includes(f));
+    document.getElementById('faq-list').innerHTML = list.map((x,i)=>`
+      <div class="acc-item">
+        <div class="acc-head"><span>Q. ${x.q}</span><span class="chev">▾</span></div>
+        <div class="acc-body"><div class="acc-body-inner">A. ${x.a}</div></div>
+      </div>`).join('');
+    document.getElementById('faq-empty').classList.toggle('hidden', list.length>0);
+  }
+  render('');
+
+  document.getElementById('faq-search').addEventListener('input', (e)=>render(e.target.value));
+</script>
+</body>
+</html>

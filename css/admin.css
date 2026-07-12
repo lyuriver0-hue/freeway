@@ -1,0 +1,53 @@
+/* =========================================================
+   FREEWAY internal admin console — distinct, plain "back office" look
+   (kept separate from the consumer-facing styles.css branding)
+========================================================= */
+body.admin-body{ background:var(--gray-100); padding-top:0; }
+
+.admin-topbar{
+  height:56px; background:#1F2937; color:#fff; display:flex; align-items:center;
+  justify-content:space-between; padding:0 24px; font-weight:800; font-size:15px;
+}
+.admin-topbar .admin-who{display:flex; align-items:center; gap:12px; font-size:13px; font-weight:600; color:#D1D5DB;}
+.admin-topbar button{background:none; border:1px solid #4B5563; color:#D1D5DB; padding:6px 12px; border-radius:7px; font-size:12.5px; cursor:pointer;}
+.admin-topbar button:hover{background:#374151; color:#fff;}
+
+.admin-wrap{max-width:900px; margin:32px auto; padding:0 20px;}
+
+.admin-panel{background:#fff; border:1px solid var(--gray-200); border-radius:12px; overflow:hidden;}
+.admin-panel-head{display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid var(--gray-200);}
+.admin-panel-head h1{font-size:17px; font-weight:800;}
+.admin-panel-head .actions{display:flex; gap:8px;}
+.admin-btn{padding:9px 16px; border-radius:7px; font-size:13px; font-weight:700; cursor:pointer; border:1px solid var(--gray-300); background:#fff; color:var(--gray-700);}
+.admin-btn:hover{background:var(--gray-50);}
+.admin-btn.dark{background:#1F2937; color:#fff; border-color:#1F2937;}
+.admin-btn.dark:hover{background:#111827;}
+.admin-btn.primary{background:var(--primary); color:#fff; border-color:var(--primary);}
+.admin-btn.primary:hover{background:var(--primary-dark);}
+.admin-btn.gray{background:#9CA3AF; color:#fff; border-color:#9CA3AF;}
+.admin-btn.gray:hover{background:#6B7280;}
+
+.role-acc{border-bottom:1px solid var(--gray-200);}
+.role-acc:last-child{border-bottom:none;}
+.role-acc-head{display:flex; justify-content:space-between; align-items:center; padding:16px 24px; cursor:pointer; font-weight:700; font-size:14.5px;}
+.role-acc-head:hover{background:var(--gray-50);}
+.role-acc-head .chev{color:var(--gray-500); transition:.2s;}
+.role-acc.open .role-acc-head .chev{transform:rotate(180deg); color:var(--primary);}
+.role-acc-body{display:none; padding:6px 24px 24px;}
+.role-acc.open .role-acc-body{display:block;}
+
+.role-name-row{display:flex; align-items:center; gap:10px; padding:14px 0; border-bottom:1px solid var(--gray-100); margin-bottom:6px;}
+.role-name-row .rn-label{width:96px; font-size:13px; font-weight:700; color:var(--gray-700); flex-shrink:0;}
+.role-name-row input[type=text]{flex:1; max-width:220px; padding:9px 12px; border:1px solid var(--gray-300); border-radius:7px; font-size:13.5px; outline:none;}
+.role-name-row input[type=text]:focus{border-color:var(--primary);}
+.role-name-row .spacer{flex:1;}
+
+.perm-row{display:flex; align-items:flex-start; gap:10px; padding:13px 0; border-bottom:1px solid var(--gray-100);}
+.perm-row:last-child{border-bottom:none;}
+.perm-group-label{width:96px; flex-shrink:0; display:flex; align-items:center; gap:8px; font-weight:700; font-size:13.5px; padding-top:1px;}
+.perm-items{display:flex; flex-wrap:wrap; gap:6px 22px; flex:1;}
+.perm-item{display:flex; align-items:center; gap:7px; font-size:13.5px; color:var(--gray-700);}
+.perm-item input, .perm-group-label input{width:16px; height:16px; accent-color:var(--primary); cursor:pointer;}
+
+.admin-login-wrap{max-width:380px; margin:80px auto; padding:0 20px;}
+.admin-login-card{background:#fff; border:1px solid var(--gray-200); border-radius:14px; padding:36px 32px;}

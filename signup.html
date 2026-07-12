@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회원가입 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .auth-wrap{max-width:520px; margin:40px auto; padding:0 20px;}
+  .auth-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:36px 32px; box-shadow:var(--shadow);}
+  .auth-title{text-align:center; margin-bottom:6px; font-size:22px;}
+  .auth-sub{text-align:center; color:var(--gray-500); font-size:13.5px; margin-bottom:26px;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="auth-wrap">
+  <div class="auth-card">
+    <h1 class="auth-title">회원가입</h1>
+    <p class="auth-sub">프리웨이와 함께 시작해보세요</p>
+
+    <div class="stepbar" id="stepbar">
+      <div class="step-item active" data-step="0"><div class="circle">1</div><div class="label">유형선택</div></div>
+      <div class="line"></div>
+      <div class="step-item" data-step="1"><div class="circle">2</div><div class="label">기본정보</div></div>
+      <div class="line"></div>
+      <div class="step-item" data-step="2"><div class="circle">3</div><div class="label">약관동의</div></div>
+      <div class="line"></div>
+      <div class="step-item" data-step="3"><div class="circle">4</div><div class="label">완료</div></div>
+    </div>
+
+    <!-- Step 0: role -->
+    <div class="wizard-panel active" data-panel="0">
+      <div class="role-select">
+        <div class="role-card" data-role="client">
+          <div class="emoji">🏢</div>
+          <h4>클라이언트로 시작</h4>
+          <p>전문가에게 업무를 맡기고 싶어요</p>
+        </div>
+        <div class="role-card" data-role="freelancer">
+          <div class="emoji">🧑‍💻</div>
+          <h4>전문가로 시작</h4>
+          <p>제 서비스를 등록하고 수익을 내고 싶어요</p>
+        </div>
+      </div>
+      <div class="wizard-actions" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-to-1" disabled>다음</button>
+      </div>
+    </div>
+
+    <!-- Step 1: basic info -->
+    <div class="wizard-panel" data-panel="1">
+      <div class="field"><label>이름 / 상호명</label><input type="text" id="su-name" placeholder="홍길동"></div>
+      <div class="field"><label>이메일</label><input type="email" id="su-email" placeholder="example@email.com"></div>
+      <div class="row-2">
+        <div class="field"><label>비밀번호</label><input type="password" id="su-pw" placeholder="8자 이상"></div>
+        <div class="field"><label>비밀번호 확인</label><input type="password" id="su-pw2" placeholder="다시 입력"></div>
+      </div>
+      <div id="freelancer-extra" class="hidden">
+        <div class="field"><label>사업자등록증 번호 (선택)</label><input type="text" placeholder="000-00-00000"></div>
+        <div class="field"><label>주요 활동 분야</label>
+          <select id="su-category">
+            <option value="">선택해주세요</option>
+          </select>
+        </div>
+      </div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="0">이전</button>
+        <button class="btn btn-primary" id="btn-to-2">다음</button>
+      </div>
+    </div>
+
+    <!-- Step 2: agreement -->
+    <div class="wizard-panel" data-panel="2">
+      <div class="checkbox-row" style="margin-bottom:12px;"><input type="checkbox" id="agree-all"> <b>전체 동의합니다</b></div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item"> [필수] 이용약관 동의</div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item"> [필수] 개인정보 수집 및 이용 동의</div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item"> [선택] 마케팅 정보 수신 동의</div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="1">이전</button>
+        <button class="btn btn-primary" id="btn-to-3" disabled>가입완료</button>
+      </div>
+    </div>
+
+    <!-- Step 3: done -->
+    <div class="wizard-panel" data-panel="3">
+      <div style="text-align:center; padding:20px 0;">
+        <div style="font-size:44px; margin-bottom:14px;">🎉</div>
+        <h3 style="margin-bottom:8px;">회원가입이 완료되었습니다!</h3>
+        <p class="text-muted" id="done-msg" style="margin-bottom:24px;"></p>
+        <a href="index.html" class="btn btn-primary btn-lg" id="done-cta">시작하기</a>
+      </div>
+    </div>
+
+    <div class="auth-foot" style="text-align:center; font-size:13px; color:var(--gray-500); margin-top:20px;" id="login-link-wrap">
+      이미 계정이 있으신가요? <a href="login.html" style="color:var(--primary); font-weight:700;">로그인</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('su-category').innerHTML += FREEWAY_CATEGORIES.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+
+  let role = null;
+  let currentStep = 0;
+
+  function goStep(n){
+    currentStep = n;
+    document.querySelectorAll('.wizard-panel').forEach(p=>p.classList.toggle('active', +p.getAttribute('data-panel')===n));
+    document.querySelectorAll('.step-item').forEach(s=>{
+      const idx = +s.getAttribute('data-step');
+      s.classList.toggle('active', idx===n);
+      s.classList.toggle('done', idx<n);
+    });
+    document.getElementById('login-link-wrap').classList.toggle('hidden', n===3);
+  }
+
+  document.querySelectorAll('.role-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      role = card.getAttribute('data-role');
+      document.getElementById('btn-to-1').disabled = false;
+    });
+  });
+
+  document.getElementById('btn-to-1').addEventListener('click', ()=>{
+    document.getElementById('freelancer-extra').classList.toggle('hidden', role !== 'freelancer');
+    goStep(1);
+  });
+
+  document.getElementById('btn-to-2').addEventListener('click', ()=>{
+    const name = document.getElementById('su-name').value.trim();
+    const email = document.getElementById('su-email').value.trim();
+    const pw = document.getElementById('su-pw').value;
+    const pw2 = document.getElementById('su-pw2').value;
+    if(!name || !email || pw.length<4 || pw!==pw2){
+      FreewayStore.toast('입력 내용을 다시 확인해주세요');
+      return;
+    }
+    goStep(2);
+  });
+
+  document.querySelectorAll('[data-back]').forEach(btn=>{
+    btn.addEventListener('click', ()=>goStep(+btn.getAttribute('data-back')));
+  });
+
+  const agreeAll = document.getElementById('agree-all');
+  const agreeItems = document.querySelectorAll('.agree-item');
+  function syncAgreeBtn(){
+    const allChecked = [...agreeItems].every(i=>i.checked);
+    document.getElementById('btn-to-3').disabled = !allChecked;
+  }
+  agreeAll.addEventListener('change', ()=>{
+    agreeItems.forEach(i=>i.checked = agreeAll.checked);
+    syncAgreeBtn();
+  });
+  agreeItems.forEach(i=>i.addEventListener('change', ()=>{
+    agreeAll.checked = [...agreeItems].every(x=>x.checked);
+    syncAgreeBtn();
+  }));
+
+  document.getElementById('btn-to-3').addEventListener('click', ()=>{
+    const name = document.getElementById('su-name').value.trim() || '회원';
+    FreewayStore.setUser({name, role, email: document.getElementById('su-email').value.trim()});
+    document.getElementById('done-msg').textContent = role==='freelancer'
+      ? '전문가 프로필을 완성하고 첫 서비스를 등록해보세요.'
+      : '지금 바로 프로젝트를 등록하고 전문가의 제안을 받아보세요.';
+    document.getElementById('done-cta').href = role==='freelancer' ? 'mypage-fl-services.html' : 'project-register.html';
+    document.getElementById('done-cta').textContent = role==='freelancer' ? '서비스 등록하러 가기' : '프로젝트 등록하러 가기';
+    goStep(3);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수익 현황 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .stat-cards{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px;}
+  .stat-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:18px;}
+  .stat-card .label{font-size:12.5px; color:var(--gray-500); margin-bottom:8px;}
+  .stat-card .val{font-size:21px; font-weight:900;}
+  .bar-chart{display:flex; align-items:flex-end; gap:14px; height:180px; padding:10px 6px;}
+  .bar-chart .bar-wrap{flex:1; display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .bar-chart .bar{width:100%; background:var(--primary); border-radius:6px 6px 0 0; transition:.3s;}
+  .bar-chart .m-label{font-size:11.5px; color:var(--gray-500);}
+  @media (max-width:860px){ .stat-cards{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <h1 class="section-title" style="font-size:22px; margin-bottom:20px;">수익 현황</h1>
+
+      <div class="stat-cards">
+        <div class="stat-card"><div class="label">이번달 수익</div><div class="val" id="st-month">₩0</div></div>
+        <div class="stat-card"><div class="label">누적 수익</div><div class="val" id="st-total">₩0</div></div>
+        <div class="stat-card"><div class="label">정산 예정</div><div class="val" style="color:var(--primary);" id="st-pending">₩0</div></div>
+        <div class="stat-card"><div class="label">정산 완료</div><div class="val" style="color:var(--green-dark);" id="st-done">₩0</div></div>
+      </div>
+
+      <div class="card pad-24" style="margin-bottom:24px;">
+        <h3 style="font-size:15px; margin-bottom:16px;">월별 수익 추이</h3>
+        <div class="bar-chart" id="bar-chart"></div>
+      </div>
+
+      <div class="card pad-24">
+        <h3 style="font-size:15px; margin-bottom:16px;">정산 계좌</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="font-size:13.5px; color:var(--gray-700);">국민은행 123456-04-123456 (예금주: 김수현)</div>
+          <button class="btn btn-ghost btn-sm">계좌 변경</button>
+        </div>
+      </div>
+
+      <h3 style="font-size:15px; margin:24px 0 14px;">거래 내역</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>프로젝트명</th><th>클라이언트</th><th>결제일</th><th>금액</th><th>수수료</th><th>정산상태</th></tr></thead>
+          <tbody id="tx-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('freelancer', 'mypage-fl-earnings.html');
+
+  const monthly = [
+    {m:'2월', v:1200000},{m:'3월', v:1800000},{m:'4월', v:900000},
+    {m:'5월', v:2400000},{m:'6월', v:2100000},{m:'7월', v:1500000},
+  ];
+  const maxV = Math.max(...monthly.map(x=>x.v));
+  document.getElementById('bar-chart').innerHTML = monthly.map(x=>`
+    <div class="bar-wrap">
+      <div class="bar" style="height:${Math.round(x.v/maxV*140)}px;" title="₩${x.v.toLocaleString()}"></div>
+      <div class="m-label">${x.m}</div>
+    </div>`).join('');
+
+  const total = monthly.reduce((a,b)=>a+b.v,0);
+  document.getElementById('st-month').textContent = `₩${monthly[monthly.length-1].v.toLocaleString()}`;
+  document.getElementById('st-total').textContent = `₩${total.toLocaleString()}`;
+  document.getElementById('st-pending').textContent = `₩${(monthly[monthly.length-1].v*0.4).toLocaleString()}`;
+  document.getElementById('st-done').textContent = `₩${(total*0.85).toLocaleString()}`;
+
+  const tx = [
+    {pj:'브랜드 로고 리뉴얼', client:'㈜스토어이든', date:'2026-06-28', amt:450000, status:'done'},
+    {pj:'패키지 디자인', client:'그린테이블', date:'2026-06-15', amt:600000, status:'done'},
+    {pj:'상세페이지 제작', client:'한올테크', date:'2026-07-02', amt:350000, status:'pending'},
+  ];
+  document.getElementById('tx-body').innerHTML = tx.map(t=>`
+    <tr>
+      <td>${t.pj}</td><td>${t.client}</td><td>${t.date}</td>
+      <td>₩${t.amt.toLocaleString()}</td><td>₩${Math.round(t.amt*0.1).toLocaleString()}</td>
+      <td><span class="status ${t.status==='done'?'done':'pending'}">${t.status==='done'?'정산완료':'정산예정'}</span></td>
+    </tr>`).join('');
+</script>
+</body>
+</html>

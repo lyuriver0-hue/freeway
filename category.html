@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서비스 카테고리 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .cat-layout{display:grid; grid-template-columns:220px 1fr; gap:28px; align-items:start;}
+  .cat-side{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:10px; position:sticky; top:calc(var(--header-h) + 20px);}
+  .cat-side a{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:9px; font-size:13.5px; font-weight:600; color:var(--gray-700);}
+  .cat-side a:hover{background:var(--gray-50);}
+  .cat-side a.active{background:var(--primary-light); color:var(--primary);}
+  .filter-bar{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap;}
+  .filter-left{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip-select{padding:9px 14px; border:1.5px solid var(--gray-300); border-radius:9px; font-size:13px; font-weight:600; background:#fff; cursor:pointer;}
+  .result-count{font-size:13.5px; color:var(--gray-500);}
+  @media (max-width:860px){ .cat-layout{grid-template-columns:1fr;} .cat-side{position:static;} }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="breadcrumb"><a href="index.html">홈</a> / <span id="crumb-cat">서비스 카테고리</span></div>
+  <h1 class="section-title" style="margin-bottom:24px;">서비스 둘러보기</h1>
+
+  <div class="cat-layout">
+    <aside class="cat-side" id="cat-side"></aside>
+
+    <div>
+      <div class="filter-bar">
+        <div class="filter-left">
+          <select class="chip-select" id="f-price">
+            <option value="all">전체 가격대</option>
+            <option value="0-100000">~10만원</option>
+            <option value="100000-500000">10~50만원</option>
+            <option value="500000-1000000">50~100만원</option>
+            <option value="1000000-999999999">100만원 이상</option>
+          </select>
+          <select class="chip-select" id="f-sort">
+            <option value="popular">인기순</option>
+            <option value="price-asc">낮은 가격순</option>
+            <option value="price-desc">높은 가격순</option>
+            <option value="rating">평점순</option>
+          </select>
+        </div>
+        <div class="result-count"><b id="result-num">0</b>개의 서비스</div>
+      </div>
+
+      <div class="svc-grid" id="svc-grid"></div>
+      <div id="empty" class="empty-state hidden">
+        <div class="emoji">🔍</div>
+        <p>조건에 맞는 서비스가 없습니다. 다른 필터를 선택해보세요.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount('category');
+  const params = new URLSearchParams(location.search);
+  let currentCat = params.get('cat') || 'all';
+
+  function renderSidebar(){
+    const all = [{id:'all', name:'전체 카테고리', emoji:'📋'}, ...FREEWAY_CATEGORIES];
+    document.getElementById('cat-side').innerHTML = all.map(c=>`
+      <a href="category.html?cat=${c.id}" class="${currentCat===c.id?'active':''}">${c.emoji||'📋'} ${c.name}</a>
+    `).join('');
+    const found = FREEWAY_CATEGORIES.find(c=>c.id===currentCat);
+    document.getElementById('crumb-cat').textContent = found ? found.name : '전체 카테고리';
+  }
+
+  function svcCardHTML(s){
+    const fl = FREEWAY_FREELANCERS.find(f=>f.id===s.freelancerId);
+    const boosted = FreewayStore.isBoosted(s.id);
+    return `
+    <a class="svc-card ${boosted?'is-boosted':''}" href="service-detail.html?id=${s.id}">
+      <div class="svc-thumb">${s.thumb}${boosted?'<span class="svc-boost-badge">🚀 상위노출</span>':''}<button class="svc-heart" data-fav-id="${s.id}">♥</button></div>
+      <div class="svc-body">
+        <div class="svc-cat">${s.catName}</div>
+        <div class="svc-title">${s.title}</div>
+        <div class="svc-pro"><span class="avatar" style="width:20px;height:20px;font-size:10px;border-radius:6px;">${fl.avatar}</span> ${fl.name}</div>
+        <div class="svc-foot">
+          <span class="svc-rating">★ ${s.rating} <span>(${s.reviews})</span></span>
+          <span class="svc-price">₩${s.price.toLocaleString()}<small> ~</small></span>
+        </div>
+      </div>
+    </a>`;
+  }
+
+  function applyFilters(){
+    let list = FREEWAY_SERVICES.slice();
+    if(currentCat !== 'all') list = list.filter(s=>s.category===currentCat);
+
+    const priceVal = document.getElementById('f-price').value;
+    if(priceVal !== 'all'){
+      const [min,max] = priceVal.split('-').map(Number);
+      list = list.filter(s=>s.price>=min && s.price<=max);
+    }
+
+    const sortVal = document.getElementById('f-sort').value;
+    if(sortVal==='price-asc') list.sort((a,b)=>a.price-b.price);
+    else if(sortVal==='price-desc') list.sort((a,b)=>b.price-a.price);
+    else if(sortVal==='rating') list.sort((a,b)=>b.rating-a.rating);
+    else list.sort((a,b)=>b.reviews-a.reviews);
+
+    // 상위노출 결제된 서비스는 정렬 기준과 무관하게 최상단에 노출 (안정 정렬로 그룹 내 순서는 유지)
+    list.sort((a,b)=> (FreewayStore.isBoosted(b.id)?1:0) - (FreewayStore.isBoosted(a.id)?1:0));
+
+    document.getElementById('svc-grid').innerHTML = list.map(svcCardHTML).join('');
+    document.getElementById('result-num').textContent = list.length;
+    document.getElementById('empty').classList.toggle('hidden', list.length>0);
+    document.getElementById('svc-grid').classList.toggle('hidden', list.length===0);
+    initFavoriteButtons();
+  }
+
+  renderSidebar();
+  applyFilters();
+  document.getElementById('f-price').addEventListener('change', applyFilters);
+  document.getElementById('f-sort').addEventListener('change', applyFilters);
+</script>
+</body>
+</html>

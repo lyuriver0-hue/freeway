@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>견적서 관리 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .pj-quote-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:20px; margin-bottom:14px;}
+  .pj-quote-top{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <div class="section-head">
+        <h1 class="section-title" style="font-size:22px;">견적서 관리</h1>
+        <div class="tabs" data-tabs style="border-bottom:none; margin:0;">
+          <button class="tab-btn active" data-tab-target="t-all" data-filter="all">전체</button>
+          <button class="tab-btn" data-tab-target="t-all" data-filter="progress">진행중</button>
+          <button class="tab-btn" data-tab-target="t-all" data-filter="done">종료</button>
+        </div>
+      </div>
+      <div id="pj-list"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('client', 'mypage-cl-quotes.html');
+
+  let currentFilter = 'all';
+  function render(){
+    const list = FREEWAY_PROJECTS.filter(p=>currentFilter==='all' || p.status===currentFilter);
+    document.getElementById('pj-list').innerHTML = list.map(p=>{
+      const qCount = FREEWAY_QUOTES.filter(q=>q.projectId===p.id).length;
+      return `<div class="pj-quote-card">
+        <div class="pj-quote-top">
+          <div>
+            <span class="badge badge-blue">${p.catName}</span>
+            <h3 style="font-size:15.5px; margin-top:8px;">${p.title}</h3>
+          </div>
+          <span class="status ${p.status==='done'?'done':'progress'}">${p.status==='done'?'종료':'진행중'}</span>
+        </div>
+        <div class="text-muted" style="font-size:13px; margin-bottom:14px;">예산 ₩${p.budget.toLocaleString()} · 마감 ${p.deadline} · 받은 제안 <b>${qCount}</b>건</div>
+        <a class="btn btn-ghost btn-sm" href="quotes.html?pid=${p.id}">받은 제안 보기 →</a>
+      </div>`;
+    }).join('') || '<div class="empty-state"><div class="emoji">📄</div><p>해당 상태의 견적 요청이 없습니다.</p></div>';
+  }
+  render();
+
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.tab-btn[data-filter]');
+    if(btn){ currentFilter = btn.getAttribute('data-filter'); render(); }
+  });
+</script>
+</body>
+</html>

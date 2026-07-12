@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정책 안내 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container" style="max-width:800px;">
+  <h1 class="section-title" style="margin-bottom:20px;">정책 안내</h1>
+  <div class="tabs" data-tabs>
+    <button class="tab-btn active" data-tab-target="p-terms">이용약관</button>
+    <button class="tab-btn" data-tab-target="p-privacy">개인정보처리방침</button>
+    <button class="tab-btn" data-tab-target="p-contract">표준계약서</button>
+    <button class="tab-btn" data-tab-target="p-fee">수수료 정책</button>
+  </div>
+
+  <div class="tab-panel active card pad-24" id="p-terms">
+    <h3 style="font-size:15px; margin-bottom:12px;">이용약관</h3>
+    <p style="font-size:13.5px; line-height:1.9; color:var(--gray-700);">
+      본 약관은 프리웨이(이하 "회사")가 제공하는 프리웨이 중개 서비스의 이용조건 및 절차, 회사와 회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.
+      회원은 서비스 등록, 프로젝트 의뢰, 계약 체결 및 안전결제 이용 시 관련 법령 및 본 약관을 준수해야 합니다. 자세한 조항은 각 항목별 세부 페이지에서 확인하실 수 있습니다.
+    </p>
+  </div>
+  <div class="tab-panel card pad-24" id="p-privacy">
+    <h3 style="font-size:15px; margin-bottom:12px;">개인정보처리방침</h3>
+    <p style="font-size:13.5px; line-height:1.9; color:var(--gray-700);">
+      회사는 회원의 개인정보를 중요시하며, 관련 법령에 따라 개인정보를 안전하게 관리하고 있습니다. 수집하는 개인정보 항목은 이름, 이메일, 연락처, 사업자등록정보(전문가) 등이며,
+      서비스 제공 및 안전결제 처리 목적으로만 이용됩니다. 회원은 언제든지 자신의 개인정보 열람, 정정, 삭제를 요청할 수 있습니다.
+    </p>
+  </div>
+  <div class="tab-panel card pad-24" id="p-contract">
+    <h3 style="font-size:15px; margin-bottom:12px;">표준계약서 안내</h3>
+    <p style="font-size:13.5px; line-height:1.9; color:var(--gray-700); margin-bottom:16px;">
+      프리웨이는 분야별 표준계약서 템플릿을 제공하여 클라이언트와 전문가 간의 분쟁을 예방하고 양측의 권리를 보호합니다. 견적 수락 시 표준계약서가 자동으로 생성되며, 특약사항은 양측 합의 하에 추가할 수 있습니다.
+    </p>
+    <div class="grid-3">
+      <div class="badge badge-blue" style="justify-content:center; padding:10px;">디자인 분야 표준계약서</div>
+      <div class="badge badge-blue" style="justify-content:center; padding:10px;">개발 분야 표준계약서</div>
+      <div class="badge badge-blue" style="justify-content:center; padding:10px;">마케팅 분야 표준계약서</div>
+    </div>
+  </div>
+  <div class="tab-panel card pad-24" id="p-fee">
+    <h3 style="font-size:15px; margin-bottom:12px;">수수료 정책</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>구분</th><th>수수료율</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td>클라이언트 결제 수수료</td><td>3%</td><td>안전결제 이용 시 부과</td></tr>
+          <tr><td>전문가 정산 수수료</td><td>8~15%</td><td>신뢰등급에 따라 차등 적용</td></tr>
+          <tr><td>신규가입 이벤트</td><td>50% 할인</td><td>첫 거래 한정</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>freewayMount();</script>
+</body>
+</html>

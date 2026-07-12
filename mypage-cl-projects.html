@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>진행중인 프로젝트 관리 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .prj-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:20px; margin-bottom:14px; cursor:pointer;}
+  .prj-card:hover{box-shadow:var(--shadow);}
+  .prj-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;}
+  .milestone{display:flex; gap:10px; align-items:flex-start; padding:10px 0;}
+  .milestone .dot{width:10px; height:10px; border-radius:50%; background:var(--green); margin-top:5px; flex-shrink:0;}
+  .milestone.pending .dot{background:var(--gray-300);}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <h1 class="section-title" style="font-size:22px; margin-bottom:20px;">진행중인 프로젝트 관리</h1>
+      <div id="prj-list"></div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="prj-modal">
+  <div class="modal-box" style="max-width:520px;">
+    <button class="modal-close" onclick="closeModal('prj-modal')">✕</button>
+    <h3 id="pm-title"></h3>
+    <div class="progress" style="margin:14px 0;"><div id="pm-progress"></div></div>
+    <div class="trust-strip" style="margin-bottom:16px;">
+      <span class="item">📄 표준계약서 확인 가능</span>
+      <span class="item" id="pm-escrow">🔒 안전결제 예치중</span>
+    </div>
+    <h4 style="font-size:13.5px; margin-bottom:8px;">진행 타임라인</h4>
+    <div id="pm-timeline"></div>
+  </div>
+</div>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('client', 'mypage-cl-projects.html');
+
+  document.getElementById('prj-list').innerHTML = FREEWAY_PROJECTS.map(p=>{
+    const fl = FREEWAY_FREELANCERS.find(f=>f.id===p.freelancerId);
+    return `<div class="prj-card" data-pid="${p.id}">
+      <div class="prj-top">
+        <div><span class="badge badge-blue">${p.catName}</span><h3 style="font-size:15.5px; margin-top:8px;">${p.title}</h3></div>
+        <span class="status ${p.status==='done'?'done':'progress'}">${p.status==='done'?'완료':'진행중'}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--gray-500); margin-bottom:8px;">
+        <span>담당 전문가 · ${fl.name}</span><span>마감 ${p.deadline}</span>
+      </div>
+      <div class="progress"><div style="width:${p.progress}%;"></div></div>
+      <div style="text-align:right; font-size:12px; color:var(--gray-500); margin-top:6px;">${p.progress}% 완료</div>
+    </div>`;
+  }).join('');
+
+  document.addEventListener('click', (e)=>{
+    const card = e.target.closest('.prj-card');
+    if(!card) return;
+    const p = FREEWAY_PROJECTS.find(x=>x.id===card.getAttribute('data-pid'));
+    document.getElementById('pm-title').textContent = p.title;
+    document.getElementById('pm-progress').style.width = p.progress+'%';
+    document.getElementById('pm-escrow').textContent = p.status==='done' ? '🔒 안전결제 지급완료' : '🔒 안전결제 예치중';
+    document.getElementById('pm-timeline').innerHTML = `
+      <div class="milestone"><div class="dot"></div><div>계약 체결 및 안전결제 예치<div class="text-muted" style="font-size:11.5px;">완료</div></div></div>
+      <div class="milestone ${p.progress<50?'pending':''}"><div class="dot"></div><div>1차 시안 전달<div class="text-muted" style="font-size:11.5px;">${p.progress>=50?'완료':'대기중'}</div></div></div>
+      <div class="milestone ${p.progress<100?'pending':''}"><div class="dot"></div><div>최종 납품 및 검수<div class="text-muted" style="font-size:11.5px;">${p.progress>=100?'완료':'대기중'}</div></div></div>`;
+    openModal('prj-modal');
+  });
+</script>
+</body>
+</html>

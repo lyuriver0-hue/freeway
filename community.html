@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>커뮤니티 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .post-row{display:flex; align-items:center; gap:14px; padding:15px 20px; border-bottom:1px solid var(--gray-100);}
+  .post-row .title{flex:1; font-weight:600; font-size:14px;}
+  .post-row .meta{font-size:12px; color:var(--gray-500); white-space:nowrap;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container" style="max-width:800px;">
+  <div class="section-head">
+    <h1 class="section-title">커뮤니티</h1>
+    <button class="btn btn-primary" onclick="openModal('write-modal')">✏️ 글쓰기</button>
+  </div>
+  <div class="tabs" data-tabs>
+    <button class="tab-btn active" data-tab-target="t-all" data-filter="all">전체</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="꿀팁공유">꿀팁공유</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="질문답변">질문답변</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="공지">공지</button>
+  </div>
+  <div class="card" id="post-list"></div>
+</main>
+
+<div class="modal-overlay" id="write-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('write-modal')">✕</button>
+    <h3>글쓰기</h3>
+    <div class="field"><label>카테고리</label>
+      <select id="wr-cat"><option>꿀팁공유</option><option>질문답변</option></select>
+    </div>
+    <div class="field"><label>제목</label><input type="text" id="wr-title" placeholder="제목을 입력하세요"></div>
+    <div class="field"><label>내용</label><textarea id="wr-body" placeholder="내용을 입력하세요"></textarea></div>
+    <button class="btn btn-primary btn-block" id="wr-submit">등록하기</button>
+  </div>
+</div>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount('community');
+  let posts = FREEWAY_COMMUNITY_POSTS.slice();
+  let currentFilter = 'all';
+
+  function render(){
+    const list = posts.filter(p=>currentFilter==='all' || p.cat===currentFilter);
+    document.getElementById('post-list').innerHTML = list.map(p=>`
+      <div class="post-row">
+        <span class="badge badge-gray">${p.cat}</span>
+        <span class="title">${p.title}</span>
+        <span class="meta">${p.author} · ${p.date} · 조회 ${p.views} · 댓글 ${p.comments}</span>
+      </div>`).join('') || '<div class="empty-state"><p>게시물이 없습니다.</p></div>';
+  }
+  render();
+
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.tab-btn[data-filter]');
+    if(btn){ currentFilter = btn.getAttribute('data-filter'); render(); }
+  });
+
+  document.getElementById('wr-submit').addEventListener('click', ()=>{
+    const title = document.getElementById('wr-title').value.trim();
+    if(!title){ FreewayStore.toast('제목을 입력해주세요'); return; }
+    posts.unshift({id:'new'+Date.now(), cat: document.getElementById('wr-cat').value, title, author:'나', date:'2026-07-05', views:0, comments:0});
+    render();
+    closeModal('write-modal');
+    document.getElementById('wr-title').value=''; document.getElementById('wr-body').value='';
+    FreewayStore.toast('게시글이 등록되었습니다');
+  });
+</script>
+</body>
+</html>

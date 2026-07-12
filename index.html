@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프리웨이 | 필요한 전문가를 가장 안전하고 빠르게</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .hero{background:radial-gradient(1100px 460px at 85% -10%, #DBEAFE 0%, rgba(255,255,255,0) 60%), #fff; padding:64px 0 56px;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:48px; align-items:center;}
+  .hero-badge{display:inline-flex; align-items:center; gap:8px; background:var(--primary-light); color:var(--primary-dark); font-weight:700; font-size:13px; padding:8px 14px; border-radius:100px; margin-bottom:20px;}
+  .hero h1{font-size:44px; line-height:1.25; margin-bottom:18px;}
+  .hero h1 .hl{color:var(--primary);}
+  .hero p.lead{font-size:16.5px; color:var(--gray-500); max-width:520px; margin-bottom:26px;}
+  .search-box{background:#fff; border:1px solid var(--gray-300); border-radius:14px; padding:8px; display:flex; gap:8px; box-shadow:var(--shadow); margin-bottom:16px;}
+  .search-box input{flex:1; border:none; outline:none; padding:12px 14px; font-size:15px; background:transparent;}
+  .search-tags{display:flex; gap:8px; flex-wrap:wrap; font-size:12.5px; color:var(--gray-500); margin-bottom:28px;}
+  .search-tags span{padding:6px 12px; border:1px solid var(--gray-300); border-radius:100px; cursor:pointer;}
+  .search-tags span:hover{border-color:var(--primary); color:var(--primary);}
+  .hero-stats{display:flex; gap:32px; flex-wrap:wrap;}
+  .hero-stats div b{display:block; font-size:23px; font-weight:900; color:var(--ink);}
+  .hero-stats div span{font-size:12.5px; color:var(--gray-500);}
+  .hero-card{background:#fff; border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:22px; border:1px solid var(--gray-200); position:relative;}
+  .hero-card .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .task-row{display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-top:1px dashed var(--gray-200);}
+  .task-row:first-of-type{border-top:none;}
+  .task-row .who{display:flex; gap:10px; align-items:center;}
+  .task-row .name{font-weight:700; font-size:13.5px;}
+  .task-row .sub{font-size:11.5px; color:var(--gray-500);}
+  .task-row .price{font-weight:800; font-size:13.5px;}
+  .floating-badge{position:absolute; background:#fff; border-radius:12px; box-shadow:var(--shadow); padding:10px 14px; display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700;}
+  .fb-1{top:-18px; right:-14px; color:var(--green-dark);}
+  .fb-2{bottom:-16px; left:-18px; color:var(--primary);}
+  .dot{width:7px; height:7px; border-radius:50%; background:currentColor;}
+
+  .why-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+  .why-card{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:26px 22px; transition:.2s;}
+  .why-card:hover{box-shadow:var(--shadow); transform:translateY(-3px); border-color:var(--gray-300);}
+  .why-icon{width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:16px; background:var(--primary-light);}
+  .why-card h3{font-size:16px; margin-bottom:7px;}
+  .why-card p{font-size:13.5px; color:var(--gray-500); line-height:1.6;}
+
+  .cat-section{background:#fff; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200);}
+  .cat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .cat-card{background:var(--gray-50); border-radius:14px; padding:22px 18px; border:1px solid var(--gray-200); transition:.2s; cursor:pointer;}
+  .cat-card:hover{border-color:var(--primary); background:#fff; box-shadow:var(--shadow); transform:translateY(-3px);}
+  .cat-emoji{font-size:24px; margin-bottom:10px;}
+  .cat-card h4{font-size:14.5px; margin-bottom:3px;}
+  .cat-card span{font-size:11.5px; color:var(--gray-500);}
+
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+  .step{padding:24px 20px; background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius);}
+  .step .num{width:34px; height:34px; border-radius:10px; background:var(--ink); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; margin-bottom:14px; font-size:14px;}
+  .step h4{font-size:15px; margin-bottom:7px;}
+  .step p{font-size:13px; color:var(--gray-500); line-height:1.6;}
+
+  .trust-section{background:linear-gradient(135deg,#0F172A,#1E3A8A); color:#fff; border-radius:24px; padding:56px 48px;}
+  .trust-section .section-tag{background:rgba(255,255,255,0.12); color:#BFDBFE;}
+  .trust-section h2{color:#fff;}
+  .trust-section .section-sub{color:#CBD5E1;}
+  .trust-grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:36px;}
+  .trust-card{background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); border-radius:16px; padding:24px;}
+  .trust-card .why-icon{background:rgba(255,255,255,0.12);}
+  .trust-card h3{color:#fff; font-size:16px; margin-bottom:7px;}
+  .trust-card p{color:#CBD5E1; font-size:13.5px; line-height:1.6;}
+
+  .pro-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
+  .pro-card{border:1px solid var(--gray-200); border-radius:var(--radius); padding:22px; transition:.2s; background:#fff;}
+  .pro-card:hover{box-shadow:var(--shadow); transform:translateY(-3px);}
+  .pro-top{display:flex; gap:13px; align-items:center; margin-bottom:14px;}
+  .pro-name{font-size:15.5px; font-weight:800; display:flex; align-items:center; gap:5px;}
+  .pro-role{font-size:12.5px; color:var(--gray-500);}
+  .pro-rating{font-size:12.5px; color:var(--amber); font-weight:700; margin-top:2px;}
+  .pro-tags{display:flex; flex-wrap:wrap; gap:6px; margin:12px 0;}
+  .pro-tags span{background:var(--gray-100); font-size:11px; font-weight:600; color:var(--gray-700); padding:5px 10px; border-radius:100px;}
+  .pro-foot{display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--gray-200); padding-top:13px; margin-top:4px;}
+  .pro-price b{font-size:17px; color:var(--ink);}
+  .pro-price span{font-size:11.5px; color:var(--gray-500); display:block;}
+
+  .review-section{background:var(--gray-50);}
+  .review-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .review-card{background:#fff; border-radius:var(--radius); padding:24px; border:1px solid var(--gray-200);}
+  .review-card p.txt{font-size:14px; color:var(--gray-700); line-height:1.7; margin:12px 0 18px;}
+  .review-who b{display:block; font-size:13.5px;}
+  .review-who span{font-size:11.5px; color:var(--gray-500);}
+
+  .cta-banner{background:linear-gradient(135deg,var(--primary),#1E40AF); border-radius:24px; padding:56px; text-align:center; color:#fff;}
+  .cta-banner h2{color:#fff; font-size:30px; margin-bottom:12px;}
+  .cta-banner p{color:#DBEAFE; font-size:15px; margin-bottom:26px;}
+  .cta-actions{display:flex; gap:12px; justify-content:center;}
+  .cta-banner .btn-ghost{background:transparent; border-color:rgba(255,255,255,0.5); color:#fff;}
+  .cta-banner .btn-ghost:hover{background:rgba(255,255,255,0.15); border-color:#fff;}
+  .cta-banner .btn-primary{background:#fff; color:var(--primary);}
+  .cta-banner .btn-primary:hover{background:#EFF6FF;}
+
+  @media (max-width:960px){
+    .hero-grid{grid-template-columns:1fr;}
+    .why-grid, .cat-grid{grid-template-columns:repeat(2,1fr);}
+    .steps, .trust-grid3, .pro-grid, .review-grid{grid-template-columns:1fr;}
+    .trust-section, .cta-banner{padding:40px 24px;}
+  }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="hero-badge">🚀 국내 최다 분야 통합 아웃소싱 플랫폼</span>
+      <h1>필요한 전문가를,<br><span class="hl">가장 안전하고 빠르게</span><br>연결합니다</h1>
+      <p class="lead">기업·소상공인의 채용 부담은 줄이고, 프리랜서의 안정적인 수익은 늘리는 프리웨이. 표준계약서와 안전결제로 첫 거래도 안심하세요.</p>
+
+      <form class="search-box" onsubmit="event.preventDefault(); location.href='search.html?q='+encodeURIComponent(this.q.value);">
+        <input name="q" type="text" placeholder="예: 로고 디자인, 쇼핑몰 개발, 영상 편집...">
+        <button class="btn btn-primary" type="submit">전문가 찾기</button>
+      </form>
+      <div class="search-tags">
+        <span onclick="location.href='search.html?q=홈페이지 제작'">홈페이지 제작</span>
+        <span onclick="location.href='search.html?q=브랜드 디자인'">브랜드 디자인</span>
+        <span onclick="location.href='search.html?q=앱 개발'">앱 개발</span>
+        <span onclick="location.href='search.html?q=번역'">번역</span>
+      </div>
+
+      <div class="hero-actions" style="margin:0 0 28px; display:flex; gap:12px;">
+        <a href="project-register.html" class="btn btn-primary">프로젝트 무료로 등록하기</a>
+        <a href="signup.html" class="btn btn-ghost">전문가로 지원하기</a>
+      </div>
+
+      <div class="hero-stats">
+        <div><b>32,400+</b><span>등록 전문가</span></div>
+        <div><b>18,900+</b><span>누적 프로젝트</span></div>
+        <div><b>4.8 / 5</b><span>평균 만족도</span></div>
+        <div><b>120+</b><span>서비스 카테고리</span></div>
+      </div>
+    </div>
+
+    <div class="hero-visual" style="position:relative;">
+      <div class="floating-badge fb-1"><span class="dot"></span> 안전결제 완료</div>
+      <div class="hero-card">
+        <div class="top"><h4 style="font-size:14.5px;">진행중인 프로젝트</h4><span class="status done">계약 체결됨</span></div>
+        <div class="task-row"><div class="who"><div class="avatar">디</div><div><div class="name">브랜드 로고 디자인</div><div class="sub">디자인 전문가 · 김수현</div></div></div><div class="price">₩450,000</div></div>
+        <div class="task-row"><div class="who"><div class="avatar">개</div><div><div class="name">쇼핑몰 웹사이트 개발</div><div class="sub">개발 전문가 · 박지훈</div></div></div><div class="price">₩3,200,000</div></div>
+        <div class="task-row"><div class="who"><div class="avatar">마</div><div><div class="name">SNS 마케팅 대행</div><div class="sub">마케팅 전문가 · 이하늘</div></div></div><div class="price">₩800,000 /월</div></div>
+      </div>
+      <div class="floating-badge fb-2"><span class="dot"></span> 표준계약서 자동생성</div>
+    </div>
+  </div>
+</section>
+
+<section id="why" class="page" style="padding-top:16px;">
+  <div class="container">
+    <div class="section-head center">
+      <span class="section-tag">WHY FREEWAY</span>
+      <h2 class="section-title">왜 프리웨이가 필요할까요?</h2>
+      <p class="section-sub">직접 채용의 부담 없이, 필요할 때 필요한 만큼 전문성을 연결합니다.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-icon">💰</div><h3>비용 &amp; 시간 절약</h3><p>높은 인건비 부담 없이 필요한 전문분야만 외주로 해결해 비용과 채용 시간을 함께 줄여요.</p></div>
+      <div class="why-card"><div class="why-icon">🤝</div><h3>손쉬운 매칭</h3><p>웹·모바일에서 몇 번의 클릭만으로 B2B, B2C 전문 인력과 서비스를 빠르게 연결합니다.</p></div>
+      <div class="why-card"><div class="why-icon">🛡️</div><h3>신뢰 &amp; 안전장치</h3><p>가격 공개형 투명 견적, 표준계약서, 안전결제 시스템으로 양측 모두를 보호합니다.</p></div>
+      <div class="why-card"><div class="why-icon">🎯</div><h3>핵심 역량 집중</h3><p>비핵심 업무는 외주로, 기업은 필요한 순간 전문 인력을 확보해 핵심 사업에 집중해요.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="categories" class="cat-section page">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">CATEGORY</span>
+        <h2 class="section-title">분야별 독점 없이, 하나의 플랫폼에서</h2>
+        <p class="section-sub">기존 국내 플랫폼들의 분야별 독점 구조를 벗어나, 다양한 전문분야를 카테고리로 통합해 더 낮은 수수료로 제공합니다.</p>
+      </div>
+      <a href="category.html" class="btn btn-ghost btn-sm">카테고리 전체보기 →</a>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+</section>
+
+<section id="pros" class="page">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">TOP PROFESSIONALS</span>
+        <h2 class="section-title">지금 활동 중인 인기 전문가</h2>
+        <p class="section-sub">투명하게 공개된 가격과 리뷰를 확인하고 바로 문의해보세요.</p>
+      </div>
+      <a href="search.html" class="btn btn-ghost btn-sm">전문가 전체보기 →</a>
+    </div>
+    <div class="pro-grid" id="pro-grid"></div>
+  </div>
+</section>
+
+<section id="new-projects" class="page" style="background:var(--gray-50);">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">NEW &amp; POPULAR</span>
+        <h2 class="section-title">신규 &amp; 인기 서비스</h2>
+        <p class="section-sub">최근 등록되었거나 클라이언트들이 가장 많이 찾은 서비스입니다.</p>
+      </div>
+      <a href="category.html" class="btn btn-ghost btn-sm">전체 서비스 보기 →</a>
+    </div>
+    <div class="svc-grid" id="svc-grid"></div>
+  </div>
+</section>
+
+<section id="how" class="page">
+  <div class="container">
+    <div class="section-head center">
+      <span class="section-tag">HOW IT WORKS</span>
+      <h2 class="section-title">4단계면 충분합니다</h2>
+      <p class="section-sub">프로젝트 등록부터 안전한 완료까지, 복잡한 절차 없이 진행하세요.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="num">01</div><h4>프로젝트 등록</h4><p>필요한 업무와 예산, 일정을 등록하면 맞춤 전문가가 자동으로 매칭돼요.</p></div>
+      <div class="step"><div class="num">02</div><h4>견적 비교</h4><p>공개된 가격과 포트폴리오를 투명하게 비교하고 원하는 전문가를 선택하세요.</p></div>
+      <div class="step"><div class="num">03</div><h4>표준계약 &amp; 안전결제</h4><p>표준계약서로 조건을 확정하고, 에스크로 방식의 안전결제로 대금을 예치해요.</p></div>
+      <div class="step"><div class="num">04</div><h4>완료 &amp; 정산</h4><p>결과물 확인 후 대금이 정산되고, 리뷰를 남기며 신뢰를 함께 쌓아가요.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="trust" class="page">
+  <div class="container">
+    <div class="trust-section">
+      <span class="section-tag green">TRUST &amp; SAFETY</span>
+      <h2 class="section-title">신뢰할 수 있는 거래를 위한 안전장치</h2>
+      <p class="section-sub">가격 비공개 관행 대신, 투명한 정보와 확실한 제도로 기업과 프리랜서 모두를 보호합니다.</p>
+      <div class="trust-grid3">
+        <div class="trust-card"><div class="why-icon">🏷️</div><h3>투명 가격 공개</h3><p>서비스 가격을 플랫폼에 직접 공개해 합리적인 가격 경쟁과 신뢰를 동시에 확보해요.</p></div>
+        <div class="trust-card"><div class="why-icon">📄</div><h3>표준계약서 제공</h3><p>분야별 표준 계약 템플릿으로 분쟁 소지를 줄이고 양측의 권리를 명확히 보장합니다.</p></div>
+        <div class="trust-card"><div class="why-icon">🔒</div><h3>안전결제 시스템</h3><p>결과물 확인 전까지 대금을 예치하는 에스크로 결제로 먹튀·미지급 걱정을 없앴어요.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="review-section page">
+  <div class="container">
+    <div class="section-head center">
+      <span class="section-tag">REVIEW</span>
+      <h2 class="section-title">먼저 경험한 고객들의 이야기</h2>
+    </div>
+    <div class="review-grid" id="review-grid"></div>
+  </div>
+</section>
+
+<section class="page">
+  <div class="container">
+    <div class="cta-banner">
+      <h2>지금 바로 필요한 전문가를 찾아보세요</h2>
+      <p>등록은 무료이며, 첫 프로젝트는 안전결제 수수료 할인 혜택을 드립니다.</p>
+      <div class="cta-actions">
+        <a href="project-register.html" class="btn btn-primary">프로젝트 등록하기</a>
+        <a href="signup.html" class="btn btn-ghost">전문가로 지원하기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+
+  document.getElementById('cat-grid').innerHTML = FREEWAY_CATEGORIES.slice(0,8).map(c=>`
+    <a class="cat-card" href="category.html?cat=${c.id}">
+      <div class="cat-emoji">${c.emoji}</div>
+      <h4>${c.name}</h4>
+      <span>${c.desc}</span>
+    </a>`).join('');
+
+  document.getElementById('pro-grid').innerHTML = FREEWAY_FREELANCERS.slice(0,3).map(f=>`
+    <a class="pro-card" href="freelancer.html?id=${f.id}">
+      <div class="pro-top">
+        <div class="avatar lg">${f.avatar}</div>
+        <div>
+          <div class="pro-name">${f.name} ${f.verified? '<span class="verified">✔</span>':''}</div>
+          <div class="pro-role">${f.role} · ${f.career}</div>
+          <div class="pro-rating">★★★★★ ${f.rating} (${f.reviews})</div>
+        </div>
+      </div>
+      <div class="pro-tags">${f.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+      <div class="pro-foot">
+        <div class="pro-price"><b>₩${f.price.toLocaleString()}~</b><span>프로젝트 기준</span></div>
+        <span class="btn btn-ghost btn-sm">문의하기</span>
+      </div>
+    </a>`).join('');
+
+  const boostedFirstServices = FREEWAY_SERVICES.slice().sort((a,b)=> (FreewayStore.isBoosted(b.id)?1:0) - (FreewayStore.isBoosted(a.id)?1:0));
+  document.getElementById('svc-grid').innerHTML = boostedFirstServices.slice(0,4).map(s=>`
+    <a class="svc-card ${FreewayStore.isBoosted(s.id)?'is-boosted':''}" href="service-detail.html?id=${s.id}">
+      <div class="svc-thumb">${s.thumb}
+        ${FreewayStore.isBoosted(s.id)?'<span class="svc-boost-badge">🚀 상위노출</span>':''}
+        <button class="svc-heart" data-fav-id="${s.id}">♥</button>
+      </div>
+      <div class="svc-body">
+        <div class="svc-cat">${s.catName}</div>
+        <div class="svc-title">${s.title}</div>
+        <div class="svc-pro"><span class="avatar" style="width:20px;height:20px;font-size:10px;border-radius:6px;">${FREEWAY_FREELANCERS.find(f=>f.id===s.freelancerId).avatar}</span> ${FREEWAY_FREELANCERS.find(f=>f.id===s.freelancerId).name}</div>
+        <div class="svc-foot">
+          <span class="svc-rating">★ ${s.rating} <span>(${s.reviews})</span></span>
+          <span class="svc-price">₩${s.price.toLocaleString()}<small> ~</small></span>
+        </div>
+      </div>
+    </a>`).join('');
+  initFavoriteButtons();
+
+  document.getElementById('review-grid').innerHTML = FREEWAY_REVIEWS.map(r=>`
+    <div class="review-card">
+      <div class="stars">${'★'.repeat(r.rating)}</div>
+      <p class="txt">"${r.text}"</p>
+      <div class="review-who" style="display:flex; align-items:center; gap:10px;">
+        <div class="avatar">${r.name[0]}</div>
+        <div><b>${r.name}</b><span>${r.role}</span></div>
+      </div>
+    </div>`).join('');
+</script>
+</body>
+</html>

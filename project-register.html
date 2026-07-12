@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로젝트 등록 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .wizard-wrap{max-width:680px; margin:0 auto;}
+  .cat-pick{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+  .cat-pick-item{border:1.5px solid var(--gray-200); border-radius:12px; padding:16px 10px; text-align:center; cursor:pointer; font-size:13px; font-weight:600;}
+  .cat-pick-item:hover{border-color:var(--primary);}
+  .cat-pick-item.selected{border-color:var(--primary); background:var(--primary-light); color:var(--primary-dark);}
+  .cat-pick-item .e{font-size:22px; display:block; margin-bottom:8px;}
+  .review-box{background:var(--gray-50); border-radius:12px; padding:18px; font-size:13.5px; line-height:2;}
+  .review-box b{color:var(--gray-900);}
+  @media (max-width:640px){ .cat-pick{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container wizard-wrap">
+  <h1 class="section-title" style="text-align:center;">프로젝트 등록</h1>
+  <p class="section-sub" style="text-align:center; margin:0 auto 32px;">필요한 업무 내용을 등록하면 맞춤 전문가들의 제안을 받을 수 있어요.</p>
+
+  <div class="stepbar">
+    <div class="step-item active" data-step="0"><div class="circle">1</div><div class="label">카테고리</div></div>
+    <div class="line"></div>
+    <div class="step-item" data-step="1"><div class="circle">2</div><div class="label">상세내용</div></div>
+    <div class="line"></div>
+    <div class="step-item" data-step="2"><div class="circle">3</div><div class="label">예산·일정</div></div>
+    <div class="line"></div>
+    <div class="step-item" data-step="3"><div class="circle">4</div><div class="label">확인 및 등록</div></div>
+  </div>
+
+  <div class="card pad-24">
+    <div class="wizard-panel active" data-panel="0">
+      <h3 style="font-size:15.5px; margin-bottom:16px;">어떤 분야의 전문가가 필요하신가요?</h3>
+      <div class="cat-pick" id="cat-pick"></div>
+      <div class="wizard-actions" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-0" disabled>다음</button>
+      </div>
+    </div>
+
+    <div class="wizard-panel" data-panel="1">
+      <div class="field"><label>프로젝트 제목</label><input type="text" id="pj-title" placeholder="예: 스타트업 브랜드 로고 디자인 의뢰"></div>
+      <div class="field"><label>상세 요구사항</label><textarea id="pj-desc" placeholder="필요한 작업 범위, 참고 자료, 원하는 스타일 등을 자세히 적어주세요."></textarea></div>
+      <div class="field"><label>참고 파일 첨부 (선택)</label><input type="file" id="pj-file"></div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="0">이전</button>
+        <button class="btn btn-primary" id="btn-1">다음</button>
+      </div>
+    </div>
+
+    <div class="wizard-panel" data-panel="2">
+      <div class="row-2">
+        <div class="field"><label>예산 (원)</label><input type="number" id="pj-budget" placeholder="500000"></div>
+        <div class="field"><label>희망 마감일</label><input type="date" id="pj-deadline"></div>
+      </div>
+      <div class="hint" style="margin-top:-8px; margin-bottom:16px;">예산은 예상 범위이며, 전문가 제안에 따라 조정될 수 있습니다.</div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="1">이전</button>
+        <button class="btn btn-primary" id="btn-2">다음</button>
+      </div>
+    </div>
+
+    <div class="wizard-panel" data-panel="3">
+      <h3 style="font-size:15.5px; margin-bottom:14px;">등록 내용을 확인해주세요</h3>
+      <div class="review-box" id="review-box"></div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="2">이전</button>
+        <button class="btn btn-primary" id="btn-submit">프로젝트 등록하기</button>
+      </div>
+    </div>
+
+    <div class="wizard-panel" data-panel="4">
+      <div style="text-align:center; padding:20px 0;">
+        <div style="font-size:44px; margin-bottom:14px;">🚀</div>
+        <h3 style="margin-bottom:8px;">프로젝트가 등록되었습니다!</h3>
+        <p class="text-muted" style="margin-bottom:24px;">전문가들의 제안을 기다리는 중이에요. 제안이 도착하면 알림으로 안내해드릴게요.</p>
+        <a href="quotes.html" class="btn btn-primary btn-lg">받은 제안 확인하러 가기</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount('project');
+  document.getElementById('cat-pick').innerHTML = FREEWAY_CATEGORIES.map(c=>`
+    <div class="cat-pick-item" data-cat="${c.id}"><span class="e">${c.emoji}</span>${c.name}</div>`).join('');
+
+  let selectedCat = null;
+  document.querySelectorAll('.cat-pick-item').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.cat-pick-item').forEach(o=>o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedCat = el.getAttribute('data-cat');
+      document.getElementById('btn-0').disabled = false;
+    });
+  });
+
+  function goStep(n){
+    document.querySelectorAll('.wizard-panel').forEach(p=>p.classList.toggle('active', +p.getAttribute('data-panel')===n));
+    document.querySelectorAll('.step-item').forEach(s=>{
+      const idx = +s.getAttribute('data-step');
+      s.classList.toggle('active', idx===n);
+      s.classList.toggle('done', idx<n);
+    });
+  }
+
+  document.getElementById('btn-0').addEventListener('click', ()=>goStep(1));
+  document.getElementById('btn-1').addEventListener('click', ()=>{
+    if(!document.getElementById('pj-title').value.trim()){ FreewayStore.toast('프로젝트 제목을 입력해주세요'); return; }
+    goStep(2);
+  });
+  document.getElementById('btn-2').addEventListener('click', ()=>{
+    const budget = document.getElementById('pj-budget').value;
+    if(!budget){ FreewayStore.toast('예산을 입력해주세요'); return; }
+    const cat = FREEWAY_CATEGORIES.find(c=>c.id===selectedCat);
+    document.getElementById('review-box').innerHTML = `
+      <div><b>카테고리</b> · ${cat.emoji} ${cat.name}</div>
+      <div><b>제목</b> · ${document.getElementById('pj-title').value}</div>
+      <div><b>예산</b> · ₩${Number(budget).toLocaleString()}</div>
+      <div><b>마감일</b> · ${document.getElementById('pj-deadline').value || '협의 가능'}</div>`;
+    goStep(3);
+  });
+  document.querySelectorAll('[data-back]').forEach(btn=>btn.addEventListener('click', ()=>goStep(+btn.getAttribute('data-back'))));
+  document.getElementById('btn-submit').addEventListener('click', ()=>{
+    FreewayStore.toast('프로젝트가 등록되었습니다!');
+    goStep(4);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>포트폴리오 상세 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .pf-main{aspect-ratio:16/9; background:linear-gradient(135deg,var(--primary-light),#E0F2FE); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:90px; cursor:zoom-in; margin-bottom:12px;}
+  .pf-thumbs{display:flex; gap:10px;}
+  .pf-thumbs div{width:72px; height:56px; border-radius:8px; background:var(--gray-100); display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; border:2px solid transparent;}
+  .pf-thumbs div.active{border-color:var(--primary);}
+  .lightbox{position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:3000; font-size:140px; color:#fff;}
+  .lightbox.open{display:flex;}
+  .lightbox .lb-close{position:absolute; top:24px; right:32px; font-size:28px; cursor:pointer; color:#fff;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container" style="max-width:900px;">
+  <div class="breadcrumb"><a href="index.html">홈</a> / <span>포트폴리오 상세</span></div>
+
+  <div class="pf-main" id="pf-main" onclick="openModal('lightbox')">🖼️</div>
+  <div class="pf-thumbs" id="pf-thumbs"></div>
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:24px; flex-wrap:wrap; gap:12px;">
+    <div>
+      <h1 style="font-size:22px; margin-bottom:8px;" id="pf-title">포트폴리오 프로젝트</h1>
+      <div class="text-muted" style="font-size:13px;" id="pf-period">작업기간 · 2026.05 ~ 2026.06</div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn-icon" id="pf-like">♥</button>
+      <button class="btn-icon" onclick="FreewayStore.toast('링크가 복사되었습니다')">🔗</button>
+    </div>
+  </div>
+
+  <p style="font-size:14.5px; line-height:1.9; color:var(--gray-700); margin:16px 0;">
+    본 프로젝트는 클라이언트의 브랜드 아이덴티티를 재정립하기 위해 진행되었으며, 리서치부터 최종 산출물 납품까지 표준계약서 기반으로 투명하게 진행되었습니다.
+    안전결제 시스템을 통해 각 단계별 검수 및 정산이 이루어졌습니다.
+  </p>
+  <div id="pf-tags" style="margin-bottom:24px;"></div>
+
+  <div class="card pad-24" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+    <div style="display:flex; gap:12px; align-items:center;">
+      <div class="avatar lg" id="pf-avatar"></div>
+      <div>
+        <div style="font-weight:700;" id="pf-fl-name"></div>
+        <div class="text-muted" style="font-size:12.5px;" id="pf-fl-role"></div>
+      </div>
+    </div>
+    <a href="#" class="btn btn-primary" id="pf-svc-link">관련 서비스 보기</a>
+  </div>
+</main>
+
+<div class="lightbox" id="lightbox">
+  <span class="lb-close" onclick="closeModal('lightbox')">✕</span>
+  <span id="lb-emoji">🖼️</span>
+</div>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  const params = new URLSearchParams(location.search);
+  const fl = FREEWAY_FREELANCERS[0];
+  const svc = FREEWAY_SERVICES.find(s=>s.freelancerId===fl.id);
+  const emojis = ['🖼️','🖌️','📐','🧩'];
+
+  document.getElementById('pf-title').textContent = `${fl.name}의 ${svc.catName} 포트폴리오`;
+  document.getElementById('pf-tags').innerHTML = fl.tags.map(t=>`<span class="badge badge-blue" style="margin-right:6px;">${t}</span>`).join('');
+  document.getElementById('pf-avatar').textContent = fl.avatar;
+  document.getElementById('pf-fl-name').textContent = fl.name;
+  document.getElementById('pf-fl-role').textContent = fl.role + ' · ' + fl.career;
+  document.getElementById('pf-svc-link').href = `service-detail.html?id=${svc.id}`;
+  document.getElementById('pf-like').setAttribute('data-fav-id', params.get('id') || 'p1');
+
+  document.getElementById('pf-thumbs').innerHTML = emojis.map((e,i)=>`<div data-i="${i}" class="${i===0?'active':''}">${e}</div>`).join('');
+  document.addEventListener('click', (e)=>{
+    const t = e.target.closest('#pf-thumbs div');
+    if(!t) return;
+    document.querySelectorAll('#pf-thumbs div').forEach(d=>d.classList.remove('active'));
+    t.classList.add('active');
+    const emoji = emojis[+t.getAttribute('data-i')];
+    document.getElementById('pf-main').textContent = emoji;
+    document.getElementById('lb-emoji').textContent = emoji;
+  });
+
+  initFavoriteButtons();
+</script>
+</body>
+</html>

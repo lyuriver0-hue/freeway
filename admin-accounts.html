@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>계정 권한 관리 | FREEWAY 내부 시스템</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body class="admin-body">
+<div class="admin-topbar">
+  <span>FREEWAY 관리자 시스템</span>
+  <div class="admin-who">
+    <span id="admin-who-text"></span>
+    <button onclick="AdminStore.logout(); location.href='admin-login.html';">로그아웃</button>
+  </div>
+</div>
+
+<div class="admin-wrap">
+  <div class="admin-panel">
+    <div class="admin-panel-head">
+      <h1>계정 권한 관리</h1>
+      <div class="actions">
+        <button class="admin-btn" id="btn-add-role">계정 추가</button>
+        <button class="admin-btn dark" id="btn-close">닫기</button>
+      </div>
+    </div>
+    <div id="role-list"></div>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/admin-data.js"></script>
+<script>
+  AdminStore.requireAuth();
+  const session = AdminStore.getSession();
+  if(session) document.getElementById('admin-who-text').textContent = `${session.name} (${session.email})`;
+
+  function groupState(role, group){
+    const keys = group.items.map(i=>i.key);
+    const checkedCount = keys.filter(k=>role.permissions.includes(k)).length;
+    return {all: checkedCount===keys.length, some: checkedCount>0 && checkedCount<keys.length};
+  }
+
+  function render(){
+    document.getElementById('role-list').innerHTML = ADMIN_ROLES.map(role=>`
+      <div class="role-acc ${role.open?'open':''}" data-role-id="${role.id}">
+        <div class="role-acc-head" data-toggle="${role.id}">
+          <span>${role.name}</span>
+          <span class="chev">⌄</span>
+        </div>
+        <div class="role-acc-body">
+          <div class="role-name-row">
+            <span class="rn-label">권한 명칭</span>
+            <input type="text" class="rn-input" value="${role.name}">
+            <button class="admin-btn gray" data-del="${role.id}">권한 삭제</button>
+            <span class="spacer"></span>
+            <button class="admin-btn primary" data-save="${role.id}">저장</button>
+          </div>
+          ${ADMIN_PERMISSION_GROUPS.map(group=>{
+            const st = groupState(role, group);
+            return `
+            <div class="perm-row">
+              <label class="perm-group-label">
+                <input type="checkbox" class="group-checkbox" data-role="${role.id}" data-group="${group.key}" ${st.all?'checked':''} ${st.some && !st.all ? 'data-indeterminate="1"':''}>
+                ${group.label}
+              </label>
+              <div class="perm-items">
+                ${group.items.map(item=>`
+                  <label class="perm-item">
+                    <input type="checkbox" class="item-checkbox" data-role="${role.id}" data-item="${item.key}" data-group="${group.key}" ${role.permissions.includes(item.key)?'checked':''}>
+                    ${item.label}
+                  </label>`).join('')}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+
+    document.querySelectorAll('.group-checkbox[data-indeterminate="1"]').forEach(cb=>{ cb.indeterminate = true; });
+  }
+  render();
+
+  document.addEventListener('click', (e)=>{
+    const head = e.target.closest('.role-acc-head');
+    if(head){
+      const acc = head.closest('.role-acc');
+      const role = ADMIN_ROLES.find(r=>r.id===acc.getAttribute('data-role-id'));
+      role.open = !acc.classList.contains('open');
+      acc.classList.toggle('open');
+      return;
+    }
+    const delBtn = e.target.closest('[data-del]');
+    if(delBtn){
+      const id = delBtn.getAttribute('data-del');
+      const role = ADMIN_ROLES.find(r=>r.id===id);
+      ADMIN_ROLES = ADMIN_ROLES.filter(r=>r.id!==id);
+      render();
+      FreewayStore.toast(`'${role.name}' 권한이 삭제되었습니다`);
+      return;
+    }
+    const saveBtn = e.target.closest('[data-save]');
+    if(saveBtn){
+      const id = saveBtn.getAttribute('data-save');
+      const role = ADMIN_ROLES.find(r=>r.id===id);
+      const input = saveBtn.closest('.role-acc-body').querySelector('.rn-input');
+      role.name = input.value.trim() || role.name;
+      render();
+      document.querySelector(`.role-acc[data-role-id="${id}"]`).classList.add('open');
+      FreewayStore.toast(`'${role.name}' 권한이 저장되었습니다`);
+      return;
+    }
+    const addBtn = e.target.closest('#btn-add-role');
+    if(addBtn){
+      const newRole = {id:'r'+Date.now(), name:'새 권한', open:true, permissions:[]};
+      ADMIN_ROLES.push(newRole);
+      render();
+      FreewayStore.toast('새 권한이 추가되었습니다. 명칭과 권한을 설정 후 저장해주세요.');
+      return;
+    }
+    const closeBtn = e.target.closest('#btn-close');
+    if(closeBtn){ location.href = 'admin-dashboard.html'; return; }
+  });
+
+  document.addEventListener('change', (e)=>{
+    const itemCb = e.target.closest('.item-checkbox');
+    if(itemCb){
+      const role = ADMIN_ROLES.find(r=>r.id===itemCb.getAttribute('data-role'));
+      const key = itemCb.getAttribute('data-item');
+      if(itemCb.checked){ if(!role.permissions.includes(key)) role.permissions.push(key); }
+      else{ role.permissions = role.permissions.filter(k=>k!==key); }
+      render();
+      return;
+    }
+    const groupCb = e.target.closest('.group-checkbox');
+    if(groupCb){
+      const role = ADMIN_ROLES.find(r=>r.id===groupCb.getAttribute('data-role'));
+      const group = ADMIN_PERMISSION_GROUPS.find(g=>g.key===groupCb.getAttribute('data-group'));
+      const keys = group.items.map(i=>i.key);
+      if(groupCb.checked){ keys.forEach(k=>{ if(!role.permissions.includes(k)) role.permissions.push(k); }); }
+      else{ role.permissions = role.permissions.filter(k=>!keys.includes(k)); }
+      render();
+    }
+  });
+</script>
+</body>
+</html>

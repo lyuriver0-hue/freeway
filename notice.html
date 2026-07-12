@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공지사항 · 이벤트 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .notice-row{display:flex; align-items:center; gap:16px; padding:16px 20px; border-bottom:1px solid var(--gray-100); cursor:pointer;}
+  .notice-row:hover{background:var(--gray-50);}
+  .notice-row .title{flex:1; font-weight:600; font-size:14px;}
+  .notice-row .meta{font-size:12px; color:var(--gray-500); white-space:nowrap;}
+  .notice-detail{display:none; padding:20px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); font-size:13.5px; line-height:1.8; color:var(--gray-700);}
+  .notice-detail.open{display:block;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container" style="max-width:800px;">
+  <h1 class="section-title" style="margin-bottom:20px;">공지사항 · 이벤트</h1>
+  <div class="tabs" data-tabs>
+    <button class="tab-btn active" data-tab-target="t-all" data-filter="all">전체</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="공지">공지</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="이벤트">이벤트</button>
+  </div>
+  <div class="card" id="notice-list"></div>
+</main>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  let currentFilter = 'all';
+  let openId = null;
+
+  function render(){
+    const list = FREEWAY_NOTICES.filter(n=>currentFilter==='all' || n.tag===currentFilter);
+    document.getElementById('notice-list').innerHTML = list.map(n=>`
+      <div>
+        <div class="notice-row" data-nid="${n.id}">
+          <span class="badge ${n.tag==='이벤트'?'badge-green':'badge-blue'}">${n.tag}</span>
+          <span class="title">${n.title}</span>
+          <span class="meta">${n.date} · 조회 ${n.views}</span>
+        </div>
+        <div class="notice-detail ${openId===n.id?'open':''}" id="detail-${n.id}">${n.body}</div>
+      </div>`).join('') || '<div class="empty-state"><p>게시물이 없습니다.</p></div>';
+  }
+  render();
+
+  document.addEventListener('click', (e)=>{
+    const filterBtn = e.target.closest('.tab-btn[data-filter]');
+    if(filterBtn){ currentFilter = filterBtn.getAttribute('data-filter'); render(); return; }
+    const row = e.target.closest('.notice-row');
+    if(row){
+      const id = row.getAttribute('data-nid');
+      openId = openId===id ? null : id;
+      render();
+    }
+  });
+</script>
+</body>
+</html>

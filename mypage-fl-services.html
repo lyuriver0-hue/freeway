@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서비스 관리 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .svc-row{display:flex; align-items:center; gap:16px; padding:16px; border-bottom:1px solid var(--gray-100);}
+  .svc-row:last-child{border-bottom:none;}
+  .svc-row .thumb{width:56px; height:56px; border-radius:10px; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;}
+  .svc-row .info{flex:1; min-width:0;}
+  .svc-row .title{font-weight:700; font-size:14px; margin-bottom:4px;}
+  .svc-row .meta{font-size:12px; color:var(--gray-500);}
+  .toggle{width:40px; height:22px; background:var(--gray-300); border-radius:100px; position:relative; cursor:pointer; flex-shrink:0; border:none;}
+  .toggle.on{background:var(--green);}
+  .toggle .dot{position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:.15s;}
+  .toggle.on .dot{left:20px;}
+  .boost-payment-summary{background:var(--gray-50); border-radius:10px; padding:14px 16px; font-size:13px; color:var(--gray-700); display:flex; justify-content:space-between; margin-bottom:16px;}
+  .boost-payment-summary b{color:var(--ink); font-size:16px;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <div class="section-head">
+        <h1 class="section-title" style="font-size:22px;">서비스 관리</h1>
+        <button class="btn btn-primary" onclick="openModal('new-svc-modal')">+ 새 서비스 등록</button>
+      </div>
+      <div class="table-wrap" id="svc-list"></div>
+    </div>
+  </div>
+</main>
+
+<!-- 새 서비스 등록 모달 -->
+<div class="modal-overlay" id="new-svc-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('new-svc-modal')">✕</button>
+    <h3>새 서비스 등록</h3>
+    <div class="field"><label>서비스 제목</label><input type="text" id="ns-title" placeholder="예: 브랜드 로고 디자인"></div>
+    <div class="field"><label>카테고리</label><select id="ns-cat"></select></div>
+    <div class="field"><label>가격 (원)</label><input type="number" id="ns-price" placeholder="300000"></div>
+    <button class="btn btn-primary btn-block" id="ns-submit">등록하기</button>
+  </div>
+</div>
+
+<!-- 상위노출 요금제 선택 모달 -->
+<div class="modal-overlay" id="boost-modal">
+  <div class="modal-box" style="max-width:480px;">
+    <button class="modal-close" onclick="closeModal('boost-modal')">✕</button>
+    <h3>🚀 상위노출 이용 신청</h3>
+    <p class="text-muted" style="font-size:13px; margin:6px 0 18px;" id="boost-target-title"></p>
+    <div class="boost-plan-grid" id="boost-plan-grid"></div>
+    <button class="btn btn-primary btn-block btn-lg" id="boost-goto-pay">선택한 상품 결제하기</button>
+  </div>
+</div>
+
+<!-- 결제 확인 모달 -->
+<div class="modal-overlay" id="boost-pay-modal">
+  <div class="modal-box" style="max-width:420px;">
+    <button class="modal-close" onclick="closeModal('boost-pay-modal')">✕</button>
+    <h3>결제 확인</h3>
+    <div class="boost-payment-summary" style="margin-top:16px;">
+      <span id="pay-summary-label">상위노출 7일</span>
+      <b id="pay-summary-price">₩90,000</b>
+    </div>
+    <div class="field">
+      <label>결제 수단</label>
+      <select id="pay-method">
+        <option>신용카드 (국민 **** 1234)</option>
+        <option>카카오페이</option>
+        <option>계좌이체</option>
+      </select>
+    </div>
+    <label class="checkbox-row" style="margin-bottom:18px;"><input type="checkbox" id="pay-agree"> 결제 진행 및 환불정책에 동의합니다</label>
+    <button class="btn btn-primary btn-block btn-lg" id="pay-confirm" disabled>₩<span id="pay-confirm-price">90,000</span> 결제하기</button>
+  </div>
+</div>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('freelancer', 'mypage-fl-services.html');
+  document.getElementById('ns-cat').innerHTML = FREEWAY_CATEGORIES.map(c=>`<option value="${c.id}">${c.emoji} ${c.name}</option>`).join('');
+
+  const myFlId = 'f1';
+  let myServices = FREEWAY_SERVICES.filter(s=>s.freelancerId===myFlId).map(s=>({...s, visible:true, views: Math.floor(s.reviews*3.2), inquiries: Math.floor(s.reviews*0.4)}));
+
+  function render(){
+    document.getElementById('svc-list').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th></th><th>서비스명</th><th>가격</th><th>노출상태</th><th>상위노출</th><th>조회수</th><th>문의수</th><th>평점</th><th></th></tr></thead>
+      <tbody>
+        ${myServices.map((s,i)=>{
+          const boosted = FreewayStore.isBoosted(s.id);
+          const remain = FreewayStore.getBoostRemainingDays(s.id);
+          return `
+        <tr>
+          <td><div class="thumb" style="width:40px;height:40px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:18px;">${s.thumb}</div></td>
+          <td>${s.title}</td>
+          <td>₩${s.price.toLocaleString()}</td>
+          <td><button class="toggle ${s.visible?'on':''}" data-idx="${i}"><span class="dot"></span></button></td>
+          <td>
+            ${boosted
+              ? `<span class="boost-status">🚀 노출중 D-${remain}</span> <button class="btn btn-ghost btn-sm" data-boost="${i}" style="margin-top:4px;">연장</button>`
+              : `<button class="btn btn-sm" style="background:linear-gradient(135deg,#F59E0B,#EA580C); color:#fff;" data-boost="${i}">🚀 상위노출</button>`}
+          </td>
+          <td>${s.views}</td>
+          <td>${s.inquiries}</td>
+          <td>★ ${s.rating} (${s.reviews})</td>
+          <td><button class="btn btn-outline-danger btn-sm" data-del="${i}">삭제</button></td>
+        </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+  }
+  render();
+
+  document.getElementById('svc-list').addEventListener('click', (e)=>{
+    const t = e.target.closest('.toggle');
+    if(t){ const i = +t.getAttribute('data-idx'); myServices[i].visible = !myServices[i].visible; render(); FreewayStore.toast(myServices[i].visible?'서비스가 노출됩니다':'서비스가 숨김 처리되었습니다'); return; }
+    const d = e.target.closest('[data-del]');
+    if(d){ const i = +d.getAttribute('data-del'); myServices.splice(i,1); render(); FreewayStore.toast('서비스가 삭제되었습니다'); return; }
+    const b = e.target.closest('[data-boost]');
+    if(b){ openBoostModal(+b.getAttribute('data-boost')); }
+  });
+
+  document.getElementById('ns-submit').addEventListener('click', ()=>{
+    const title = document.getElementById('ns-title').value.trim();
+    const price = document.getElementById('ns-price').value;
+    if(!title || !price){ FreewayStore.toast('제목과 가격을 입력해주세요'); return; }
+    const cat = FREEWAY_CATEGORIES.find(c=>c.id===document.getElementById('ns-cat').value);
+    myServices.unshift({id:'new'+Date.now(), title, price:Number(price), rating:0, reviews:0, thumb:cat.emoji, catName:cat.name, visible:true, views:0, inquiries:0});
+    render();
+    closeModal('new-svc-modal');
+    FreewayStore.toast('새 서비스가 등록되었습니다');
+    document.getElementById('ns-title').value=''; document.getElementById('ns-price').value='';
+  });
+
+  /* ---------------- 상위노출 결제 플로우 ---------------- */
+  let boostTargetIdx = null;
+  let selectedPlanId = FREEWAY_BOOST_PLANS[1].id; // 기본값: 7일 (인기)
+
+  function openBoostModal(idx){
+    boostTargetIdx = idx;
+    const svc = myServices[idx];
+    document.getElementById('boost-target-title').textContent = `"${svc.title}" 서비스를 검색 결과 상단에 노출시킵니다.`;
+    renderPlanGrid();
+    openModal('boost-modal');
+  }
+
+  function renderPlanGrid(){
+    document.getElementById('boost-plan-grid').innerHTML = FREEWAY_BOOST_PLANS.map(p=>`
+      <div class="boost-plan-card ${p.id===selectedPlanId?'selected':''}" data-plan="${p.id}">
+        ${p.badge?`<span class="bp-badge">${p.badge}</span>`:''}
+        <div class="bp-days">${p.days}일</div>
+        <div class="bp-price">₩${p.price.toLocaleString()}</div>
+        <div class="bp-perday">1일 ₩${Math.round(p.price/p.days).toLocaleString()}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('boost-plan-grid').addEventListener('click', (e)=>{
+    const card = e.target.closest('.boost-plan-card');
+    if(!card) return;
+    selectedPlanId = card.getAttribute('data-plan');
+    renderPlanGrid();
+  });
+
+  document.getElementById('boost-goto-pay').addEventListener('click', ()=>{
+    const plan = FREEWAY_BOOST_PLANS.find(p=>p.id===selectedPlanId);
+    document.getElementById('pay-summary-label').textContent = plan.label;
+    document.getElementById('pay-summary-price').textContent = `₩${plan.price.toLocaleString()}`;
+    document.getElementById('pay-confirm-price').textContent = plan.price.toLocaleString();
+    document.getElementById('pay-agree').checked = false;
+    document.getElementById('pay-confirm').disabled = true;
+    closeModal('boost-modal');
+    openModal('boost-pay-modal');
+  });
+
+  document.getElementById('pay-agree').addEventListener('change', (e)=>{
+    document.getElementById('pay-confirm').disabled = !e.target.checked;
+  });
+
+  document.getElementById('pay-confirm').addEventListener('click', ()=>{
+    const plan = FREEWAY_BOOST_PLANS.find(p=>p.id===selectedPlanId);
+    const svc = myServices[boostTargetIdx];
+    FreewayStore.setBoost(svc.id, plan.days);
+    FreewayStore.addBoostHistory({
+      serviceId: svc.id, title: svc.title, plan: plan.label, price: plan.price,
+      date: new Date().toISOString().slice(0,10), method: document.getElementById('pay-method').value,
+    });
+    closeModal('boost-pay-modal');
+    render();
+    FreewayStore.toast(`결제가 완료되었습니다! "${svc.title}"가 ${plan.days}일간 상위노출됩니다.`);
+  });
+</script>
+</body>
+</html>
