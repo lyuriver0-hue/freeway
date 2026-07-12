@@ -8,6 +8,7 @@
 <style>
   .post-row{display:flex; align-items:center; gap:14px; padding:15px 20px; border-bottom:1px solid var(--gray-100); cursor:pointer;}
   .post-row:hover{background:var(--gray-50);}
+  .post-no{width:32px; flex-shrink:0; text-align:center; font-size:12.5px; font-weight:700; color:var(--gray-500);}
   .post-row .title{flex:1; font-weight:600; font-size:14px;}
   .post-row .meta{font-size:12px; color:var(--gray-500); white-space:nowrap;}
   .post-detail{display:none; padding:20px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); font-size:13.5px; line-height:1.8; color:var(--gray-700);}
@@ -39,6 +40,7 @@
   </div>
   <div class="tabs" data-tabs>
     <button class="tab-btn active" data-tab-target="t-all" data-filter="all">전체</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="자유게시판">자유게시판</button>
     <button class="tab-btn" data-tab-target="t-all" data-filter="꿀팁공유">꿀팁공유</button>
     <button class="tab-btn" data-tab-target="t-all" data-filter="질문답변">질문답변</button>
     <button class="tab-btn" data-tab-target="t-all" data-filter="공지">공지</button>
@@ -51,7 +53,7 @@
     <button class="modal-close" onclick="closeModal('write-modal')">✕</button>
     <h3>글쓰기</h3>
     <div class="field"><label>카테고리</label>
-      <select id="wr-cat"><option>꿀팁공유</option><option>질문답변</option></select>
+      <select id="wr-cat"><option>자유게시판</option><option>꿀팁공유</option><option>질문답변</option></select>
     </div>
     <div class="field"><label>제목</label><input type="text" id="wr-title" placeholder="제목을 입력하세요"></div>
     <div class="field"><label>내용</label><textarea id="wr-body" placeholder="내용을 입력하세요"></textarea></div>
@@ -71,16 +73,18 @@
 
   function render(){
     const list = posts.filter(p=>currentFilter==='all' || p.cat===currentFilter);
-    document.getElementById('post-list').innerHTML = list.map(p=>{
+    document.getElementById('post-list').innerHTML = list.map((p,i)=>{
       const liveComments = FreewayStore.getComments(p.id);
       const totalComments = (p.comments||0) + liveComments.length;
       const totalViews = p.views + (FreewayStore.getExtraViews()[p.id]||0);
       const liked = FreewayStore.isLiked(p.id);
       const totalLikes = (p.likes||0) + (liked?1:0);
       const isOpen = openId===p.id;
+      const no = list.length - i;
       return `
       <div>
         <div class="post-row" data-pid="${p.id}">
+          <span class="post-no">${no}</span>
           <span class="badge badge-gray">${p.cat}</span>
           <span class="title">${p.title}</span>
           <span class="meta">${p.author} · ${p.date} · 조회 ${totalViews} · 좋아요 ${totalLikes} · 댓글 ${totalComments}</span>
