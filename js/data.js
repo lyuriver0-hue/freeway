@@ -118,10 +118,10 @@ const FREEWAY_FAQS = [
 ];
 
 const FREEWAY_COMMUNITY_POSTS = [
-  {id:'c1', cat:'꿀팁공유', title:'프리랜서 첫 견적서 작성할 때 꿀팁 공유합니다', author:'디자이너K', date:'2026-07-03', views:412, comments:12, body:'견적서를 작성할 때는 작업 범위, 수정 횟수, 납기일을 명확히 적는 게 가장 중요합니다. 특히 수정 횟수를 미리 못박아두지 않으면 무한 수정 요청에 시달릴 수 있어요. 저는 보통 "2차 수정까지 무료, 이후 회당 추가 비용" 식으로 명시합니다.'},
-  {id:'c2', cat:'질문답변', title:'안전결제 정산까지 보통 며칠 걸리나요?', author:'초보의뢰인', date:'2026-07-02', views:203, comments:5, body:'구매확정 후 영업일 기준 2~3일 이내에 등록하신 계좌로 정산됩니다. 주말/공휴일이 낀 경우 다음 영업일에 처리되니 참고해주세요.'},
-  {id:'c3', cat:'공지', title:'커뮤니티 이용 가이드라인 안내', author:'프리웨이팀', date:'2026-06-28', views:891, comments:1, body:'프리웨이 커뮤니티는 프리랜서와 클라이언트 모두가 자유롭게 정보를 나누는 공간입니다. 광고성 게시물, 타인 비방, 개인정보 노출 게시물은 사전 통보 없이 삭제될 수 있습니다. 즐거운 커뮤니티 문화를 함께 만들어주세요.'},
-  {id:'c4', cat:'질문답변', title:'표준계약서 특약사항 추가하고 싶은데 가능한가요?', author:'스타트업대표', date:'2026-06-25', views:156, comments:8, body:'네, 가능합니다. 프로젝트 등록 시 계약서 작성 단계에서 "특약사항" 항목에 원하시는 조건을 자유롭게 추가하실 수 있어요. 다만 관련 법령에 위배되는 조항은 자동으로 안내 문구가 표시됩니다.'},
+  {id:'c1', cat:'꿀팁공유', title:'프리랜서 첫 견적서 작성할 때 꿀팁 공유합니다', author:'디자이너K', date:'2026-07-03', views:412, likes:34, comments:12, body:'견적서를 작성할 때는 작업 범위, 수정 횟수, 납기일을 명확히 적는 게 가장 중요합니다. 특히 수정 횟수를 미리 못박아두지 않으면 무한 수정 요청에 시달릴 수 있어요. 저는 보통 "2차 수정까지 무료, 이후 회당 추가 비용" 식으로 명시합니다.'},
+  {id:'c2', cat:'질문답변', title:'안전결제 정산까지 보통 며칠 걸리나요?', author:'초보의뢰인', date:'2026-07-02', views:203, likes:9, comments:5, body:'구매확정 후 영업일 기준 2~3일 이내에 등록하신 계좌로 정산됩니다. 주말/공휴일이 낀 경우 다음 영업일에 처리되니 참고해주세요.'},
+  {id:'c3', cat:'공지', title:'커뮤니티 이용 가이드라인 안내', author:'프리웨이팀', date:'2026-06-28', views:891, likes:52, comments:1, body:'프리웨이 커뮤니티는 프리랜서와 클라이언트 모두가 자유롭게 정보를 나누는 공간입니다. 광고성 게시물, 타인 비방, 개인정보 노출 게시물은 사전 통보 없이 삭제될 수 있습니다. 즐거운 커뮤니티 문화를 함께 만들어주세요.'},
+  {id:'c4', cat:'질문답변', title:'표준계약서 특약사항 추가하고 싶은데 가능한가요?', author:'스타트업대표', date:'2026-06-25', views:156, likes:14, comments:8, body:'네, 가능합니다. 프로젝트 등록 시 계약서 작성 단계에서 "특약사항" 항목에 원하시는 조건을 자유롭게 추가하실 수 있어요. 다만 관련 법령에 위배되는 조항은 자동으로 안내 문구가 표시됩니다.'},
 ];
 
 const FREEWAY_PROJECTS = [
@@ -184,6 +184,45 @@ const FreewayStore = {
     const list = this.getBoostHistory();
     list.unshift(entry);
     this._set('freeway_boost_history', list);
+  },
+
+  /* ---- 커뮤니티: 좋아요 ---- */
+  getLikedPosts(){ return this._get('freeway_liked_posts', []); },
+  toggleLike(postId){
+    const liked = this.getLikedPosts();
+    const idx = liked.indexOf(postId);
+    if(idx>-1) liked.splice(idx,1); else liked.push(postId);
+    this._set('freeway_liked_posts', liked);
+    return liked.includes(postId);
+  },
+  isLiked(postId){ return this.getLikedPosts().includes(postId); },
+
+  /* ---- 커뮤니티: 댓글 ---- */
+  getComments(postId){
+    const all = this._get('freeway_comments', {});
+    return all[postId] || [];
+  },
+  addComment(postId, body){
+    const all = this._get('freeway_comments', {});
+    if(!all[postId]) all[postId] = [];
+    const user = this.getUser();
+    const comment = {id:'cm'+Date.now(), author: user ? user.name : '익명', date: new Date().toISOString().slice(0,10), body};
+    all[postId].push(comment);
+    this._set('freeway_comments', all);
+    return comment;
+  },
+
+  /* ---- 커뮤니티: 조회수 (브라우저당 게시물별 1회만 반영) ---- */
+  getExtraViews(){ return this._get('freeway_extra_views', {}); },
+  addView(postId){
+    const viewed = this._get('freeway_viewed_posts', []);
+    if(viewed.includes(postId)) return false;
+    viewed.push(postId);
+    this._set('freeway_viewed_posts', viewed);
+    const extra = this.getExtraViews();
+    extra[postId] = (extra[postId]||0) + 1;
+    this._set('freeway_extra_views', extra);
+    return true;
   },
 
   toast(msg){
