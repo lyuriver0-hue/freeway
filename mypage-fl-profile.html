@@ -15,18 +15,22 @@
   .portfolio-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:18px;}
   @media (max-width:860px){ .portfolio-grid{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:560px){ .portfolio-grid{grid-template-columns:1fr;} }
-  .pf-item{position:relative; border:1px solid var(--gray-200); border-radius:var(--radius); overflow:hidden; background:#fff;}
+  .pf-item{position:relative; border:1px solid var(--gray-200); border-radius:var(--radius); overflow:hidden; background:#fff; cursor:pointer;}
   .pf-item img{width:100%; aspect-ratio:4/3; object-fit:cover; display:block;}
   .pf-item .pf-body{padding:12px 14px;}
   .pf-item .pf-title{font-weight:700; font-size:13.5px; margin-bottom:4px;}
   .pf-item .pf-desc{font-size:12px; color:var(--gray-500); line-height:1.5;}
-  .pf-item .pf-del{position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:50%; background:rgba(17,24,39,0.55); color:#fff; border:none; cursor:pointer; font-size:14px;}
+  .pf-item .pf-del{position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:50%; background:rgba(17,24,39,0.55); color:#fff; border:none; cursor:pointer; font-size:14px; z-index:2;}
   .pf-item .pf-del:hover{background:#DC2626;}
+  .pf-count-badge{position:absolute; bottom:8px; right:8px; background:rgba(17,24,39,0.7); color:#fff; font-size:11px; font-weight:700; padding:3px 9px; border-radius:100px;}
 
   .upload-drop{border:1.5px dashed var(--gray-300); border-radius:var(--radius-sm); padding:20px; text-align:center; cursor:pointer; font-size:13px; color:var(--gray-500);}
   .upload-drop:hover{border-color:var(--primary); color:var(--primary);}
-  .upload-preview{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:var(--radius-sm); margin-top:10px; display:none;}
-  .upload-preview.show{display:block;}
+  .pf-preview-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px;}
+  .pf-preview-thumb{position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden;}
+  .pf-preview-thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .pf-preview-del{position:absolute; top:3px; right:3px; width:20px; height:20px; border-radius:50%; background:rgba(17,24,39,0.6); color:#fff; border:none; cursor:pointer; font-size:11px; line-height:1;}
+  .pf-img-count{font-size:11.5px; color:var(--gray-500); margin-top:6px; text-align:right;}
 
   .preview-frame{border:1px solid var(--gray-200); border-radius:var(--radius); background:var(--gray-50); padding:22px; margin-top:16px;}
   .preview-pro-header{display:flex; gap:16px; align-items:center; margin-bottom:20px;}
@@ -36,6 +40,15 @@
   .preview-portfolio-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
   @media (max-width:860px){ .preview-portfolio-grid{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:560px){ .preview-portfolio-grid{grid-template-columns:1fr;} }
+
+  .pf-lightbox{position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:3000; padding:24px;}
+  .pf-lightbox.open{display:flex;}
+  .pf-lightbox .lb-content{display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .pf-lightbox img#lb-img{max-width:min(900px,90vw); max-height:75vh; border-radius:8px;}
+  .pf-lightbox .lb-close{position:absolute; top:24px; right:32px; font-size:28px; cursor:pointer; color:#fff;}
+  .lb-thumbs{display:flex; gap:8px; flex-wrap:wrap; justify-content:center; max-width:min(900px,90vw);}
+  .lb-thumbs img{width:56px; height:56px; object-fit:cover; border-radius:6px; cursor:pointer; border:2px solid transparent; opacity:.6;}
+  .lb-thumbs img.active{border-color:#fff; opacity:1;}
 </style>
 </head>
 <body>
@@ -94,14 +107,23 @@
     <button class="modal-close" onclick="closeModal('pf-add-modal')">✕</button>
     <h3>포트폴리오 추가</h3>
     <div class="field">
-      <label>이미지</label>
-      <div class="upload-drop" onclick="document.getElementById('pf-img-input').click()">클릭해서 이미지를 선택하세요</div>
-      <input type="file" accept="image/*" id="pf-img-input" style="display:none;">
-      <img class="upload-preview" id="pf-img-preview">
+      <label>이미지 (최대 6장)</label>
+      <div class="upload-drop" onclick="document.getElementById('pf-img-input').click()">클릭해서 이미지를 선택하세요 (여러 장 선택 가능)</div>
+      <input type="file" accept="image/*" id="pf-img-input" multiple style="display:none;">
+      <div class="pf-preview-grid" id="pf-img-preview-grid"></div>
+      <div class="pf-img-count" id="pf-img-count">0 / 6장</div>
     </div>
     <div class="field"><label>제목</label><input type="text" id="pf-title" placeholder="예: 스타트업 브랜드 아이덴티티 리뉴얼"></div>
     <div class="field"><label>설명</label><textarea id="pf-desc" placeholder="작업 내용을 간단히 소개해주세요"></textarea></div>
     <button class="btn btn-primary btn-block" id="pf-submit">등록하기</button>
+  </div>
+</div>
+
+<div class="pf-lightbox" id="pf-lightbox">
+  <span class="lb-close" onclick="closeModal('pf-lightbox')">✕</span>
+  <div class="lb-content">
+    <img id="lb-img">
+    <div class="lb-thumbs" id="lb-thumbs"></div>
   </div>
 </div>
 
@@ -137,6 +159,26 @@
     });
   }
 
+  /* ---------------- 라이트박스 (여러 장 보기) ---------------- */
+  let lbImages = [];
+  let lbIndex = 0;
+  function openLightbox(images){
+    lbImages = images;
+    lbIndex = 0;
+    renderLightbox();
+    openModal('pf-lightbox');
+  }
+  function renderLightbox(){
+    document.getElementById('lb-img').src = lbImages[lbIndex];
+    document.getElementById('lb-thumbs').innerHTML = lbImages.length > 1 ? lbImages.map((src,i)=>`<img src="${src}" class="${i===lbIndex?'active':''}" data-lb-i="${i}">`).join('') : '';
+  }
+  document.getElementById('lb-thumbs').addEventListener('click', (e)=>{
+    const t = e.target.closest('[data-lb-i]');
+    if(!t) return;
+    lbIndex = +t.getAttribute('data-lb-i');
+    renderLightbox();
+  });
+
   /* ---------------- 노출 미리보기 ---------------- */
   function renderPreview(){
     const photo = FreewayStore.getFlPhoto(myFlId);
@@ -146,11 +188,21 @@
 
     const list = FreewayStore.getFlPortfolio(myFlId);
     document.getElementById('preview-portfolio').innerHTML = list.map(p=>`
-      <div class="svc-card">
-        <div class="svc-thumb" style="padding:0;"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
+      <div class="svc-card" data-pf-view="${p.id}">
+        <div class="svc-thumb" style="padding:0;">
+          <img src="${p.images[0]}" style="width:100%; height:100%; object-fit:cover;">
+          ${p.images.length>1?`<span class="pf-count-badge">🖼 ${p.images.length}</span>`:''}
+        </div>
         <div class="svc-body"><div class="svc-title">${p.title}</div></div>
       </div>`).join('') || '<p class="text-muted" style="grid-column:1/-1;">포트폴리오를 추가하면 이곳에 미리보기가 표시됩니다.</p>';
   }
+
+  document.getElementById('preview-portfolio').addEventListener('click', (e)=>{
+    const card = e.target.closest('[data-pf-view]');
+    if(!card) return;
+    const item = FreewayStore.getFlPortfolio(myFlId).find(p=>p.id===card.getAttribute('data-pf-view'));
+    if(item) openLightbox(item.images);
+  });
 
   /* ---------------- 업체 대표 사진 ---------------- */
   function renderPhoto(){
@@ -183,9 +235,12 @@
   function renderPortfolio(){
     const list = FreewayStore.getFlPortfolio(myFlId);
     document.getElementById('pf-grid').innerHTML = list.map(p=>`
-      <div class="pf-item">
+      <div class="pf-item" data-pf-view="${p.id}">
         <button class="pf-del" data-pf-del="${p.id}">✕</button>
-        <img src="${p.image}">
+        <div style="position:relative;">
+          <img src="${p.images[0]}">
+          ${p.images.length>1?`<span class="pf-count-badge">🖼 ${p.images.length}</span>`:''}
+        </div>
         <div class="pf-body">
           <div class="pf-title">${p.title}</div>
           <div class="pf-desc">${p.desc || ''}</div>
@@ -196,37 +251,64 @@
   renderPortfolio();
 
   document.getElementById('pf-grid').addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-pf-del]');
-    if(!btn) return;
-    FreewayStore.removeFlPortfolioItem(myFlId, btn.getAttribute('data-pf-del'));
-    renderPortfolio();
-    FreewayStore.toast('포트폴리오가 삭제되었습니다');
+    const del = e.target.closest('[data-pf-del]');
+    if(del){
+      FreewayStore.removeFlPortfolioItem(myFlId, del.getAttribute('data-pf-del'));
+      renderPortfolio();
+      FreewayStore.toast('포트폴리오가 삭제되었습니다');
+      return;
+    }
+    const card = e.target.closest('[data-pf-view]');
+    if(card){
+      const item = FreewayStore.getFlPortfolio(myFlId).find(p=>p.id===card.getAttribute('data-pf-view'));
+      if(item) openLightbox(item.images);
+    }
   });
 
-  let pendingPfImage = null;
+  /* ---------------- 포트폴리오 추가 모달: 여러 장 업로드 ---------------- */
+  const PF_IMG_MAX = 6;
+  let pendingPfImages = [];
+
+  function renderPfImagePreview(){
+    document.getElementById('pf-img-preview-grid').innerHTML = pendingPfImages.map((src,i)=>`
+      <div class="pf-preview-thumb">
+        <img src="${src}">
+        <button type="button" class="pf-preview-del" data-preview-del="${i}">✕</button>
+      </div>`).join('');
+    document.getElementById('pf-img-count').textContent = `${pendingPfImages.length} / ${PF_IMG_MAX}장`;
+  }
+
   document.getElementById('pf-img-input').addEventListener('change', async (e)=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    pendingPfImage = await readImageAsDataURL(file, 800);
-    const preview = document.getElementById('pf-img-preview');
-    preview.src = pendingPfImage;
-    preview.classList.add('show');
+    const files = Array.from(e.target.files);
+    for(const file of files){
+      if(pendingPfImages.length >= PF_IMG_MAX){ FreewayStore.toast(`이미지는 최대 ${PF_IMG_MAX}장까지 등록할 수 있습니다`); break; }
+      const dataUrl = await readImageAsDataURL(file, 800);
+      pendingPfImages.push(dataUrl);
+      renderPfImagePreview();
+    }
+    e.target.value = '';
+  });
+
+  document.getElementById('pf-img-preview-grid').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-preview-del]');
+    if(!btn) return;
+    pendingPfImages.splice(+btn.getAttribute('data-preview-del'), 1);
+    renderPfImagePreview();
   });
 
   document.getElementById('pf-submit').addEventListener('click', ()=>{
     const title = document.getElementById('pf-title').value.trim();
     const desc = document.getElementById('pf-desc').value.trim();
-    if(!pendingPfImage){ FreewayStore.toast('이미지를 선택해주세요'); return; }
+    if(pendingPfImages.length === 0){ FreewayStore.toast('이미지를 1장 이상 선택해주세요'); return; }
     if(!title){ FreewayStore.toast('제목을 입력해주세요'); return; }
-    FreewayStore.addFlPortfolioItem(myFlId, {id:'pf'+Date.now(), title, desc, image: pendingPfImage});
+    FreewayStore.addFlPortfolioItem(myFlId, {id:'pf'+Date.now(), title, desc, images: pendingPfImages.slice()});
     renderPortfolio();
     closeModal('pf-add-modal');
     FreewayStore.toast('포트폴리오가 등록되었습니다');
     document.getElementById('pf-title').value = '';
     document.getElementById('pf-desc').value = '';
-    document.getElementById('pf-img-preview').classList.remove('show');
-    document.getElementById('pf-img-preview').src = '';
-    pendingPfImage = null;
+    pendingPfImages = [];
+    renderPfImagePreview();
   });
 </script>
 </body>
