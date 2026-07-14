@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>마이페이지 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="index.html#venues">웨딩홀</a>
+      <a href="index.html#studio">스튜디오</a>
+      <a href="index.html#dress">드레스</a>
+      <a href="index.html#makeup">메이크업</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page mypage-page">
+  <div class="container mypage-grid">
+    <aside class="mypage-side">
+      <div class="mypage-who">
+        <div class="mypage-avatar" id="mp-avatar">?</div>
+        <div>
+          <b id="mp-name">회원</b>
+          <span>개인 회원</span>
+        </div>
+      </div>
+      <nav class="side-nav" id="side-nav">
+        <a data-target="panel-fav" class="active">❤️ 찜한 업체</a>
+        <a data-target="panel-quotes">📋 견적함</a>
+        <a data-target="panel-bookings">📅 예약 일정</a>
+        <a data-target="panel-payments">💳 결제내역</a>
+        <a data-target="panel-inquiries">💬 문의내역</a>
+      </nav>
+      <button class="btn btn-ghost btn-block btn-sm" id="btn-logout-side">로그아웃</button>
+    </aside>
+
+    <div class="mypage-content">
+      <!-- 찜한 업체 -->
+      <div class="mypage-panel active" id="panel-fav">
+        <div class="mypage-panel-head">
+          <h2>❤️ 찜한 업체</h2>
+          <p>관심 있는 웨딩홀과 스드메 업체를 모아보세요.</p>
+        </div>
+        <div class="field" style="max-width:240px;">
+          <label>지역 필터</label>
+          <select id="fav-region-filter">
+            <option value="all">전체 지역</option>
+          </select>
+        </div>
+        <div class="card-grid" id="fav-grid"></div>
+        <div class="empty-box hidden" id="fav-empty">
+          <div class="emoji">💔</div>
+          <p id="fav-empty-msg">아직 찜한 업체가 없어요.</p>
+          <a href="index.html#venues" class="btn btn-primary btn-sm" style="margin-top:14px;">둘러보러 가기</a>
+        </div>
+      </div>
+
+      <!-- 견적함 -->
+      <div class="mypage-panel" id="panel-quotes">
+        <div class="mypage-panel-head">
+          <h2>📋 견적함</h2>
+          <p>요청한 견적의 진행 상황을 확인하세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>업체</th><th>구분</th><th>희망 예산</th><th>요청일</th><th>상태</th></tr></thead>
+          <tbody id="quotes-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 예약 일정 -->
+      <div class="mypage-panel" id="panel-bookings">
+        <div class="mypage-panel-head">
+          <h2>📅 예약 일정</h2>
+          <p>상담·촬영·피팅 등 예정된 일정입니다.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>일정</th><th>업체</th><th>날짜</th><th>상태</th></tr></thead>
+          <tbody id="bookings-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 결제내역 -->
+      <div class="mypage-panel" id="panel-payments">
+        <div class="mypage-panel-head">
+          <h2>💳 결제내역</h2>
+          <p>계약금 등 결제 내역을 확인하세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>내역</th><th>업체</th><th>금액</th><th>결제일</th><th>상태</th></tr></thead>
+          <tbody id="payments-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 문의내역 -->
+      <div class="mypage-panel" id="panel-inquiries">
+        <div class="mypage-panel-head">
+          <h2>💬 문의내역</h2>
+          <p>1:1 문의 답변 상태를 확인하세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>제목</th><th>문의일</th><th>상태</th></tr></thead>
+          <tbody id="inquiries-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+  // 로그인 가드: 비로그인 시 로그인 페이지로, 기업 회원이면 파트너센터로 이동
+  const currentUser = WeddingStore.getUser();
+  if (!currentUser) {
+    location.href = "login.html";
+  } else if (currentUser.type === "business") {
+    location.href = "mypage-business.html";
+  } else {
+    document.getElementById("mp-name").textContent = currentUser.name + "님";
+    document.getElementById("mp-avatar").textContent = currentUser.name.charAt(0);
+    weddingRenderHeader();
+  }
+
+  const FAVORITES = [
+    { name: "아펠가모 반포", loc: "서울 서초구", price: "1,800,000원~", emoji: "🏛️" },
+    { name: "클라라웨딩", loc: "서울 강남구", price: "2,050,000원~", emoji: "👗" },
+    { name: "청담 이유", loc: "서울 강남구", price: "920,000원~", emoji: "💄" },
+    { name: "섬스튜디오", loc: "경기 하남시", price: "1,050,000원~", emoji: "📸" },
+    { name: "더채플앳 논현", loc: "서울 강남구", price: "2,100,000원~", emoji: "⛪" },
+  ];
+
+  const QUOTES = [
+    { name: "더채플앳 논현", type: "웨딩홀", budget: "2,000,000원대", date: "2026-06-20", status: "progress", label: "검토중" },
+    { name: "아르센 스튜디오", type: "스튜디오", budget: "1,000,000원대", date: "2026-06-15", status: "done", label: "견적완료" },
+    { name: "모리엠포티", type: "드레스", budget: "1,500,000원대", date: "2026-06-10", status: "wait", label: "답변대기" },
+  ];
+
+  const BOOKINGS = [
+    { title: "웨딩홀 방문 상담", name: "아펠가모 반포", date: "2026-07-20 14:00", status: "progress", label: "예정" },
+    { title: "드레스 피팅", name: "클라라웨딩", date: "2026-07-25 11:00", status: "progress", label: "예정" },
+    { title: "스튜디오 촬영", name: "아르센 스튜디오", date: "2026-06-02 10:00", status: "done", label: "완료" },
+  ];
+
+  const PAYMENTS = [
+    { title: "웨딩홀 계약금", name: "아펠가모 반포", amount: "3,000,000원", date: "2026-06-25", status: "done", label: "결제완료" },
+    { title: "스튜디오 예약금", name: "아르센 스튜디오", amount: "300,000원", date: "2026-06-05", status: "done", label: "결제완료" },
+  ];
+
+  const INQUIRIES = [
+    { title: "웨딩홀 주차 문의", date: "2026-07-01", status: "done", label: "답변완료" },
+    { title: "결제 취소 문의", date: "2026-07-10", status: "wait", label: "답변대기" },
+  ];
+
+  function statusPill(status, label) {
+    return `<span class="status-pill status-${status}">${label}</span>`;
+  }
+
+  function populateRegionFilter() {
+    const select = document.getElementById("fav-region-filter");
+    const regions = [...new Set(FAVORITES.map(v => v.loc))].sort();
+    select.innerHTML = `<option value="all">전체 지역</option>` + regions.map(r => `<option value="${r}">${r}</option>`).join("");
+  }
+
+  function renderFavorites() {
+    const region = document.getElementById("fav-region-filter").value;
+    const items = region === "all" ? FAVORITES : FAVORITES.filter(v => v.loc === region);
+    const grid = document.getElementById("fav-grid");
+    grid.innerHTML = items.map(v => `
+      <div class="venue-card">
+        <div class="venue-thumb">${v.emoji}</div>
+        <div class="venue-body">
+          <div class="venue-loc">${v.loc}</div>
+          <div class="venue-name">${v.name}</div>
+          <div class="venue-meta"><span class="venue-price">${v.price}</span></div>
+        </div>
+      </div>
+    `).join("");
+    grid.classList.toggle("hidden", items.length === 0);
+    document.getElementById("fav-empty").classList.toggle("hidden", items.length > 0);
+    document.getElementById("fav-empty-msg").textContent = region === "all"
+      ? "아직 찜한 업체가 없어요."
+      : `"${region}"에 찜한 업체가 없어요.`;
+  }
+
+  function renderQuotes() {
+    document.getElementById("quotes-body").innerHTML = QUOTES.map(q => `
+      <tr><td>${q.name}</td><td>${q.type}</td><td>${q.budget}</td><td>${q.date}</td><td>${statusPill(q.status, q.label)}</td></tr>
+    `).join("");
+  }
+
+  function renderBookings() {
+    document.getElementById("bookings-body").innerHTML = BOOKINGS.map(b => `
+      <tr><td>${b.title}</td><td>${b.name}</td><td>${b.date}</td><td>${statusPill(b.status, b.label)}</td></tr>
+    `).join("");
+  }
+
+  function renderPayments() {
+    document.getElementById("payments-body").innerHTML = PAYMENTS.map(p => `
+      <tr><td>${p.title}</td><td>${p.name}</td><td>${p.amount}</td><td>${p.date}</td><td>${statusPill(p.status, p.label)}</td></tr>
+    `).join("");
+  }
+
+  function renderInquiries() {
+    document.getElementById("inquiries-body").innerHTML = INQUIRIES.map(i => `
+      <tr><td>${i.title}</td><td>${i.date}</td><td>${statusPill(i.status, i.label)}</td></tr>
+    `).join("");
+  }
+
+  populateRegionFilter();
+  renderFavorites();
+  renderQuotes();
+  renderBookings();
+  renderPayments();
+  renderInquiries();
+
+  document.getElementById("fav-region-filter").addEventListener("change", renderFavorites);
+
+  document.addEventListener("click", (e) => {
+    const navItem = e.target.closest("#side-nav a");
+    if (navItem) {
+      document.querySelectorAll("#side-nav a").forEach(a => a.classList.remove("active"));
+      navItem.classList.add("active");
+      document.querySelectorAll(".mypage-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById(navItem.dataset.target).classList.add("active");
+      return;
+    }
+    if (e.target.closest("#btn-logout-side")) {
+      WeddingStore.logout();
+      WeddingStore.toast("로그아웃 되었습니다");
+      setTimeout(() => (location.href = "index.html"), 500);
+    }
+  });
+</script>
+</body>
+</html>

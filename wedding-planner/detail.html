@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>업체 상세정보 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="index.html#venues">웨딩홀</a>
+      <a href="index.html#studio">스튜디오</a>
+      <a href="index.html#dress">드레스</a>
+      <a href="index.html#makeup">메이크업</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="container">
+    <div class="detail-breadcrumb" id="breadcrumb"></div>
+    <div class="detail-gallery" id="gallery"></div>
+
+    <div class="detail-layout">
+      <div class="detail-main">
+        <div class="detail-title-row">
+          <div>
+            <div class="detail-tags" id="detail-tags"></div>
+            <h1 id="detail-name"></h1>
+          </div>
+          <button type="button" class="heart-btn" id="heart-btn">♡</button>
+        </div>
+        <div class="detail-loc-row"><span id="detail-loc"></span></div>
+
+        <div class="detail-section">
+          <h3>상세 소개</h3>
+          <p class="detail-desc" id="detail-desc"></p>
+          <div class="info-grid" id="info-grid" style="margin-top:18px;"></div>
+        </div>
+
+        <div class="detail-section">
+          <h3>가격표</h3>
+          <table class="list-table">
+            <thead><tr><th>항목</th><th>가격</th></tr></thead>
+            <tbody id="price-body"></tbody>
+          </table>
+        </div>
+
+        <div class="detail-section">
+          <h3>위치</h3>
+          <div id="detail-map" class="naver-map-box" style="height:280px;">
+            <div class="map-placeholder"><span>🗺️</span><p>지도를 불러오는 중입니다…</p></div>
+          </div>
+        </div>
+
+        <div class="detail-section" style="margin-bottom:0;">
+          <h3>리뷰</h3>
+          <div id="reviews-list"></div>
+        </div>
+      </div>
+
+      <aside class="booking-card">
+        <div class="price-lead" id="booking-price">-</div>
+        <div style="font-size:12.5px; color:var(--gray-500); margin-bottom:20px;">상담 신청 후 담당자가 확인하여 연락드립니다.</div>
+
+        <form id="booking-form">
+          <div class="field"><label>이름</label><input type="text" id="bk-name" placeholder="홍길동"></div>
+          <div class="field"><label>연락처</label><input type="tel" id="bk-phone" placeholder="010-0000-0000"></div>
+          <div class="field"><label>희망 상담일</label><input type="date" id="bk-date"></div>
+          <div class="field"><label>문의 내용</label><textarea rows="3" id="bk-msg" placeholder="문의하실 내용을 남겨주세요."></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">상담 신청하기</button>
+        </form>
+
+        <div class="booking-success" id="booking-success">
+          <div class="emoji">🎉</div>
+          <p style="font-weight:800; margin-bottom:6px;">상담 신청이 접수되었습니다!</p>
+          <p class="text-muted" style="font-size:12.5px;">빠른 시일 내에 담당자가 연락드릴게요.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/listings.js"></script>
+<script>
+  const TAG_CLASS = { "BEST": "tag-best", "인기": "tag-hot", "추천": "tag-pick" };
+
+  const params = new URLSearchParams(location.search);
+  const detailType = params.get("type");
+  const detailId = Number(params.get("id"));
+  const item = getListing(detailType, detailId);
+
+  if (!item) {
+    document.querySelector(".detail-layout").innerHTML = `
+      <div class="empty-box" style="grid-column:1/-1;">
+        <div class="emoji">😢</div>
+        <p>존재하지 않는 업체입니다.</p>
+        <a href="index.html" class="btn btn-primary btn-sm" style="margin-top:14px;">홈으로 돌아가기</a>
+      </div>`;
+    document.getElementById("gallery").classList.add("hidden");
+  } else {
+    const typeLabel = LISTING_TYPE_LABEL[detailType];
+    document.title = `${item.name} | 웨딩닷컴`;
+
+    const sectionId = detailType === "hall" ? "venues" : "studio";
+    document.getElementById("breadcrumb").innerHTML =
+      `<a href="index.html">홈</a> / <a href="index.html#${sectionId}">${typeLabel}</a> / ${item.name}`;
+
+    document.getElementById("gallery").innerHTML = `
+      <div class="g-item g-main">${item.emoji}</div>
+      <div class="g-item">${item.emoji}</div>
+      <div class="g-item">${item.emoji}</div>
+      <div class="g-item">${item.emoji}</div>
+      <div class="g-item">${item.emoji}</div>
+    `;
+
+    document.getElementById("detail-tags").innerHTML =
+      (item.tags || []).map(t => `<span class="${TAG_CLASS[t] || 'tag-best'}">${t}</span>`).join("") +
+      `<span style="background:var(--gray-500);">${typeLabel}</span>`;
+    document.getElementById("detail-name").textContent = item.name;
+    document.getElementById("detail-loc").textContent = `📍 ${item.loc}`;
+    document.getElementById("detail-desc").textContent = item.desc;
+
+    document.getElementById("info-grid").innerHTML = `
+      <div class="info-item"><span>${detailType === "hall" ? "수용 인원" : "소요 시간/구성"}</span><b>${item.capacity}</b></div>
+      <div class="info-item"><span>스타일</span><b>${item.style}</b></div>
+    `;
+
+    document.getElementById("price-body").innerHTML =
+      item.priceTable.map(p => `<tr><td>${p.item}</td><td>${p.price}</td></tr>`).join("");
+
+    document.getElementById("booking-price").innerHTML = `${item.price} <span>부터</span>`;
+
+    initNaverStaticMap("detail-map", item.loc);
+
+    const r1 = REVIEW_POOL[detailId % REVIEW_POOL.length];
+    const r2 = REVIEW_POOL[(detailId + 2) % REVIEW_POOL.length];
+    document.getElementById("reviews-list").innerHTML = [r1, r2].map(r => `
+      <div class="review-item">
+        <div class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+        <div class="txt">${r.txt}</div>
+        <div class="meta">${r.name}</div>
+      </div>
+    `).join("");
+
+    const favKey = `${detailType}:${detailId}`;
+    const heartBtn = document.getElementById("heart-btn");
+    function syncHeart() {
+      const active = isFavorite(favKey);
+      heartBtn.classList.toggle("active", active);
+      heartBtn.textContent = active ? "♥" : "♡";
+    }
+    syncHeart();
+    heartBtn.addEventListener("click", () => {
+      const active = toggleFavorite(favKey);
+      syncHeart();
+      WeddingStore.toast(active ? "찜 목록에 추가했습니다" : "찜 목록에서 제거했습니다");
+    });
+
+    document.getElementById("booking-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("bk-name").value.trim();
+      const phone = document.getElementById("bk-phone").value.trim();
+      if (!name || !phone) {
+        WeddingStore.toast("이름과 연락처를 입력해주세요");
+        return;
+      }
+      document.getElementById("booking-form").style.display = "none";
+      document.getElementById("booking-success").classList.add("show");
+    });
+  }
+</script>
+</body>
+</html>

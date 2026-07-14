@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기업 로그인 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="index.html#venues">웨딩홀</a>
+      <a href="index.html#studio">스튜디오</a>
+      <a href="index.html#dress">드레스</a>
+      <a href="index.html#makeup">메이크업</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-wrap">
+  <div class="auth-card">
+    <h1 class="auth-title">기업 로그인</h1>
+    <p class="auth-sub">웨딩닷컴 파트너 센터에 로그인하세요</p>
+
+    <div class="type-switch-banner">💍 신랑신부이신가요? <a href="login.html">개인 로그인 →</a></div>
+
+    <form id="login-form" novalidate>
+      <div class="field" id="f-email">
+        <label>이메일 또는 사업자등록번호</label>
+        <input type="text" name="email" placeholder="business@email.com 또는 000-00-00000">
+        <div class="error-msg">이메일 또는 사업자등록번호를 입력해주세요.</div>
+      </div>
+      <div class="field" id="f-password">
+        <label>비밀번호</label>
+        <input type="password" name="password" placeholder="비밀번호를 입력하세요">
+        <div class="error-msg">비밀번호는 6자 이상이어야 합니다.</div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:18px; font-size:12.5px;">
+        <label class="checkbox-row"><input type="checkbox"> 로그인 상태 유지</label>
+        <a href="#" style="color:var(--gray-500);">아이디/비밀번호 찾기</a>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">로그인</button>
+    </form>
+
+    <div class="auth-foot">아직 입점하지 않으셨나요? <a href="signup-business.html">기업 회원가입</a></div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+  function setFieldError(id, hasError) {
+    document.getElementById(id).classList.toggle("error", hasError);
+  }
+
+  function doLoginSuccess(user) {
+    WeddingStore.setUser(user);
+    WeddingStore.toast(`${user.name}님, 환영합니다!`);
+    setTimeout(() => { location.href = "index.html"; }, 600);
+  }
+
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const idVal = e.target.email.value.trim();
+    const pw = e.target.password.value;
+    const idOk = idVal.length > 0;
+    const pwOk = pw.length >= 6;
+    setFieldError("f-email", !idOk);
+    setFieldError("f-password", !pwOk);
+    if (idOk && pwOk) {
+      // 이메일 또는 사업자등록번호로 가입된 계정을 조회, 없으면 데모 계정 생성 (프로토타입 모의 인증)
+      const existing = WeddingStore.findAccount(idVal);
+      const user = existing && existing.type === "business"
+        ? existing
+        : { name: idVal.includes("@") ? idVal.split("@")[0] : "파트너", type: "business", email: idVal.includes("@") ? idVal : "demo@weddingcom.kr" };
+      doLoginSuccess(user);
+    }
+  });
+</script>
+</body>
+</html>
