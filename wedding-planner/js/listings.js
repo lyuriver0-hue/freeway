@@ -90,9 +90,45 @@ const LISTINGS = {
       capacity: "헤어+메이크업", style: "프리미엄 글램",
       priceTable: [{ item: "본식 메이크업", price: "1,100,000원" }, { item: "리허설 촬영 추가", price: "400,000원" }, { item: "어머님 메이크업", price: "280,000원" }] },
   ],
+  suit: [
+    { name: "예작맨스웨어", loc: "서울 강남구", price: "1,200,000원~", emoji: "🤵",
+      desc: "이탈리아 원단을 사용한 맞춤 예복 전문 브랜드입니다.",
+      capacity: "가봉 2회 포함", style: "클래식 슈트",
+      priceTable: [{ item: "예복 대여", price: "1,200,000원" }, { item: "맞춤 제작", price: "2,500,000원" }, { item: "셔츠·타이 세트", price: "150,000원" }] },
+    { name: "브라이덜수트 청담", loc: "서울 강남구", price: "980,000원~", emoji: "🤵",
+      desc: "슬림핏 실루엣이 강점인 청담동 예복 전문샵입니다.",
+      capacity: "가봉 2회 포함", style: "슬림핏",
+      priceTable: [{ item: "예복 대여", price: "980,000원" }, { item: "맞춤 제작", price: "2,100,000원" }, { item: "구두 대여", price: "80,000원" }] },
+    { name: "젠틀맨스박스", loc: "서울 서초구", price: "890,000원~", emoji: "🤵",
+      desc: "톤온톤 스타일링으로 신랑 예복부터 혼주 한복까지 함께 준비할 수 있습니다.",
+      capacity: "가봉 1회 포함", style: "모던 클래식",
+      priceTable: [{ item: "예복 대여", price: "890,000원" }, { item: "맞춤 제작", price: "1,900,000원" }, { item: "넥타이 세트", price: "90,000원" }] },
+    { name: "슈트클래스 강남", loc: "서울 강남구", price: "1,050,000원~", emoji: "🤵",
+      desc: "체형별 맞춤 코칭으로 신랑의 첫 슈트 피팅을 편안하게 도와드립니다.",
+      capacity: "가봉 2회 포함", style: "테일러드",
+      priceTable: [{ item: "예복 대여", price: "1,050,000원" }, { item: "맞춤 제작", price: "2,300,000원" }, { item: "구두+벨트 세트", price: "120,000원" }] },
+  ],
+  jewelry: [
+    { name: "루이델라 주얼리", loc: "서울 강남구", price: "1,800,000원~", emoji: "💍",
+      desc: "다이아몬드 감정서가 포함된 커플링 전문 주얼리 브랜드입니다.",
+      capacity: "커플링 세트", style: "클래식 다이아",
+      priceTable: [{ item: "커플링 세트", price: "1,800,000원" }, { item: "각인 서비스", price: "무료" }, { item: "사이즈 조정", price: "무료 1회" }] },
+    { name: "다이아본느", loc: "서울 강남구", price: "1,450,000원~", emoji: "💍",
+      desc: "합리적인 가격대의 4C 등급 다이아몬드 예물을 제안합니다.",
+      capacity: "커플링 세트", style: "미니멀",
+      priceTable: [{ item: "커플링 세트", price: "1,450,000원" }, { item: "목걸이 세트 추가", price: "600,000원" }, { item: "각인 서비스", price: "무료" }] },
+    { name: "이든주얼리", loc: "서울 서초구", price: "2,100,000원~", emoji: "💍",
+      desc: "1:1 맞춤 디자인 상담으로 세상에 하나뿐인 반지를 제작합니다.",
+      capacity: "맞춤 디자인", style: "커스텀 디자인",
+      priceTable: [{ item: "커플링 세트", price: "2,100,000원" }, { item: "디자인 상담", price: "무료" }, { item: "사이즈 조정", price: "무료 2회" }] },
+    { name: "골든아워 주얼리", loc: "경기 하남시", price: "1,250,000원~", emoji: "💍",
+      desc: "화이트골드·로즈골드 등 다양한 소재로 부담 없는 예물을 준비할 수 있습니다.",
+      capacity: "커플링 세트", style: "데일리 심플",
+      priceTable: [{ item: "커플링 세트", price: "1,250,000원" }, { item: "각인 서비스", price: "무료" }, { item: "보증서 발급", price: "무료" }] },
+  ],
 };
 
-const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업" };
+const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업", suit: "예복", jewelry: "예물" };
 
 const REVIEW_POOL = [
   { name: "김민지", stars: 5, txt: "정말 만족스러운 진행이었어요! 담당자분이 친절하게 설명해주셔서 편했습니다." },

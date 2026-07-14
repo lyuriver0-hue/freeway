@@ -162,9 +162,8 @@
     const typeLabel = LISTING_TYPE_LABEL[detailType];
     document.title = `${item.name} | 웨딩닷컴`;
 
-    const sectionId = detailType === "hall" ? "venues" : "studio";
     document.getElementById("breadcrumb").innerHTML =
-      `<a href="index.html">홈</a> / <a href="index.html#${sectionId}">${typeLabel}</a> / ${item.name}`;
+      `<a href="index.html">홈</a> / <a href="category.html?cat=${detailType}">${typeLabel}</a> / ${item.name}`;
 
     // 업체가 마이페이지에서 이 리스팅에 연결해 업로드한 실제 사진이 있으면 그것을 우선 사용
     const linkedPhotos = findLinkedBusinessPhotos(detailType, detailId);
