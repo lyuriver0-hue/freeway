@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>웨딩닷컴 | 당신의 특별한 하루, 웨딩닷컴에서</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="#venues">웨딩홀</a>
+      <a href="#studio">스튜디오</a>
+      <a href="#dress">드레스</a>
+      <a href="#makeup">메이크업</a>
+      <a href="#honeymoon" class="soon">허니문</a>
+      <a href="#planner">웨딩플래너</a>
+      <a href="#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HERO + SEARCH WIDGET -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <span class="hero-badge">✨ 2026 웨딩 체험전 진행 중</span>
+      <h1>당신의 특별한 하루,<br><span class="hl">웨딩닷컴</span>에서 시작하세요</h1>
+      <p class="lead">웨딩홀부터 스튜디오·드레스·메이크업, 그리고 허니문까지 — 결혼 준비의 모든 순간을 한 곳에서.</p>
+    </div>
+    <div class="container">
+      <div class="search-widget">
+        <div class="search-tabs" role="tablist">
+          <div class="search-tab active" data-panel="panel-hall">🏛️ 웨딩홀 찾기</div>
+          <div class="search-tab" data-panel="panel-sdm">💄 스드메 견적</div>
+          <div class="search-tab" data-panel="panel-honeymoon">✈️ 허니문 여행 <span class="badge-soon">Coming Soon</span></div>
+        </div>
+        <div class="search-body">
+          <div class="search-panel active" id="panel-hall">
+            <div class="map-search">
+              <div class="map-search-row">
+                <input type="text" id="map-query" placeholder="지역/동네를 검색하세요 (예: 서울 강남구, 부산 해운대구, 제주 애월읍)">
+                <button type="button" class="btn btn-primary btn-sm" id="map-search-btn">검색</button>
+              </div>
+              <div id="naver-map" class="naver-map-box">
+                <div class="map-placeholder" id="map-placeholder">
+                  <span>🗺️</span>
+                  <p>네이버 지도를 불러오는 중입니다…</p>
+                </div>
+              </div>
+              <div class="map-selected" id="map-selected-label">📍 지도를 검색하거나 클릭해서 원하는 지역을 선택하세요.</div>
+            </div>
+            <div class="search-form">
+              <div class="search-field">
+                <label>예식 예정일</label>
+                <input type="text" placeholder="날짜 선택">
+              </div>
+              <div class="search-field">
+                <label>하객 규모</label>
+                <select>
+                  <option>100~150명</option>
+                  <option>150~250명</option>
+                  <option>250명 이상</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" type="button" id="hall-search-btn">웨딩홀 검색</button>
+            </div>
+          </div>
+          <div class="search-panel" id="panel-sdm">
+            <div class="search-form">
+              <div class="search-field">
+                <label>희망 지역</label>
+                <select>
+                  <option>서울 전체</option>
+                  <option>강남/서초</option>
+                  <option>홍대/합정</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label>예산 범위</label>
+                <select>
+                  <option>~200만원</option>
+                  <option>200~350만원</option>
+                  <option>350만원 이상</option>
+                </select>
+              </div>
+              <div class="search-field">
+                <label>촬영 스타일</label>
+                <select>
+                  <option>내추럴</option>
+                  <option>클래식</option>
+                  <option>필름</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" type="button">스드메 견적받기</button>
+            </div>
+          </div>
+          <div class="search-panel" id="panel-honeymoon">
+            <div class="search-form">
+              <div class="search-field">
+                <label>여행지</label>
+                <input type="text" placeholder="예: 몰디브, 하와이, 발리" disabled>
+              </div>
+              <div class="search-field">
+                <label>출발일</label>
+                <input type="text" placeholder="날짜 선택" disabled>
+              </div>
+              <div class="search-field">
+                <label>인원</label>
+                <input type="text" placeholder="성인 2명" disabled>
+              </div>
+              <button class="btn btn-gold" type="button" disabled>오픈 알림 신청</button>
+            </div>
+            <p class="search-panel-note">🔔 허니문 여행 예약 서비스는 준비 중입니다. 오픈 소식을 가장 먼저 알려드릴게요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container hero-stats">
+      <div><b>1,240+</b><span>등록 웨딩홀</span></div>
+      <div><b>3,800+</b><span>스드메 파트너</span></div>
+      <div><b>52,000+</b><span>누적 견적 문의</span></div>
+      <div><b>4.8</b><span>평균 만족도</span></div>
+    </div>
+  </section>
+
+  <!-- QUICK CATEGORY NAV -->
+  <section class="cat-section">
+    <div class="container" style="padding:26px 24px;">
+      <div class="cat-grid">
+        <a class="cat-card" href="#venues"><div class="cat-emoji">🏛️</div><h4>웨딩홀</h4></a>
+        <a class="cat-card" href="#studio"><div class="cat-emoji">📸</div><h4>스튜디오</h4></a>
+        <a class="cat-card" href="#studio" data-subtab="grid-dress"><div class="cat-emoji">👗</div><h4>드레스</h4></a>
+        <a class="cat-card" href="#studio" data-subtab="grid-makeup"><div class="cat-emoji">💄</div><h4>메이크업</h4></a>
+        <a class="cat-card" href="#estimate"><div class="cat-emoji">🤵</div><h4>예복</h4></a>
+        <a class="cat-card" href="#estimate"><div class="cat-emoji">💍</div><h4>예물</h4></a>
+        <a class="cat-card" href="#honeymoon"><div class="cat-emoji">✈️</div><h4>허니문</h4></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 인기 웨딩홀 -->
+  <section class="section" id="venues">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="section-tag">HOT VENUE</span>
+          <h2>지금 제일 핫한 웨딩홀</h2>
+          <p class="section-sub">예약 문의가 많은 인기 웨딩홀을 소개합니다.</p>
+        </div>
+        <a href="#" class="more-link">전체보기 →</a>
+      </div>
+      <div class="card-grid" id="venue-grid"></div>
+    </div>
+  </section>
+
+  <!-- 스드메 섹션 -->
+  <section class="section" id="studio" style="background:#fff; border-top:1px solid var(--gray-200);">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="section-tag">STUDIO · DRESS · MAKEUP</span>
+          <h2>요즘 신부들이 반한 스드메</h2>
+          <p class="section-sub">인생샷 스튜디오부터 감성 드레스, 신부 메이크업까지.</p>
+        </div>
+        <a href="#" class="more-link">전체보기 →</a>
+      </div>
+      <div class="subtab-group">
+        <div class="subtab active" data-target="grid-studio">스튜디오</div>
+        <div class="subtab" data-target="grid-dress">드레스</div>
+        <div class="subtab" data-target="grid-makeup">메이크업</div>
+      </div>
+      <div class="card-grid sdm-grid active" id="grid-studio"></div>
+      <div class="card-grid sdm-grid" id="grid-dress" style="display:none;"></div>
+      <div class="card-grid sdm-grid" id="grid-makeup" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- 셀프견적 CTA -->
+  <section class="section" id="estimate">
+    <div class="container">
+      <div class="estimate-banner">
+        <div>
+          <h2>내 스드메 가격이 궁금할땐?</h2>
+          <p>3분이면 충분해요. 예산과 취향만 알려주시면 맞춤 견적을 보내드립니다.</p>
+        </div>
+        <a href="#" class="btn btn-gold btn-lg">빠른 견적 내보기</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 허니문 티저 -->
+  <section class="section honeymoon-section" id="honeymoon">
+    <div class="container">
+      <div class="honeymoon-banner">
+        <div class="honeymoon-inner">
+          <div>
+            <span class="coming-soon-badge">✈️ COMING SOON</span>
+            <h3>허니문도 웨딩닷컴에서,<br>곧 만나요</h3>
+            <p>웨딩 준비부터 신혼여행 예약까지 한 번에. 항공권·호텔·현지 투어를 연결하는 허니문 서비스를 준비하고 있습니다.</p>
+            <div class="honeymoon-dest">
+              <span class="dest-chip">🏝️ 몰디브</span>
+              <span class="dest-chip">🌺 하와이</span>
+              <span class="dest-chip">🌊 발리</span>
+              <span class="dest-chip">🗼 유럽</span>
+            </div>
+          </div>
+          <div class="honeymoon-preview">
+            <div class="hp-card">🏝️</div>
+            <div class="hp-card">🌅</div>
+            <div class="hp-card">🍹</div>
+            <div class="hp-card">🌺</div>
+            <div class="hp-card">🛎️</div>
+            <div class="hp-card">🌊</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 웨딩플래너 파트너 배너 -->
+  <section class="section" id="planner" style="padding-top:0;">
+    <div class="container">
+      <div class="planner-banner">
+        <div>
+          <h3>웨딩닷컴과 함께할 웨딩플래너를 기다립니다.</h3>
+          <p>검증된 파트너와 신랑신부를 연결하는 웨딩닷컴의 플래너가 되어보세요.</p>
+        </div>
+        <a href="#" class="btn btn-primary">채용 안내 보기</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/listings.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

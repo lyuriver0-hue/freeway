@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>기업 회원가입 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="index.html#venues">웨딩홀</a>
+      <a href="index.html#studio">스튜디오</a>
+      <a href="index.html#dress">드레스</a>
+      <a href="index.html#makeup">메이크업</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="auth-wrap wide">
+  <div class="auth-card">
+    <h1 class="auth-title">기업 회원가입</h1>
+    <p class="auth-sub">웨딩닷컴의 파트너 업체로 입점해보세요</p>
+
+    <div class="type-switch-banner">💍 신랑신부이신가요? <a href="signup.html">개인 회원가입 →</a></div>
+
+    <div class="stepbar" id="stepbar">
+      <div class="step-item active" data-step="0"><div class="circle">1</div><div class="label">기본정보</div></div>
+      <div class="line"></div>
+      <div class="step-item" data-step="1"><div class="circle">2</div><div class="label">사업자인증</div></div>
+      <div class="line"></div>
+      <div class="step-item" data-step="2"><div class="circle">3</div><div class="label">약관동의</div></div>
+      <div class="line"></div>
+      <div class="step-item" data-step="3"><div class="circle">4</div><div class="label">완료</div></div>
+    </div>
+
+    <!-- Step 0: 기본정보 -->
+    <div class="wizard-panel active" data-panel="0">
+      <div class="field" id="f-biz-name"><label>업체명(상호명)</label><input type="text" id="su-biz-name" placeholder="예: 웨딩닷컴 스튜디오"><div class="error-msg">업체명을 입력해주세요.</div></div>
+      <div class="field" id="f-manager"><label>담당자 이름</label><input type="text" id="su-manager" placeholder="홍길동"><div class="error-msg">담당자 이름을 입력해주세요.</div></div>
+      <div class="field" id="f-email"><label>이메일</label><input type="email" id="su-email" placeholder="business@email.com"><div class="error-msg">올바른 이메일 주소를 입력해주세요.</div></div>
+      <div class="row-2">
+        <div class="field" id="f-pw"><label>비밀번호</label><input type="password" id="su-pw" placeholder="8자 이상"><div class="error-msg">비밀번호는 8자 이상이어야 합니다.</div></div>
+        <div class="field" id="f-pw2"><label>비밀번호 확인</label><input type="password" id="su-pw2" placeholder="다시 입력"><div class="error-msg">비밀번호가 일치하지 않습니다.</div></div>
+      </div>
+      <div class="field" id="f-phone"><label>담당자 연락처</label><input type="tel" id="su-phone" placeholder="010-0000-0000"><div class="error-msg">연락처를 입력해주세요.</div></div>
+      <div class="wizard-actions" style="justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-to-1">다음</button>
+      </div>
+    </div>
+
+    <!-- Step 1: 사업자 인증 -->
+    <div class="wizard-panel" data-panel="1">
+      <p class="text-muted" style="font-size:13px; margin-bottom:18px;">사업자등록번호 인증을 완료해야 기업 회원가입이 가능합니다.</p>
+      <div class="field" id="f-ceo"><label>대표자 이름</label><input type="text" id="su-ceo" placeholder="대표자 성함"><div class="error-msg">대표자 이름을 입력해주세요.</div></div>
+      <div class="biz-verify-box">
+        <div class="field" style="margin-bottom:10px;">
+          <label>사업자등록번호</label>
+          <div class="biz-verify-row">
+            <input type="text" id="su-biz-no" placeholder="000-00-00000" maxlength="12">
+            <button type="button" class="btn btn-gold" id="btn-verify-biz">인증하기</button>
+          </div>
+        </div>
+        <div class="verify-status hidden" id="verify-status"></div>
+      </div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="0">이전</button>
+        <button class="btn btn-primary" id="btn-to-2" disabled>다음</button>
+      </div>
+    </div>
+
+    <!-- Step 2: 약관동의 -->
+    <div class="wizard-panel" data-panel="2">
+      <div class="checkbox-row" style="margin-bottom:12px;"><input type="checkbox" id="agree-all"> <b>전체 동의합니다</b></div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item agree-required"> [필수] 이용약관 동의</div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item agree-required"> [필수] 개인정보 수집 및 이용 동의</div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item agree-required"> [필수] 입점 파트너 이용약관 동의</div>
+      <div class="checkbox-row" style="margin-bottom:10px;"><input type="checkbox" class="agree-item"> [선택] 마케팅 정보 수신 동의</div>
+      <div class="wizard-actions">
+        <button class="btn btn-ghost" data-back="1">이전</button>
+        <button class="btn btn-primary" id="btn-to-3" disabled>가입완료</button>
+      </div>
+    </div>
+
+    <!-- Step 3: 완료 -->
+    <div class="wizard-panel" data-panel="3">
+      <div style="text-align:center; padding:20px 0;">
+        <div style="font-size:44px; margin-bottom:14px;">🎉</div>
+        <h3 style="margin-bottom:8px;">기업 회원가입이 완료되었습니다!</h3>
+        <p class="text-muted" style="margin-bottom:24px;">담당자 승인 후 웨딩닷컴 파트너 센터를 이용하실 수 있습니다.</p>
+        <a href="index.html" class="btn btn-primary btn-lg">시작하기</a>
+      </div>
+    </div>
+
+    <div class="auth-foot" id="login-link-wrap">이미 계정이 있으신가요? <a href="login-business.html">기업 로그인</a></div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+  let currentStep = 0;
+  let bizVerified = false;
+
+  function setFieldError(id, hasError) {
+    document.getElementById(id).classList.toggle("error", hasError);
+  }
+
+  function goStep(n) {
+    currentStep = n;
+    document.querySelectorAll(".wizard-panel").forEach(p => p.classList.toggle("active", +p.getAttribute("data-panel") === n));
+    document.querySelectorAll(".step-item").forEach(s => {
+      const idx = +s.getAttribute("data-step");
+      s.classList.toggle("active", idx === n);
+      s.classList.toggle("done", idx < n);
+    });
+    document.getElementById("login-link-wrap").classList.toggle("hidden", n === 3);
+  }
+
+  document.getElementById("btn-to-1").addEventListener("click", () => {
+    const bizName = document.getElementById("su-biz-name").value.trim();
+    const manager = document.getElementById("su-manager").value.trim();
+    const email = document.getElementById("su-email").value.trim();
+    const pw = document.getElementById("su-pw").value;
+    const pw2 = document.getElementById("su-pw2").value;
+    const phone = document.getElementById("su-phone").value.trim();
+
+    const bizNameOk = bizName.length > 0;
+    const managerOk = manager.length > 0;
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const pwOk = pw.length >= 8;
+    const pw2Ok = pw2.length > 0 && pw === pw2;
+    const phoneOk = phone.length > 0;
+
+    setFieldError("f-biz-name", !bizNameOk);
+    setFieldError("f-manager", !managerOk);
+    setFieldError("f-email", !emailOk);
+    setFieldError("f-pw", !pwOk);
+    setFieldError("f-pw2", !pw2Ok);
+    setFieldError("f-phone", !phoneOk);
+
+    if (bizNameOk && managerOk && emailOk && pwOk && pw2Ok && phoneOk) goStep(1);
+  });
+
+  // 사업자등록번호 자동 포맷팅 + 인증 (체크섬 검증, 프로토타입용 모의 인증)
+  const bizNoInput = document.getElementById("su-biz-no");
+  bizNoInput.addEventListener("input", () => {
+    bizNoInput.value = formatBizRegNo(bizNoInput.value);
+    bizVerified = false;
+    document.getElementById("btn-to-2").disabled = true;
+    document.getElementById("verify-status").classList.add("hidden");
+  });
+
+  document.getElementById("btn-verify-biz").addEventListener("click", () => {
+    const ceo = document.getElementById("su-ceo").value.trim();
+    setFieldError("f-ceo", ceo.length === 0);
+    if (!ceo) return;
+
+    const statusEl = document.getElementById("verify-status");
+    statusEl.className = "verify-status pending";
+    statusEl.textContent = "⏳ 국세청 사업자등록정보 조회 중...";
+
+    const raw = bizNoInput.value;
+    setTimeout(() => {
+      const ok = validateBizRegNo(raw);
+      if (ok) {
+        statusEl.className = "verify-status success";
+        statusEl.textContent = "✅ 인증 완료 — 정상 등록된 사업자입니다.";
+        bizVerified = true;
+        document.getElementById("btn-to-2").disabled = false;
+      } else {
+        statusEl.className = "verify-status fail";
+        statusEl.textContent = "❌ 유효하지 않은 사업자등록번호입니다. 번호를 다시 확인해주세요.";
+        bizVerified = false;
+        document.getElementById("btn-to-2").disabled = true;
+      }
+    }, 900);
+  });
+
+  document.querySelectorAll("[data-back]").forEach(btn => {
+    btn.addEventListener("click", () => goStep(+btn.getAttribute("data-back")));
+  });
+
+  const agreeAll = document.getElementById("agree-all");
+  const agreeItems = document.querySelectorAll(".agree-item");
+  const agreeRequired = document.querySelectorAll(".agree-required");
+  function syncAgreeBtn() {
+    const requiredChecked = [...agreeRequired].every(i => i.checked);
+    document.getElementById("btn-to-3").disabled = !requiredChecked;
+  }
+  agreeAll.addEventListener("change", () => {
+    agreeItems.forEach(i => (i.checked = agreeAll.checked));
+    syncAgreeBtn();
+  });
+  agreeItems.forEach(i =>
+    i.addEventListener("change", () => {
+      agreeAll.checked = [...agreeItems].every(x => x.checked);
+      syncAgreeBtn();
+    })
+  );
+
+  document.getElementById("btn-to-3").addEventListener("click", () => {
+    if (!bizVerified) {
+      WeddingStore.toast("사업자 인증을 먼저 완료해주세요");
+      goStep(1);
+      return;
+    }
+    const name = document.getElementById("su-biz-name").value.trim() || "파트너 업체";
+    const newUser = {
+      name,
+      type: "business",
+      email: document.getElementById("su-email").value.trim(),
+      bizNo: bizNoInput.value,
+    };
+    WeddingStore.setUser(newUser);
+    WeddingStore.saveAccount(newUser);
+    weddingRenderHeader();
+    goStep(3);
+  });
+</script>
+</body>
+</html>

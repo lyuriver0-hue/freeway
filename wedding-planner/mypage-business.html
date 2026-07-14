@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파트너센터 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="index.html#venues">웨딩홀</a>
+      <a href="index.html#studio">스튜디오</a>
+      <a href="index.html#dress">드레스</a>
+      <a href="index.html#makeup">메이크업</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page mypage-page">
+  <div class="container mypage-grid">
+    <aside class="mypage-side">
+      <div class="mypage-who">
+        <div class="mypage-avatar" id="mp-avatar">?</div>
+        <div>
+          <b id="mp-name">파트너 업체</b>
+          <span id="mp-region-tag">기업 회원</span>
+        </div>
+      </div>
+      <nav class="side-nav" id="side-nav">
+        <a data-target="panel-info" class="active">🏢 업체 정보</a>
+        <a data-target="panel-requests">📥 받은 견적 요청</a>
+        <a data-target="panel-bookings">📅 예약 관리</a>
+        <a data-target="panel-sales">💰 정산·매출</a>
+        <a data-target="panel-reviews">⭐ 리뷰 관리</a>
+      </nav>
+      <button class="btn btn-ghost btn-block btn-sm" id="btn-logout-side">로그아웃</button>
+    </aside>
+
+    <div class="mypage-content">
+      <!-- 업체 정보 -->
+      <div class="mypage-panel active" id="panel-info">
+        <div class="mypage-panel-head">
+          <h2>🏢 업체 정보</h2>
+          <p>고객에게 노출되는 업체 정보를 관리하세요.</p>
+        </div>
+        <div class="biz-info-card">
+          <div class="field"><label>업체명</label><input type="text" id="biz-name-input" value="웨딩닷컴 스튜디오"></div>
+          <div class="row-2">
+            <div class="field"><label>사업자등록번호</label><input type="text" id="biz-no-display" value="123-45-67800" disabled><span class="verify-badge">✅ 인증완료</span></div>
+            <div class="field"><label>대표자</label><input type="text" value="홍길동"></div>
+          </div>
+          <div class="field"><label>담당자 연락처</label><input type="tel" value="010-1234-5678"></div>
+          <div class="field"><label>업체 소개</label><textarea rows="4" placeholder="업체를 소개해주세요.">자연광 인생샷 전문 스튜디오입니다.</textarea></div>
+          <div class="field">
+            <label>업체 지역</label>
+            <div class="map-search-row" style="margin-bottom:10px;">
+              <input type="text" id="biz-region-query" placeholder="지역/동네를 검색하세요 (예: 서울 강남구)">
+              <button type="button" class="btn btn-primary btn-sm" id="biz-region-search-btn">검색</button>
+            </div>
+            <div id="biz-region-map" class="naver-map-box" style="height:220px;">
+              <div class="map-placeholder"><span>🗺️</span><p>네이버 지도를 불러오는 중입니다…</p></div>
+            </div>
+            <div class="map-selected" id="biz-region-label">📍 지도를 검색하거나 클릭해서 업체 지역을 선택하세요.</div>
+          </div>
+          <div class="field">
+            <label>업체 사진 (최대 6장, 장당 800KB 이하)</label>
+            <div class="photo-upload-zone" id="photo-upload-zone">
+              <input type="file" id="photo-input" accept="image/*" multiple style="display:none;">
+              📷 클릭해서 사진을 업로드하세요
+            </div>
+            <div class="photo-grid" id="photo-grid"></div>
+            <div class="photo-count" id="photo-count">0 / 6장</div>
+          </div>
+          <button class="btn btn-primary" id="btn-save-info">저장하기</button>
+        </div>
+
+        <div class="detail-section" style="margin-top:28px; margin-bottom:0;">
+          <h3>상세페이지 노출 미리보기</h3>
+          <p class="text-muted" style="font-size:12.5px; margin-bottom:14px;">고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.</p>
+          <div class="detail-gallery" id="preview-gallery"></div>
+        </div>
+      </div>
+
+      <!-- 받은 견적 요청 -->
+      <div class="mypage-panel" id="panel-requests">
+        <div class="mypage-panel-head">
+          <h2>📥 받은 견적 요청</h2>
+          <p>고객이 보낸 견적 요청에 답변해보세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>고객명</th><th>요청내용</th><th>지역</th><th>희망 예산</th><th>요청일</th><th>상태</th></tr></thead>
+          <tbody id="requests-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 예약 관리 -->
+      <div class="mypage-panel" id="panel-bookings">
+        <div class="mypage-panel-head">
+          <h2>📅 예약 관리</h2>
+          <p>고객 상담·촬영 예약 일정을 확인하세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>고객명</th><th>예약 종류</th><th>일시</th><th>상태</th></tr></thead>
+          <tbody id="bookings-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 정산·매출 -->
+      <div class="mypage-panel" id="panel-sales">
+        <div class="mypage-panel-head">
+          <h2>💰 정산·매출</h2>
+          <p>이번 달 매출과 정산 현황입니다.</p>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card"><span>이번 달 매출</span><b>4,850,000원</b></div>
+          <div class="stat-card"><span>정산 예정 금액</span><b>1,200,000원</b></div>
+          <div class="stat-card"><span>누적 견적 문의</span><b>128건</b></div>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>내역</th><th>고객명</th><th>금액</th><th>정산일</th><th>상태</th></tr></thead>
+          <tbody id="sales-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 리뷰 관리 -->
+      <div class="mypage-panel" id="panel-reviews">
+        <div class="mypage-panel-head">
+          <h2>⭐ 리뷰 관리</h2>
+          <p>고객이 남긴 리뷰를 확인하세요.</p>
+        </div>
+        <div id="reviews-list"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+  // 로그인 가드: 비로그인 시 기업 로그인 페이지로, 개인 회원이면 개인 마이페이지로 이동
+  const currentUser = WeddingStore.getUser();
+  if (!currentUser) {
+    location.href = "login-business.html";
+  } else if (currentUser.type !== "business") {
+    location.href = "mypage.html";
+  } else {
+    document.getElementById("mp-name").textContent = currentUser.name;
+    document.getElementById("mp-avatar").textContent = currentUser.name.charAt(0);
+    document.getElementById("biz-name-input").value = currentUser.name;
+    if (currentUser.bizNo) document.getElementById("biz-no-display").value = currentUser.bizNo;
+    weddingRenderHeader();
+  }
+
+  // 업체 지역 설정 (네이버 지도 검색 위젯 재사용)
+  let bizRegion = (currentUser && currentUser.region) || "";
+  if (bizRegion) {
+    document.getElementById("biz-region-label").textContent = `📍 선택한 지역: ${bizRegion}`;
+    document.getElementById("mp-region-tag").textContent = `기업 회원 · ${bizRegion}`;
+  }
+  initNaverRegionPicker({
+    mapElId: "biz-region-map",
+    queryInputId: "biz-region-query",
+    searchBtnId: "biz-region-search-btn",
+    labelElId: "biz-region-label",
+    onSelect: (text) => { bizRegion = text; },
+  });
+
+  // ---------- 업체 사진 업로드/관리 ----------
+  // 백엔드 없이 브라우저에서만 동작하는 프로토타입: 이미지를 data URL로 변환해 계정 정보에 저장한다.
+  // localStorage 용량 제한 때문에 장수/용량을 제한한다.
+  const PHOTO_MAX_COUNT = 6;
+  const PHOTO_MAX_SIZE = 800 * 1024; // 800KB
+  let bizPhotos = (currentUser && currentUser.photos) || [];
+
+  function renderPhotoGrid() {
+    document.getElementById("photo-grid").innerHTML = bizPhotos.map((src, i) => `
+      <div class="photo-thumb">
+        <img src="${src}" alt="업체 사진 ${i + 1}">
+        <button type="button" class="remove-btn" data-remove-photo="${i}">✕</button>
+      </div>
+    `).join("");
+    document.getElementById("photo-count").textContent = `${bizPhotos.length} / ${PHOTO_MAX_COUNT}장`;
+    renderPreviewGallery();
+  }
+
+  function renderPreviewGallery() {
+    const el = document.getElementById("preview-gallery");
+    if (!el) return;
+    if (bizPhotos.length === 0) {
+      el.innerHTML = Array.from({ length: 5 }, (_, i) => `<div class="g-item${i === 0 ? " g-main" : ""}">🏢</div>`).join("");
+      return;
+    }
+    const tiles = [];
+    for (let i = 0; i < 5; i++) {
+      const src = bizPhotos[i % bizPhotos.length];
+      tiles.push(`<div class="g-item${i === 0 ? " g-main" : ""}" style="padding:0;"><img src="${src}" alt="업체 사진"></div>`);
+    }
+    el.innerHTML = tiles.join("");
+  }
+
+  function addPhotoFiles(files) {
+    // FileReader는 비동기라, forEach 도중엔 bizPhotos.length가 아직 갱신되지 않는다.
+    // 배치로 여러 장을 한 번에 선택해도 최대 장수를 넘기지 않도록 별도 카운터로 자리를 미리 예약한다.
+    let reserved = bizPhotos.length;
+    [...files].forEach((file) => {
+      if (reserved >= PHOTO_MAX_COUNT) {
+        WeddingStore.toast(`사진은 최대 ${PHOTO_MAX_COUNT}장까지 업로드할 수 있습니다`);
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        WeddingStore.toast(`${file.name}은(는) 이미지 파일이 아닙니다`);
+        return;
+      }
+      if (file.size > PHOTO_MAX_SIZE) {
+        WeddingStore.toast(`${file.name}은(는) 800KB를 초과해 업로드할 수 없습니다`);
+        return;
+      }
+      reserved++;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        bizPhotos.push(e.target.result);
+        renderPhotoGrid();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  renderPhotoGrid();
+
+  document.getElementById("photo-upload-zone").addEventListener("click", () => {
+    document.getElementById("photo-input").click();
+  });
+  document.getElementById("photo-input").addEventListener("change", (e) => {
+    addPhotoFiles(e.target.files);
+    e.target.value = "";
+  });
+  const uploadZone = document.getElementById("photo-upload-zone");
+  uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.classList.add("dragover"); });
+  uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+  uploadZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove("dragover");
+    addPhotoFiles(e.dataTransfer.files);
+  });
+
+  const REQUESTS = [
+    { customer: "김민수", content: "본식 스냅 촬영 문의", region: "서울 강남구", budget: "1,000,000원대", date: "2026-07-08", status: "wait", label: "답변대기" },
+    { customer: "이서연", content: "야외 촬영 가능 여부", region: "경기 하남시", budget: "1,500,000원대", date: "2026-07-05", status: "done", label: "답변완료" },
+    { customer: "박준호", content: "주말 예약 문의", region: "서울 서초구", budget: "900,000원대", date: "2026-07-01", status: "done", label: "답변완료" },
+  ];
+
+  const BOOKINGS = [
+    { customer: "이서연", type: "야외 촬영 상담", date: "2026-07-22 15:00", status: "progress", label: "예정" },
+    { customer: "박준호", type: "촬영 컨셉 상담", date: "2026-07-18 10:00", status: "progress", label: "예정" },
+    { customer: "최유리", type: "본식 스냅 촬영", date: "2026-06-14 09:00", status: "done", label: "완료" },
+  ];
+
+  const SALES = [
+    { title: "본식 스냅 촬영", customer: "최유리", amount: "1,200,000원", date: "2026-06-20", status: "done", label: "정산완료" },
+    { title: "야외 촬영 예약금", customer: "이서연", amount: "300,000원", date: "2026-07-15", status: "wait", label: "정산대기" },
+  ];
+
+  const REVIEWS = [
+    { name: "최유리", stars: 5, txt: "사진이 정말 자연스럽게 잘 나왔어요! 스튜디오 분위기도 좋았습니다.", date: "2026-06-25" },
+    { name: "정하은", stars: 4, txt: "친절하게 설명해주셔서 편하게 촬영할 수 있었어요.", date: "2026-06-18" },
+  ];
+
+  function statusPill(status, label) {
+    return `<span class="status-pill status-${status}">${label}</span>`;
+  }
+
+  function renderRequests() {
+    document.getElementById("requests-body").innerHTML = REQUESTS.map(r => `
+      <tr><td>${r.customer}</td><td>${r.content}</td><td>${r.region}</td><td>${r.budget}</td><td>${r.date}</td><td>${statusPill(r.status, r.label)}</td></tr>
+    `).join("");
+  }
+
+  function renderBookings() {
+    document.getElementById("bookings-body").innerHTML = BOOKINGS.map(b => `
+      <tr><td>${b.customer}</td><td>${b.type}</td><td>${b.date}</td><td>${statusPill(b.status, b.label)}</td></tr>
+    `).join("");
+  }
+
+  function renderSales() {
+    document.getElementById("sales-body").innerHTML = SALES.map(s => `
+      <tr><td>${s.title}</td><td>${s.customer}</td><td>${s.amount}</td><td>${s.date}</td><td>${statusPill(s.status, s.label)}</td></tr>
+    `).join("");
+  }
+
+  function renderReviews() {
+    document.getElementById("reviews-list").innerHTML = REVIEWS.map(r => `
+      <div class="review-item">
+        <div class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+        <div class="txt">${r.txt}</div>
+        <div class="meta">${r.name} · ${r.date}</div>
+      </div>
+    `).join("");
+  }
+
+  renderRequests();
+  renderBookings();
+  renderSales();
+  renderReviews();
+
+  document.addEventListener("click", (e) => {
+    const navItem = e.target.closest("#side-nav a");
+    if (navItem) {
+      document.querySelectorAll("#side-nav a").forEach(a => a.classList.remove("active"));
+      navItem.classList.add("active");
+      document.querySelectorAll(".mypage-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById(navItem.dataset.target).classList.add("active");
+      return;
+    }
+    if (e.target.closest("#btn-save-info")) {
+      const user = WeddingStore.getUser();
+      if (user) {
+        user.region = bizRegion;
+        user.photos = bizPhotos;
+        try {
+          WeddingStore.setUser(user);
+          WeddingStore.saveAccount(user);
+        } catch (err) {
+          WeddingStore.toast("사진 용량이 너무 커서 저장하지 못했습니다. 사진 수나 크기를 줄여주세요.");
+          return;
+        }
+      }
+      document.getElementById("mp-region-tag").textContent = bizRegion ? `기업 회원 · ${bizRegion}` : "기업 회원";
+      WeddingStore.toast("업체 정보가 저장되었습니다");
+      return;
+    }
+    const removePhotoBtn = e.target.closest("[data-remove-photo]");
+    if (removePhotoBtn) {
+      const idx = Number(removePhotoBtn.dataset.removePhoto);
+      bizPhotos.splice(idx, 1);
+      renderPhotoGrid();
+      return;
+    }
+    if (e.target.closest("#btn-logout-side")) {
+      WeddingStore.logout();
+      WeddingStore.toast("로그아웃 되었습니다");
+      setTimeout(() => (location.href = "index.html"), 500);
+    }
+  });
+</script>
+</body>
+</html>
