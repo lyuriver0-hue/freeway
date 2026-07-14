@@ -153,6 +153,7 @@ function initAccordion(){ /* no-op: handled by delegated listener below */ }
 function freewayMypageSidebar(role, activeHref){
   const user = FreewayStore.getUser() || {name: role==='freelancer' ? '김프리랜서' : '박클라이언트'};
   const flLinks = [
+    ['mypage-fl-profile.html','🖼️','업체 사진·포트폴리오 관리'],
     ['mypage-fl-services.html','🛠️','서비스 관리'],
     ['mypage-fl-quotes.html','📋','제안 견적서 관리'],
     ['mypage-fl-earnings.html','💰','수익 현황'],

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>업체 사진·포트폴리오 관리 | 프리웨이</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .biz-photo-wrap{display:flex; gap:22px; align-items:center; flex-wrap:wrap;}
+  .biz-photo{width:120px; height:120px; border-radius:20px; object-fit:cover; background:var(--primary-light); flex-shrink:0;}
+  .biz-photo-placeholder{width:120px; height:120px; border-radius:20px; background:var(--primary-light); color:var(--primary); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:38px; flex-shrink:0;}
+  .biz-photo-actions{display:flex; gap:8px;}
+  .biz-photo-hint{font-size:12.5px; color:var(--gray-500); margin-top:8px;}
+
+  .portfolio-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:18px;}
+  @media (max-width:860px){ .portfolio-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .portfolio-grid{grid-template-columns:1fr;} }
+  .pf-item{position:relative; border:1px solid var(--gray-200); border-radius:var(--radius); overflow:hidden; background:#fff;}
+  .pf-item img{width:100%; aspect-ratio:4/3; object-fit:cover; display:block;}
+  .pf-item .pf-body{padding:12px 14px;}
+  .pf-item .pf-title{font-weight:700; font-size:13.5px; margin-bottom:4px;}
+  .pf-item .pf-desc{font-size:12px; color:var(--gray-500); line-height:1.5;}
+  .pf-item .pf-del{position:absolute; top:8px; right:8px; width:30px; height:30px; border-radius:50%; background:rgba(17,24,39,0.55); color:#fff; border:none; cursor:pointer; font-size:14px;}
+  .pf-item .pf-del:hover{background:#DC2626;}
+
+  .upload-drop{border:1.5px dashed var(--gray-300); border-radius:var(--radius-sm); padding:20px; text-align:center; cursor:pointer; font-size:13px; color:var(--gray-500);}
+  .upload-drop:hover{border-color:var(--primary); color:var(--primary);}
+  .upload-preview{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:var(--radius-sm); margin-top:10px; display:none;}
+  .upload-preview.show{display:block;}
+</style>
+</head>
+<body>
+<header class="site-header"></header>
+
+<main class="page container">
+  <div class="mypage-layout">
+    <aside class="mypage-side" id="side"></aside>
+    <div>
+      <h1 class="section-title" style="font-size:22px; margin-bottom:20px;">업체 사진·포트폴리오 관리</h1>
+
+      <div class="card pad-24" style="margin-bottom:24px;">
+        <h3 style="font-size:15.5px; margin-bottom:16px;">업체 대표 사진</h3>
+        <div class="biz-photo-wrap">
+          <img class="biz-photo" id="biz-photo-img" style="display:none;">
+          <div class="biz-photo-placeholder" id="biz-photo-placeholder"></div>
+          <div>
+            <div class="biz-photo-actions">
+              <button class="btn btn-primary btn-sm" onclick="document.getElementById('biz-photo-input').click()">사진 변경</button>
+              <button class="btn btn-outline-danger btn-sm" id="biz-photo-remove">삭제</button>
+            </div>
+            <p class="biz-photo-hint">전문가 프로필 상단과 검색 결과에 노출되는 대표 사진입니다.</p>
+            <input type="file" accept="image/*" id="biz-photo-input" style="display:none;">
+          </div>
+        </div>
+      </div>
+
+      <div class="card pad-24">
+        <div class="section-head" style="margin-bottom:0;">
+          <h3 style="font-size:15.5px;">포트폴리오</h3>
+          <button class="btn btn-primary btn-sm" onclick="openModal('pf-add-modal')">+ 포트폴리오 추가</button>
+        </div>
+        <div class="portfolio-grid" id="pf-grid"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="pf-add-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('pf-add-modal')">✕</button>
+    <h3>포트폴리오 추가</h3>
+    <div class="field">
+      <label>이미지</label>
+      <div class="upload-drop" onclick="document.getElementById('pf-img-input').click()">클릭해서 이미지를 선택하세요</div>
+      <input type="file" accept="image/*" id="pf-img-input" style="display:none;">
+      <img class="upload-preview" id="pf-img-preview">
+    </div>
+    <div class="field"><label>제목</label><input type="text" id="pf-title" placeholder="예: 스타트업 브랜드 아이덴티티 리뉴얼"></div>
+    <div class="field"><label>설명</label><textarea id="pf-desc" placeholder="작업 내용을 간단히 소개해주세요"></textarea></div>
+    <button class="btn btn-primary btn-block" id="pf-submit">등록하기</button>
+  </div>
+</div>
+
+<footer class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/common.js"></script>
+<script>
+  freewayMount();
+  document.getElementById('side').innerHTML = freewayMypageSidebar('freelancer', 'mypage-fl-profile.html');
+
+  const myFlId = 'f1';
+  const myFl = FREEWAY_FREELANCERS.find(f=>f.id===myFlId);
+
+  function readImageAsDataURL(file, maxSize){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = ()=>{
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = ()=>{
+          const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /* ---------------- 업체 대표 사진 ---------------- */
+  function renderPhoto(){
+    const photo = FreewayStore.getFlPhoto(myFlId);
+    document.getElementById('biz-photo-img').style.display = photo ? 'block' : 'none';
+    document.getElementById('biz-photo-img').src = photo || '';
+    document.getElementById('biz-photo-placeholder').style.display = photo ? 'none' : 'flex';
+    document.getElementById('biz-photo-placeholder').textContent = myFl.avatar;
+  }
+  renderPhoto();
+
+  document.getElementById('biz-photo-input').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const dataUrl = await readImageAsDataURL(file, 480);
+    FreewayStore.setFlPhoto(myFlId, dataUrl);
+    renderPhoto();
+    FreewayStore.toast('업체 사진이 변경되었습니다');
+    e.target.value = '';
+  });
+
+  document.getElementById('biz-photo-remove').addEventListener('click', ()=>{
+    FreewayStore.removeFlPhoto(myFlId);
+    renderPhoto();
+    FreewayStore.toast('업체 사진이 삭제되었습니다');
+  });
+
+  /* ---------------- 포트폴리오 ---------------- */
+  function renderPortfolio(){
+    const list = FreewayStore.getFlPortfolio(myFlId);
+    document.getElementById('pf-grid').innerHTML = list.map(p=>`
+      <div class="pf-item">
+        <button class="pf-del" data-pf-del="${p.id}">✕</button>
+        <img src="${p.image}">
+        <div class="pf-body">
+          <div class="pf-title">${p.title}</div>
+          <div class="pf-desc">${p.desc || ''}</div>
+        </div>
+      </div>`).join('') || '<p class="text-muted" style="grid-column:1/-1;">등록된 포트폴리오가 없습니다. 대표 작업물을 추가해보세요.</p>';
+  }
+  renderPortfolio();
+
+  document.getElementById('pf-grid').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-pf-del]');
+    if(!btn) return;
+    FreewayStore.removeFlPortfolioItem(myFlId, btn.getAttribute('data-pf-del'));
+    renderPortfolio();
+    FreewayStore.toast('포트폴리오가 삭제되었습니다');
+  });
+
+  let pendingPfImage = null;
+  document.getElementById('pf-img-input').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    pendingPfImage = await readImageAsDataURL(file, 800);
+    const preview = document.getElementById('pf-img-preview');
+    preview.src = pendingPfImage;
+    preview.classList.add('show');
+  });
+
+  document.getElementById('pf-submit').addEventListener('click', ()=>{
+    const title = document.getElementById('pf-title').value.trim();
+    const desc = document.getElementById('pf-desc').value.trim();
+    if(!pendingPfImage){ FreewayStore.toast('이미지를 선택해주세요'); return; }
+    if(!title){ FreewayStore.toast('제목을 입력해주세요'); return; }
+    FreewayStore.addFlPortfolioItem(myFlId, {id:'pf'+Date.now(), title, desc, image: pendingPfImage});
+    renderPortfolio();
+    closeModal('pf-add-modal');
+    FreewayStore.toast('포트폴리오가 등록되었습니다');
+    document.getElementById('pf-title').value = '';
+    document.getElementById('pf-desc').value = '';
+    document.getElementById('pf-img-preview').classList.remove('show');
+    document.getElementById('pf-img-preview').src = '';
+    pendingPfImage = null;
+  });
+</script>
+</body>
+</html>

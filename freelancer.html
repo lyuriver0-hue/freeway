@@ -13,6 +13,11 @@
   .career-item{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--gray-100);}
   .career-item .dot-line{width:10px; height:10px; border-radius:50%; background:var(--primary); margin-top:5px; flex-shrink:0;}
   .skill-tag{display:inline-block; background:var(--gray-100); padding:6px 12px; border-radius:100px; font-size:12.5px; font-weight:600; color:var(--gray-700); margin:0 6px 6px 0;}
+  .avatar.xl img{width:100%; height:100%; object-fit:cover; border-radius:inherit;}
+  .pf-lightbox{position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:3000; padding:24px;}
+  .pf-lightbox.open{display:flex;}
+  .pf-lightbox img{max-width:min(900px,90vw); max-height:85vh; border-radius:8px;}
+  .pf-lightbox .lb-close{position:absolute; top:24px; right:32px; font-size:28px; cursor:pointer; color:#fff;}
 </style>
 </head>
 <body>
@@ -82,6 +87,11 @@
   </div>
 </main>
 
+<div class="pf-lightbox" id="pf-lightbox">
+  <span class="lb-close" onclick="closeModal('pf-lightbox')">✕</span>
+  <img id="lb-img">
+</div>
+
 <footer class="site-footer"></footer>
 
 <script src="js/data.js"></script>
@@ -91,7 +101,8 @@
   const params = new URLSearchParams(location.search);
   const fl = FREEWAY_FREELANCERS.find(f=>f.id===params.get('id')) || FREEWAY_FREELANCERS[0];
 
-  document.getElementById('fl-avatar').textContent = fl.avatar;
+  const flPhoto = FreewayStore.getFlPhoto(fl.id);
+  document.getElementById('fl-avatar').innerHTML = flPhoto ? `<img src="${flPhoto}">` : fl.avatar;
   document.getElementById('fl-name').innerHTML = `${fl.name} ${fl.verified?'<span class="verified">✔</span>':''}`;
   document.getElementById('fl-role').textContent = `${fl.role} · ${fl.career}`;
   document.getElementById('fl-rating').textContent = fl.rating;
@@ -119,11 +130,25 @@
       </div>
     </a>`).join('') || '<p class="text-muted">등록된 서비스가 없습니다.</p>';
 
-  document.getElementById('fl-portfolio').innerHTML = ['🖼️','🖌️','📐','🧩','📱','🎯'].map((e,i)=>`
+  const flPortfolio = FreewayStore.getFlPortfolio(fl.id);
+  document.getElementById('fl-portfolio').innerHTML = flPortfolio.length ? flPortfolio.map(p=>`
+    <div class="svc-card" data-pf-view="${p.id}">
+      <div class="svc-thumb" style="padding:0;"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
+      <div class="svc-body"><div class="svc-title">${p.title}</div></div>
+    </div>`).join('') : ['🖼️','🖌️','📐','🧩','📱','🎯'].map((e,i)=>`
     <a class="svc-card" href="portfolio.html?id=p${i+1}">
       <div class="svc-thumb" style="font-size:40px;">${e}</div>
       <div class="svc-body"><div class="svc-title">포트폴리오 프로젝트 ${i+1}</div></div>
     </a>`).join('');
+
+  document.getElementById('fl-portfolio').addEventListener('click', (e)=>{
+    const card = e.target.closest('[data-pf-view]');
+    if(!card) return;
+    const item = flPortfolio.find(p=>p.id===card.getAttribute('data-pf-view'));
+    if(!item) return;
+    document.getElementById('lb-img').src = item.image;
+    openModal('pf-lightbox');
+  });
 
   document.getElementById('fl-career-list').innerHTML = `
     <div class="career-item"><div class="dot-line"></div><div><b>${fl.role}</b> · 프리랜서 활동 (현재)<div class="text-muted" style="font-size:12.5px;">2019 ~ 현재</div></div></div>
