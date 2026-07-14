@@ -101,6 +101,36 @@ function saveInquiry(inquiry) {
   });
   localStorage.setItem(INQUIRIES_KEY, JSON.stringify(list));
 }
+// 예약(상담 신청)에 대한 계약금 결제를 모의 처리 — 결제내역 탭은 paid=true인 신청 내역을 그대로 보여준다.
+function markInquiryPaid(id, amount) {
+  const list = getInquiries();
+  const target = list.find((r) => r.id === id);
+  if (!target) return;
+  target.paid = true;
+  target.paidAmount = amount;
+  target.paidAt = new Date().toISOString().slice(0, 10);
+  localStorage.setItem(INQUIRIES_KEY, JSON.stringify(list));
+}
+
+// ---------- 1:1 문의 ----------
+const SUPPORT_KEY = "weddingcom_support_tickets";
+function getSupportTickets() {
+  try {
+    return JSON.parse(localStorage.getItem(SUPPORT_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveSupportTicket(ticket) {
+  const list = getSupportTickets();
+  list.push({
+    id: Date.now(),
+    status: "wait",
+    createdAt: new Date().toISOString().slice(0, 10),
+    ...ticket,
+  });
+  localStorage.setItem(SUPPORT_KEY, JSON.stringify(list));
+}
 
 // 로그인 상태에 따라 헤더 nav-actions 영역을 갱신 (모든 페이지 공통)
 function weddingRenderHeader() {

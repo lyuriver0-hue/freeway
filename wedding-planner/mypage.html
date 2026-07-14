@@ -88,7 +88,7 @@
           <p>상담·촬영·피팅 등 예정된 일정입니다.</p>
         </div>
         <table class="list-table">
-          <thead><tr><th>일정</th><th>업체</th><th>날짜</th><th>상태</th></tr></thead>
+          <thead><tr><th>일정</th><th>업체</th><th>날짜</th><th>상태</th><th>결제</th></tr></thead>
           <tbody id="bookings-body"></tbody>
         </table>
       </div>
@@ -110,6 +110,11 @@
         <div class="mypage-panel-head">
           <h2>💬 문의내역</h2>
           <p>1:1 문의 답변 상태를 확인하세요.</p>
+        </div>
+        <div class="biz-info-card" style="margin-bottom:24px;">
+          <div class="field"><label>제목</label><input type="text" id="tk-title" placeholder="문의 제목을 입력해주세요"></div>
+          <div class="field" style="margin-bottom:0;"><label>내용</label><textarea rows="3" id="tk-content" placeholder="문의하실 내용을 입력해주세요"></textarea></div>
+          <button type="button" class="btn btn-primary" id="btn-submit-ticket" style="margin-top:14px;">문의 등록하기</button>
         </div>
         <table class="list-table">
           <thead><tr><th>제목</th><th>문의일</th><th>상태</th></tr></thead>
@@ -194,15 +199,13 @@
     return r.type === "fair" ? `fair-detail.html?id=${r.listingId}` : `detail.html?type=${r.type}&id=${r.listingId}`;
   }
 
-  const PAYMENTS = [
-    { title: "웨딩홀 계약금", name: "아펠가모 반포", amount: "3,000,000원", date: "2026-06-25", status: "done", label: "결제완료" },
-    { title: "스튜디오 예약금", name: "아르센 스튜디오", amount: "300,000원", date: "2026-06-05", status: "done", label: "결제완료" },
-  ];
-
-  const INQUIRIES = [
-    { title: "웨딩홀 주차 문의", date: "2026-07-01", status: "done", label: "답변완료" },
-    { title: "결제 취소 문의", date: "2026-07-10", status: "wait", label: "답변대기" },
-  ];
+  // 예약 건의 계약금(10%) 추정 — 리스팅 가격이 숫자로 표기된 경우에만 계산 가능
+  function estimateDeposit(r) {
+    const listing = getListing(r.type, r.listingId);
+    const priceVal = listing ? getPriceValue(listing.price) : null;
+    if (priceVal === null) return null;
+    return Math.round((priceVal * 0.1) / 10000) * 10000;
+  }
 
   function statusPill(status, label) {
     return `<span class="status-pill status-${status}">${label}</span>`;
@@ -268,28 +271,59 @@
     const requests = getInquiries();
     const tbody = document.getElementById("bookings-body");
     if (requests.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
       return;
     }
-    tbody.innerHTML = requests.slice().reverse().map(r => `
+    tbody.innerHTML = requests.slice().reverse().map(r => {
+      let payCell;
+      if (r.type === "fair") {
+        payCell = `<span class="text-muted" style="font-size:12px;">해당 없음</span>`;
+      } else if (r.paid) {
+        payCell = statusPill("done", "결제완료");
+      } else {
+        const deposit = estimateDeposit(r);
+        payCell = deposit === null
+          ? `<span class="text-muted" style="font-size:12px;">예치금 협의</span>`
+          : `<button type="button" class="btn btn-primary btn-sm" data-pay-id="${r.id}" data-pay-amount="${deposit}">계약금 결제 (${deposit.toLocaleString()}원)</button>`;
+      }
+      return `
+        <tr>
+          <td>${r.type === "fair" ? "박람회 사전등록" : "상담 신청"}</td>
+          <td><a href="${requestDetailHref(r)}">${r.businessName}</a></td>
+          <td>${r.preferredDate || r.createdAt}</td>
+          <td>${statusPill("wait", "예정")}</td>
+          <td>${payCell}</td>
+        </tr>`;
+    }).join("");
+  }
+
+  function renderPayments() {
+    const paid = getInquiries().filter(r => r.paid);
+    const tbody = document.getElementById("payments-body");
+    if (paid.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 결제 내역이 없어요. 예약 일정에서 계약금을 결제해보세요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = paid.slice().reverse().map(r => `
       <tr>
-        <td>${r.type === "fair" ? "박람회 사전등록" : "상담 신청"}</td>
+        <td>계약금</td>
         <td><a href="${requestDetailHref(r)}">${r.businessName}</a></td>
-        <td>${r.preferredDate || r.createdAt}</td>
-        <td>${statusPill("wait", "예정")}</td>
+        <td>${Number(r.paidAmount).toLocaleString()}원</td>
+        <td>${r.paidAt}</td>
+        <td>${statusPill("done", "결제완료")}</td>
       </tr>
     `).join("");
   }
 
-  function renderPayments() {
-    document.getElementById("payments-body").innerHTML = PAYMENTS.map(p => `
-      <tr><td>${p.title}</td><td>${p.name}</td><td>${p.amount}</td><td>${p.date}</td><td>${statusPill(p.status, p.label)}</td></tr>
-    `).join("");
-  }
-
   function renderInquiries() {
-    document.getElementById("inquiries-body").innerHTML = INQUIRIES.map(i => `
-      <tr><td>${i.title}</td><td>${i.date}</td><td>${statusPill(i.status, i.label)}</td></tr>
+    const tickets = getSupportTickets();
+    const tbody = document.getElementById("inquiries-body");
+    if (tickets.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:var(--gray-500); padding:30px 0;">등록된 문의가 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = tickets.slice().reverse().map(t => `
+      <tr><td>${t.title}</td><td>${t.createdAt}</td><td>${statusPill("wait", "답변대기")}</td></tr>
     `).join("");
   }
 
@@ -311,6 +345,30 @@
       WeddingStore.toast("찜 목록에서 제거했습니다");
       populateRegionFilter();
       renderFavorites();
+      return;
+    }
+    const payBtn = e.target.closest("[data-pay-id]");
+    if (payBtn) {
+      const id = Number(payBtn.dataset.payId);
+      const amount = Number(payBtn.dataset.payAmount);
+      markInquiryPaid(id, amount);
+      WeddingStore.toast(`계약금 ${amount.toLocaleString()}원 결제가 완료되었습니다`);
+      renderBookings();
+      renderPayments();
+      return;
+    }
+    if (e.target.closest("#btn-submit-ticket")) {
+      const title = document.getElementById("tk-title").value.trim();
+      const content = document.getElementById("tk-content").value.trim();
+      if (!title || !content) {
+        WeddingStore.toast("제목과 내용을 입력해주세요");
+        return;
+      }
+      saveSupportTicket({ title, content });
+      document.getElementById("tk-title").value = "";
+      document.getElementById("tk-content").value = "";
+      WeddingStore.toast("문의가 등록되었습니다");
+      renderInquiries();
       return;
     }
     const navItem = e.target.closest("#side-nav a");
