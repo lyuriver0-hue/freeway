@@ -80,6 +80,28 @@ function normalizeUrl(raw) {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
+// ---------- 상담 신청 / 견적 문의 ----------
+// 상세페이지·박람회 상세페이지의 신청 폼 제출을 실제로 저장해, 마이페이지의
+// 견적함·예약 일정 탭이 이 데이터를 그대로 조회해서 보여준다.
+const INQUIRIES_KEY = "weddingcom_inquiries";
+function getInquiries() {
+  try {
+    return JSON.parse(localStorage.getItem(INQUIRIES_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveInquiry(inquiry) {
+  const list = getInquiries();
+  list.push({
+    id: Date.now(),
+    status: "wait",
+    createdAt: new Date().toISOString().slice(0, 10),
+    ...inquiry,
+  });
+  localStorage.setItem(INQUIRIES_KEY, JSON.stringify(list));
+}
+
 // 로그인 상태에 따라 헤더 nav-actions 영역을 갱신 (모든 페이지 공통)
 function weddingRenderHeader() {
   const nav = document.querySelector(".nav-actions");

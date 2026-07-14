@@ -186,17 +186,13 @@
       .filter(Boolean);
   }
 
-  const QUOTES = [
-    { name: "더채플앳 논현", type: "웨딩홀", budget: "2,000,000원대", date: "2026-06-20", status: "progress", label: "검토중" },
-    { name: "아르센 스튜디오", type: "스튜디오", budget: "1,000,000원대", date: "2026-06-15", status: "done", label: "견적완료" },
-    { name: "모리엠포티", type: "드레스", budget: "1,500,000원대", date: "2026-06-10", status: "wait", label: "답변대기" },
-  ];
-
-  const BOOKINGS = [
-    { title: "웨딩홀 방문 상담", name: "아펠가모 반포", date: "2026-07-20 14:00", status: "progress", label: "예정" },
-    { title: "드레스 피팅", name: "클라라웨딩", date: "2026-07-25 11:00", status: "progress", label: "예정" },
-    { title: "스튜디오 촬영", name: "아르센 스튜디오", date: "2026-06-02 10:00", status: "done", label: "완료" },
-  ];
+  // 상세페이지 "상담 신청" / 박람회 "사전등록" 폼에서 저장한 실제 신청 내역
+  function requestTypeLabel(r) {
+    return LISTING_TYPE_LABEL[r.type] || r.type;
+  }
+  function requestDetailHref(r) {
+    return r.type === "fair" ? `fair-detail.html?id=${r.listingId}` : `detail.html?type=${r.type}&id=${r.listingId}`;
+  }
 
   const PAYMENTS = [
     { title: "웨딩홀 계약금", name: "아펠가모 반포", amount: "3,000,000원", date: "2026-06-25", status: "done", label: "결제완료" },
@@ -251,14 +247,37 @@
   }
 
   function renderQuotes() {
-    document.getElementById("quotes-body").innerHTML = QUOTES.map(q => `
-      <tr><td>${q.name}</td><td>${q.type}</td><td>${q.budget}</td><td>${q.date}</td><td>${statusPill(q.status, q.label)}</td></tr>
+    const requests = getInquiries();
+    const tbody = document.getElementById("quotes-body");
+    if (requests.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 요청한 견적이 없어요. 관심 있는 업체 상세페이지에서 상담을 신청해보세요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = requests.slice().reverse().map(r => `
+      <tr>
+        <td><a href="${requestDetailHref(r)}">${r.businessName}</a></td>
+        <td>${requestTypeLabel(r)}</td>
+        <td>${r.budget || "미입력"}</td>
+        <td>${r.createdAt}</td>
+        <td>${statusPill("wait", "답변대기")}</td>
+      </tr>
     `).join("");
   }
 
   function renderBookings() {
-    document.getElementById("bookings-body").innerHTML = BOOKINGS.map(b => `
-      <tr><td>${b.title}</td><td>${b.name}</td><td>${b.date}</td><td>${statusPill(b.status, b.label)}</td></tr>
+    const requests = getInquiries();
+    const tbody = document.getElementById("bookings-body");
+    if (requests.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = requests.slice().reverse().map(r => `
+      <tr>
+        <td>${r.type === "fair" ? "박람회 사전등록" : "상담 신청"}</td>
+        <td><a href="${requestDetailHref(r)}">${r.businessName}</a></td>
+        <td>${r.preferredDate || r.createdAt}</td>
+        <td>${statusPill("wait", "예정")}</td>
+      </tr>
     `).join("");
   }
 

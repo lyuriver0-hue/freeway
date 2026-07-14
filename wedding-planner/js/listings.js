@@ -128,7 +128,7 @@ const LISTINGS = {
   ],
 };
 
-const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업", suit: "예복", jewelry: "예물" };
+const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업", suit: "예복", jewelry: "예물", fair: "웨딩박람회" };
 
 // 웨딩박람회 — 업체(가격표·예약) 모델과 달리 날짜·장소·참가업체 중심의 행사 데이터
 const FAIRS = [

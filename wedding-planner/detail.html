@@ -82,6 +82,7 @@
           <div class="field"><label>이름</label><input type="text" id="bk-name" placeholder="홍길동"></div>
           <div class="field"><label>연락처</label><input type="tel" id="bk-phone" placeholder="010-0000-0000"></div>
           <div class="field"><label>희망 상담일</label><input type="date" id="bk-date"></div>
+          <div class="field"><label>희망 예산 (선택)</label><input type="text" id="bk-budget" placeholder="예: 200만원대"></div>
           <div class="field"><label>문의 내용</label><textarea rows="3" id="bk-msg" placeholder="문의하실 내용을 남겨주세요."></textarea></div>
           <button type="submit" class="btn btn-primary btn-block btn-lg">상담 신청하기</button>
         </form>
@@ -241,6 +242,14 @@
         WeddingStore.toast("이름과 연락처를 입력해주세요");
         return;
       }
+      saveInquiry({
+        type: detailType,
+        listingId: detailId,
+        businessName: item.name,
+        budget: document.getElementById("bk-budget").value.trim(),
+        preferredDate: document.getElementById("bk-date").value,
+        message: document.getElementById("bk-msg").value.trim(),
+      });
       document.getElementById("booking-form").style.display = "none";
       document.getElementById("booking-success").classList.add("show");
     });

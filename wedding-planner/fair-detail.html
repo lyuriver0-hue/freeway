@@ -179,6 +179,14 @@
         WeddingStore.toast("이름과 연락처를 입력해주세요");
         return;
       }
+      saveInquiry({
+        type: "fair",
+        listingId: fairId,
+        businessName: fair.name,
+        budget: "",
+        preferredDate: fair.dateStart,
+        message: `${document.getElementById("rg-email").value.trim()} 사전등록`,
+      });
       document.getElementById("register-form").style.display = "none";
       document.getElementById("register-success").classList.add("show");
     });
