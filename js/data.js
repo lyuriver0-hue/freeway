@@ -228,6 +228,24 @@ const FreewayStore = {
     return true;
   },
 
+  /* ---- 전문가 마이페이지: 업체 사진 ---- */
+  getFlPhoto(flId){ return this._get(`freeway_fl_photo_${flId}`, null); },
+  setFlPhoto(flId, dataUrl){ this._set(`freeway_fl_photo_${flId}`, dataUrl); },
+  removeFlPhoto(flId){ localStorage.removeItem(`freeway_fl_photo_${flId}`); },
+
+  /* ---- 전문가 마이페이지: 포트폴리오 ---- */
+  getFlPortfolio(flId){ return this._get(`freeway_fl_portfolio_${flId}`, []); },
+  addFlPortfolioItem(flId, item){
+    const list = this.getFlPortfolio(flId);
+    list.unshift(item);
+    this._set(`freeway_fl_portfolio_${flId}`, list);
+    return item;
+  },
+  removeFlPortfolioItem(flId, itemId){
+    const list = this.getFlPortfolio(flId).filter(p=>p.id!==itemId);
+    this._set(`freeway_fl_portfolio_${flId}`, list);
+  },
+
   toast(msg){
     let el = document.getElementById('freeway-toast');
     if(!el){
