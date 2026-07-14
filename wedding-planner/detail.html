@@ -137,6 +137,16 @@
 <script>
   const TAG_CLASS = { "BEST": "tag-best", "인기": "tag-hot", "추천": "tag-pick" };
 
+  // 마이페이지에서 이 리스팅(type, id)에 자신을 연결하고 사진을 업로드한 기업 계정이 있는지 조회
+  function findLinkedBusinessPhotos(type, id) {
+    const accounts = WeddingStore.getAccounts();
+    const match = Object.values(accounts).find(
+      (a) => a.type === "business" && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id &&
+        Array.isArray(a.photos) && a.photos.length > 0
+    );
+    return match ? match.photos : null;
+  }
+
   const params = new URLSearchParams(location.search);
   const detailType = params.get("type");
   const detailId = Number(params.get("id"));
@@ -158,13 +168,22 @@
     document.getElementById("breadcrumb").innerHTML =
       `<a href="index.html">홈</a> / <a href="index.html#${sectionId}">${typeLabel}</a> / ${item.name}`;
 
-    document.getElementById("gallery").innerHTML = `
-      <div class="g-item g-main">${item.emoji}</div>
-      <div class="g-item">${item.emoji}</div>
-      <div class="g-item">${item.emoji}</div>
-      <div class="g-item">${item.emoji}</div>
-      <div class="g-item">${item.emoji}</div>
-    `;
+    // 업체가 마이페이지에서 이 리스팅에 연결해 업로드한 실제 사진이 있으면 그것을 우선 사용
+    const linkedPhotos = findLinkedBusinessPhotos(detailType, detailId);
+    if (linkedPhotos) {
+      document.getElementById("gallery").innerHTML = Array.from({ length: 5 }, (_, i) => {
+        const src = linkedPhotos[i % linkedPhotos.length];
+        return `<div class="g-item${i === 0 ? " g-main" : ""}" style="padding:0;"><img src="${src}" alt="${item.name}"></div>`;
+      }).join("");
+    } else {
+      document.getElementById("gallery").innerHTML = `
+        <div class="g-item g-main">${item.emoji}</div>
+        <div class="g-item">${item.emoji}</div>
+        <div class="g-item">${item.emoji}</div>
+        <div class="g-item">${item.emoji}</div>
+        <div class="g-item">${item.emoji}</div>
+      `;
+    }
 
     document.getElementById("detail-tags").innerHTML =
       (item.tags || []).map(t => `<span class="${TAG_CLASS[t] || 'tag-best'}">${t}</span>`).join("") +

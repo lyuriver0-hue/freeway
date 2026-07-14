@@ -74,6 +74,13 @@
             <div class="map-selected" id="biz-region-label">📍 지도를 검색하거나 클릭해서 업체 지역을 선택하세요.</div>
           </div>
           <div class="field">
+            <label>연결된 상세페이지</label>
+            <select id="linked-listing-select">
+              <option value="">연결 안 함</option>
+            </select>
+            <p class="hint">웨딩닷컴에 등록된 업체 목록 중 내 업체에 해당하는 페이지를 선택하면, 아래 업로드한 사진이 그 상세페이지 갤러리에 실제로 노출됩니다.</p>
+          </div>
+          <div class="field">
             <label>업체 사진 (최대 6장, 장당 800KB 이하)</label>
             <div class="photo-upload-zone" id="photo-upload-zone">
               <input type="file" id="photo-input" accept="image/*" multiple style="display:none;">
@@ -87,8 +94,9 @@
 
         <div class="detail-section" style="margin-top:28px; margin-bottom:0;">
           <h3>상세페이지 노출 미리보기</h3>
-          <p class="text-muted" style="font-size:12.5px; margin-bottom:14px;">고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.</p>
+          <p class="text-muted" style="font-size:12.5px; margin-bottom:14px;" id="preview-note">고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.</p>
           <div class="detail-gallery" id="preview-gallery"></div>
+          <a href="#" id="view-live-link" class="btn btn-ghost btn-sm hidden" style="margin-top:14px;" target="_blank" rel="noopener">실제 상세페이지에서 보기 →</a>
         </div>
       </div>
 
@@ -186,6 +194,7 @@
 </footer>
 
 <script src="js/store.js"></script>
+<script src="js/listings.js"></script>
 <script>
   // 로그인 가드: 비로그인 시 기업 로그인 페이지로, 개인 회원이면 개인 마이페이지로 이동
   const currentUser = WeddingStore.getUser();
@@ -213,6 +222,40 @@
     searchBtnId: "biz-region-search-btn",
     labelElId: "biz-region-label",
     onSelect: (text) => { bizRegion = text; },
+  });
+
+  // ---------- 연결된 상세페이지 선택 ----------
+  // 상세페이지는 정적 더미 데이터(js/listings.js)로 만들어져 있어 계정과 자동으로 연결되지 않는다.
+  // 업체가 자신에 해당하는 리스팅을 직접 선택하면, 업로드한 사진이 그 상세페이지 갤러리에 노출된다.
+  let bizLinkedListing = (currentUser && currentUser.linkedListing) || null; // { type, id }
+
+  function populateLinkedListingSelect() {
+    const select = document.getElementById("linked-listing-select");
+    const groups = Object.keys(LISTINGS).map((type) => {
+      const options = LISTINGS[type].map((listing, id) => `<option value="${type}:${id}">${listing.name}</option>`).join("");
+      return `<optgroup label="${LISTING_TYPE_LABEL[type]}">${options}</optgroup>`;
+    }).join("");
+    select.innerHTML = `<option value="">연결 안 함</option>${groups}`;
+    if (bizLinkedListing) select.value = `${bizLinkedListing.type}:${bizLinkedListing.id}`;
+  }
+
+  function updateLiveLink() {
+    const link = document.getElementById("view-live-link");
+    if (bizLinkedListing) {
+      link.href = `detail.html?type=${bizLinkedListing.type}&id=${bizLinkedListing.id}`;
+      link.classList.remove("hidden");
+    } else {
+      link.classList.add("hidden");
+    }
+  }
+
+  populateLinkedListingSelect();
+  updateLiveLink();
+
+  document.getElementById("linked-listing-select").addEventListener("change", (e) => {
+    const val = e.target.value;
+    bizLinkedListing = val ? { type: val.split(":")[0], id: Number(val.split(":")[1]) } : null;
+    updateLiveLink();
   });
 
   // ---------- 업체 사진 업로드/관리 ----------
@@ -366,6 +409,7 @@
       if (user) {
         user.region = bizRegion;
         user.photos = bizPhotos;
+        user.linkedListing = bizLinkedListing;
         try {
           WeddingStore.setUser(user);
           WeddingStore.saveAccount(user);
