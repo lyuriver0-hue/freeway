@@ -135,7 +135,7 @@ header.site-header{
 
 /* ---------- Category quick nav ---------- */
 .cat-section{background:#fff; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200);}
-.cat-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:12px;}
+.cat-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:12px;}
 .cat-card{display:block; background:var(--gray-50); border-radius:16px; padding:20px 10px; border:1px solid var(--gray-200); transition:.2s; cursor:pointer; text-align:center;}
 .cat-card:hover{border-color:var(--primary); background:var(--primary-light); transform:translateY(-3px);}
 .cat-emoji{font-size:26px; margin-bottom:8px;}
@@ -156,6 +156,7 @@ header.site-header{
 .venue-name{font-size:14.5px; font-weight:800; margin-bottom:6px;}
 .venue-meta{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--gray-500);}
 .venue-price{font-weight:800; color:var(--ink); font-size:13.5px;}
+.venue-badge-row{position:absolute; top:10px; left:10px;}
 
 /* ---------- Sub category tabs (스드메 섹션) ---------- */
 .subtab-group{display:flex; gap:8px; margin-bottom:22px;}
@@ -420,3 +421,10 @@ footer.site-footer{background:var(--gray-900); color:#C9BEC0; padding:48px 0 28p
   .cat-layout{grid-template-columns:1fr;}
   .cat-side{position:static;}
 }
+
+/* =========================================================
+   웨딩박람회 (fair.html / fair-detail.html)
+========================================================= */
+.vendor-chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+.vendor-chip{background:var(--gray-100); color:var(--gray-700); font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:100px;}
+.fair-hero-meta{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}

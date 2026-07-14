@@ -130,6 +130,70 @@ const LISTINGS = {
 
 const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업", suit: "예복", jewelry: "예물" };
 
+// 웨딩박람회 — 업체(가격표·예약) 모델과 달리 날짜·장소·참가업체 중심의 행사 데이터
+const FAIRS = [
+  { name: "2026 웨딩닷컴 웨딩페어 in 강남", venue: "강남 코엑스 3층 그랜드볼룸", loc: "서울 강남구",
+    dateStart: "2026-08-15", dateEnd: "2026-08-16", timeInfo: "매일 11:00 - 18:00", emoji: "🎪",
+    entryInfo: "무료입장 (사전등록 시 스타벅스 기프티콘 증정)",
+    desc: "웨딩홀부터 스드메, 허니문까지 한 자리에서 만나보는 웨딩닷컴 대표 박람회입니다. 현장 계약 시 특별 할인 혜택도 제공됩니다.",
+    vendors: ["아펠가모 반포", "아르센", "클라라웨딩", "청담 이유", "예작맨스웨어", "루이델라 주얼리"] },
+  { name: "가을 웨딩페어 in 잠실", venue: "잠실 롯데호텔 크리스탈볼룸", loc: "서울 송파구",
+    dateStart: "2026-09-05", dateEnd: "2026-09-05", timeInfo: "11:00 - 17:00", emoji: "🎪",
+    entryInfo: "사전등록 필수 (선착순 200쌍)",
+    desc: "가을 시즌 웨딩을 준비하는 예비부부를 위한 프리미엄 단독 박람회입니다.",
+    vendors: ["더채플앳 논현", "온뜰에피움", "모리엠포티", "비올"] },
+  { name: "경기 웨딩페어 in 하남", venue: "하남 스타필드 컨벤션홀", loc: "경기 하남시",
+    dateStart: "2026-07-25", dateEnd: "2026-07-26", timeInfo: "매일 10:30 - 18:00", emoji: "🎪",
+    entryInfo: "무료입장",
+    desc: "경기 동부권 예비부부를 위한 지역 밀착형 웨딩박람회입니다.",
+    vendors: ["섬스튜디오", "골든아워 주얼리"] },
+  { name: "2026 프리미엄 브라이덜쇼", venue: "서울 강남구 세텍(SETEC)", loc: "서울 강남구",
+    dateStart: "2026-10-10", dateEnd: "2026-10-11", timeInfo: "매일 11:00 - 19:00", emoji: "🎪",
+    entryInfo: "사전등록 시 무료 (현장 등록 10,000원)",
+    desc: "하이엔드 웨딩 브랜드가 총출동하는 프리미엄 브라이덜쇼입니다.",
+    vendors: ["라브르에드니아", "하우스오브에이미", "스와니예", "이든주얼리"] },
+  { name: "여름 프리 웨딩페어 in 홍대", venue: "홍대 라이즈오토그래프컬렉션 그랜드홀", loc: "서울 마포구",
+    dateStart: "2026-06-01", dateEnd: "2026-06-01", timeInfo: "11:00 - 17:00", emoji: "🎪",
+    entryInfo: "무료입장",
+    desc: "홍대 지역 신진 웨딩 브랜드를 소개했던 프리 웨딩페어입니다.",
+    vendors: ["라포엠"] },
+];
+
+function getFair(id) {
+  return FAIRS[id] || null;
+}
+
+// 오늘 날짜 기준 박람회 진행 상태 계산
+function getFairStatus(fair) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const start = new Date(fair.dateStart);
+  const end = new Date(fair.dateEnd);
+  if (end < today) return { id: "ended", label: "종료", pill: "status-cancel" };
+  if (start <= today && today <= end) return { id: "ongoing", label: "진행중", pill: "status-progress" };
+  return { id: "upcoming", label: "예정", pill: "status-wait" };
+}
+
+function formatFairDate(fair) {
+  const fmt = (d) => d.replace(/-/g, ".").slice(2);
+  return fair.dateStart === fair.dateEnd ? fmt(fair.dateStart) : `${fmt(fair.dateStart)} - ${fmt(fair.dateEnd)}`;
+}
+
+function renderFairCard(id, fair) {
+  const status = getFairStatus(fair);
+  return `
+    <a class="venue-card" href="fair-detail.html?id=${id}">
+      <div class="venue-thumb">
+        <div class="venue-badge-row"><span class="status-pill ${status.pill}">${status.label}</span></div>
+        ${fair.emoji}
+      </div>
+      <div class="venue-body">
+        <div class="venue-loc">${fair.loc} · ${formatFairDate(fair)}</div>
+        <div class="venue-name">${fair.name}</div>
+        <div class="venue-meta"><span class="venue-price">${fair.entryInfo}</span></div>
+      </div>
+    </a>`;
+}
+
 const REVIEW_POOL = [
   { name: "김민지", stars: 5, txt: "정말 만족스러운 진행이었어요! 담당자분이 친절하게 설명해주셔서 편했습니다." },
   { name: "이수현", stars: 5, txt: "결과물이 기대 이상이었어요. 주변에도 추천하고 싶습니다." },

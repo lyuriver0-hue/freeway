@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>웨딩박람회 상세정보 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="category.html?cat=hall">웨딩홀</a>
+      <a href="category.html?cat=studio">스튜디오</a>
+      <a href="category.html?cat=dress">드레스</a>
+      <a href="category.html?cat=makeup">메이크업</a>
+      <a href="fair.html">웨딩박람회</a>
+      <a href="#planner">웨딩플래너</a>
+      <a href="#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <div class="container">
+    <div class="detail-breadcrumb" id="breadcrumb"></div>
+    <div class="detail-gallery" id="gallery"></div>
+
+    <div class="detail-layout">
+      <div class="detail-main">
+        <div class="detail-title-row">
+          <div>
+            <div class="detail-tags" id="detail-tags"></div>
+            <h1 id="detail-name"></h1>
+          </div>
+        </div>
+        <div class="detail-loc-row"><span id="detail-loc"></span></div>
+
+        <div class="detail-section">
+          <h3>박람회 정보</h3>
+          <p class="detail-desc" id="detail-desc"></p>
+          <div class="info-grid" id="info-grid" style="margin-top:18px;"></div>
+        </div>
+
+        <div class="detail-section">
+          <h3>참가업체</h3>
+          <div class="vendor-chip-row" id="vendor-chips"></div>
+        </div>
+
+        <div class="detail-section" style="margin-bottom:0;">
+          <h3>장소</h3>
+          <div id="detail-map" class="naver-map-box" style="height:280px;">
+            <div class="map-placeholder"><span>🗺️</span><p>지도를 불러오는 중입니다…</p></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="booking-card">
+        <div class="price-lead" id="entry-info">-</div>
+        <div style="font-size:12.5px; color:var(--gray-500); margin-bottom:20px;">사전등록하시면 현장에서 빠르게 입장하실 수 있어요.</div>
+
+        <form id="register-form">
+          <div class="field"><label>이름</label><input type="text" id="rg-name" placeholder="홍길동"></div>
+          <div class="field"><label>연락처</label><input type="tel" id="rg-phone" placeholder="010-0000-0000"></div>
+          <div class="field"><label>이메일</label><input type="email" id="rg-email" placeholder="example@email.com"></div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg">사전등록 신청하기</button>
+        </form>
+
+        <div class="booking-success" id="register-success">
+          <div class="emoji">🎉</div>
+          <p style="font-weight:800; margin-bottom:6px;">사전등록이 완료되었습니다!</p>
+          <p class="text-muted" style="font-size:12.5px;">박람회 당일 입구에서 성함을 말씀해주세요.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>웨딩박람회</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/listings.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const fairId = Number(params.get("id"));
+  const fair = getFair(fairId);
+
+  if (!fair) {
+    document.querySelector(".detail-layout").innerHTML = `
+      <div class="empty-box" style="grid-column:1/-1;">
+        <div class="emoji">😢</div>
+        <p>존재하지 않는 박람회입니다.</p>
+        <a href="fair.html" class="btn btn-primary btn-sm" style="margin-top:14px;">목록으로 돌아가기</a>
+      </div>`;
+    document.getElementById("gallery").classList.add("hidden");
+  } else {
+    document.title = `${fair.name} | 웨딩닷컴`;
+    const status = getFairStatus(fair);
+
+    document.getElementById("breadcrumb").innerHTML =
+      `<a href="index.html">홈</a> / <a href="fair.html">웨딩박람회</a> / ${fair.name}`;
+
+    document.getElementById("gallery").innerHTML = Array.from({ length: 5 }, (_, i) =>
+      `<div class="g-item${i === 0 ? " g-main" : ""}">${fair.emoji}</div>`
+    ).join("");
+
+    document.getElementById("detail-tags").innerHTML = `<span class="status-pill ${status.pill}">${status.label}</span>`;
+    document.getElementById("detail-name").textContent = fair.name;
+    document.getElementById("detail-loc").textContent = `📍 ${fair.venue}`;
+    document.getElementById("detail-desc").textContent = fair.desc;
+
+    document.getElementById("info-grid").innerHTML = `
+      <div class="info-item"><span>일정</span><b>${formatFairDate(fair)}</b></div>
+      <div class="info-item"><span>시간</span><b>${fair.timeInfo}</b></div>
+      <div class="info-item"><span>장소</span><b>${fair.venue}</b></div>
+      <div class="info-item"><span>입장 정보</span><b>${fair.entryInfo}</b></div>
+    `;
+
+    document.getElementById("vendor-chips").innerHTML = fair.vendors.map((v) => `<span class="vendor-chip">${v}</span>`).join("");
+
+    document.getElementById("entry-info").textContent = fair.entryInfo;
+
+    initNaverStaticMap("detail-map", `${fair.loc} ${fair.venue}`);
+
+    document.getElementById("register-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("rg-name").value.trim();
+      const phone = document.getElementById("rg-phone").value.trim();
+      if (!name || !phone) {
+        WeddingStore.toast("이름과 연락처를 입력해주세요");
+        return;
+      }
+      document.getElementById("register-form").style.display = "none";
+      document.getElementById("register-success").classList.add("show");
+    });
+  }
+</script>
+</body>
+</html>

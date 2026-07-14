@@ -16,6 +16,16 @@ renderSdmGrid("grid-studio", "studio");
 renderSdmGrid("grid-dress", "dress");
 renderSdmGrid("grid-makeup", "makeup");
 
+function renderFairPreview() {
+  const upcoming = FAIRS
+    .map((fair, id) => ({ id, fair }))
+    .filter(({ fair }) => getFairStatus(fair).id !== "ended")
+    .sort((a, b) => new Date(a.fair.dateStart) - new Date(b.fair.dateStart))
+    .slice(0, 4);
+  document.getElementById("fair-preview-grid").innerHTML = upcoming.map(({ id, fair }) => renderFairCard(id, fair)).join("");
+}
+renderFairPreview();
+
 // 검색 위젯 탭 전환 (이벤트 위임)
 document.addEventListener("click", (e) => {
   const tab = e.target.closest(".search-tab");

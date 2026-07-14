@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>웨딩박람회 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="category.html?cat=hall">웨딩홀</a>
+      <a href="category.html?cat=studio">스튜디오</a>
+      <a href="category.html?cat=dress">드레스</a>
+      <a href="category.html?cat=makeup">메이크업</a>
+      <a href="fair.html">웨딩박람회</a>
+      <a href="#planner">웨딩플래너</a>
+      <a href="#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page container">
+  <div class="detail-breadcrumb"><a href="index.html">홈</a> / 웨딩박람회</div>
+  <h1 style="font-size:24px; margin-bottom:24px;">웨딩박람회 일정</h1>
+
+  <div class="filter-bar">
+    <div class="filter-left">
+      <select class="chip-select" id="f-region"></select>
+      <select class="chip-select" id="f-status">
+        <option value="all">전체 상태</option>
+        <option value="upcoming">예정</option>
+        <option value="ongoing">진행중</option>
+        <option value="ended">종료</option>
+      </select>
+    </div>
+    <div class="result-count"><b id="result-num">0</b>개의 박람회</div>
+  </div>
+
+  <div class="card-grid" id="fair-grid"></div>
+  <div id="empty" class="empty-box hidden">
+    <div class="emoji">🔍</div>
+    <p>조건에 맞는 박람회가 없습니다. 다른 필터를 선택해보세요.</p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>웨딩박람회</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/listings.js"></script>
+<script>
+  function populateRegionFilter() {
+    const select = document.getElementById("f-region");
+    const regions = [...new Set(FAIRS.map((f) => f.loc))].sort();
+    select.innerHTML = `<option value="all">전체 지역</option>` + regions.map((r) => `<option value="${r}">${r}</option>`).join("");
+  }
+
+  function applyFilters() {
+    let list = FAIRS.map((fair, id) => ({ id, fair }));
+
+    const region = document.getElementById("f-region").value;
+    if (region !== "all") list = list.filter(({ fair }) => fair.loc === region);
+
+    const statusVal = document.getElementById("f-status").value;
+    if (statusVal !== "all") list = list.filter(({ fair }) => getFairStatus(fair).id === statusVal);
+
+    // 날짜가 이른 순으로 정렬
+    list = list.slice().sort((a, b) => new Date(a.fair.dateStart) - new Date(b.fair.dateStart));
+
+    document.getElementById("fair-grid").innerHTML = list.map(({ id, fair }) => renderFairCard(id, fair)).join("");
+    document.getElementById("result-num").textContent = list.length;
+    document.getElementById("empty").classList.toggle("hidden", list.length > 0);
+    document.getElementById("fair-grid").classList.toggle("hidden", list.length === 0);
+  }
+
+  populateRegionFilter();
+  applyFilters();
+
+  document.getElementById("f-region").addEventListener("change", applyFilters);
+  document.getElementById("f-status").addEventListener("change", applyFilters);
+</script>
+</body>
+</html>
