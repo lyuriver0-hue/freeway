@@ -210,6 +210,15 @@ function getListing(type, id) {
   return list[id] || null;
 }
 
+// 업체명으로 어떤 카테고리(type)의 몇 번째(id) 리스팅인지 역으로 찾는다 — 웨딩박람회 참가업체 링크 등에 사용
+function findListingByName(name) {
+  for (const type of Object.keys(LISTINGS)) {
+    const id = LISTINGS[type].findIndex((item) => item.name === name);
+    if (id !== -1) return { type, id };
+  }
+  return null;
+}
+
 // 전체 카테고리를 하나의 배열로 펼침 — 카테고리 필터 페이지에서 사용
 function getAllListings() {
   return Object.keys(LISTINGS).flatMap((type) => LISTINGS[type].map((item, id) => ({ type, id, ...item })));

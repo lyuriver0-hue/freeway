@@ -426,5 +426,7 @@ footer.site-footer{background:var(--gray-900); color:#C9BEC0; padding:48px 0 28p
    웨딩박람회 (fair.html / fair-detail.html)
 ========================================================= */
 .vendor-chip-row{display:flex; flex-wrap:wrap; gap:8px;}
-.vendor-chip{background:var(--gray-100); color:var(--gray-700); font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:100px;}
+.vendor-chip{display:inline-flex; background:var(--gray-100); color:var(--gray-700); font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:100px;}
+a.vendor-chip{cursor:pointer; transition:.15s;}
+a.vendor-chip:hover{background:var(--primary-light); color:var(--primary-dark);}
 .fair-hero-meta{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}

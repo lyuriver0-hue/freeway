@@ -160,7 +160,12 @@
       <div class="info-item"><span>입장 정보</span><b>${fair.entryInfo}</b></div>
     `;
 
-    document.getElementById("vendor-chips").innerHTML = fair.vendors.map((v) => `<span class="vendor-chip">${v}</span>`).join("");
+    document.getElementById("vendor-chips").innerHTML = fair.vendors.map((v) => {
+      const found = findListingByName(v);
+      return found
+        ? `<a class="vendor-chip" href="detail.html?type=${found.type}&id=${found.id}">${v} ↗</a>`
+        : `<span class="vendor-chip">${v}</span>`;
+    }).join("");
 
     document.getElementById("entry-info").textContent = fair.entryInfo;
 
