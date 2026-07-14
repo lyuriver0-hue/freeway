@@ -27,6 +27,15 @@
   .upload-drop:hover{border-color:var(--primary); color:var(--primary);}
   .upload-preview{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:var(--radius-sm); margin-top:10px; display:none;}
   .upload-preview.show{display:block;}
+
+  .preview-frame{border:1px solid var(--gray-200); border-radius:var(--radius); background:var(--gray-50); padding:22px; margin-top:16px;}
+  .preview-pro-header{display:flex; gap:16px; align-items:center; margin-bottom:20px;}
+  .preview-pro-header .avatar img{width:100%; height:100%; object-fit:cover; border-radius:inherit;}
+  .preview-name{font-weight:800; font-size:16.5px;}
+  .preview-role{font-size:12.5px; color:var(--gray-500); margin-top:2px;}
+  .preview-portfolio-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px;}
+  @media (max-width:860px){ .preview-portfolio-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .preview-portfolio-grid{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -54,12 +63,27 @@
         </div>
       </div>
 
-      <div class="card pad-24">
+      <div class="card pad-24" style="margin-bottom:24px;">
         <div class="section-head" style="margin-bottom:0;">
           <h3 style="font-size:15.5px;">포트폴리오</h3>
           <button class="btn btn-primary btn-sm" onclick="openModal('pf-add-modal')">+ 포트폴리오 추가</button>
         </div>
         <div class="portfolio-grid" id="pf-grid"></div>
+      </div>
+
+      <div class="card pad-24">
+        <h3 style="font-size:15.5px; margin-bottom:4px;">노출 미리보기</h3>
+        <p class="text-muted" style="font-size:12.5px;">고객이 전문가 프로필 페이지에서 실제로 보게 될 화면입니다.</p>
+        <div class="preview-frame">
+          <div class="preview-pro-header">
+            <div class="avatar lg" id="preview-avatar"></div>
+            <div>
+              <div class="preview-name" id="preview-name"></div>
+              <div class="preview-role" id="preview-role"></div>
+            </div>
+          </div>
+          <div class="preview-portfolio-grid" id="preview-portfolio"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -113,6 +137,21 @@
     });
   }
 
+  /* ---------------- 노출 미리보기 ---------------- */
+  function renderPreview(){
+    const photo = FreewayStore.getFlPhoto(myFlId);
+    document.getElementById('preview-avatar').innerHTML = photo ? `<img src="${photo}">` : myFl.avatar;
+    document.getElementById('preview-name').innerHTML = `${myFl.name} ${myFl.verified?'<span class="verified">✔</span>':''}`;
+    document.getElementById('preview-role').textContent = `${myFl.role} · ${myFl.career}`;
+
+    const list = FreewayStore.getFlPortfolio(myFlId);
+    document.getElementById('preview-portfolio').innerHTML = list.map(p=>`
+      <div class="svc-card">
+        <div class="svc-thumb" style="padding:0;"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
+        <div class="svc-body"><div class="svc-title">${p.title}</div></div>
+      </div>`).join('') || '<p class="text-muted" style="grid-column:1/-1;">포트폴리오를 추가하면 이곳에 미리보기가 표시됩니다.</p>';
+  }
+
   /* ---------------- 업체 대표 사진 ---------------- */
   function renderPhoto(){
     const photo = FreewayStore.getFlPhoto(myFlId);
@@ -120,6 +159,7 @@
     document.getElementById('biz-photo-img').src = photo || '';
     document.getElementById('biz-photo-placeholder').style.display = photo ? 'none' : 'flex';
     document.getElementById('biz-photo-placeholder').textContent = myFl.avatar;
+    renderPreview();
   }
   renderPhoto();
 
@@ -151,6 +191,7 @@
           <div class="pf-desc">${p.desc || ''}</div>
         </div>
       </div>`).join('') || '<p class="text-muted" style="grid-column:1/-1;">등록된 포트폴리오가 없습니다. 대표 작업물을 추가해보세요.</p>';
+    renderPreview();
   }
   renderPortfolio();
 
