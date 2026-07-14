@@ -30,6 +30,35 @@ function freewayLogoHTML(){
   </a>`;
 }
 
+function freewayNavLinksHTML(active, user){
+  const link = (href, key, label, cls='') => `<a href="${href}" class="${cls} ${active===key?'active':''}">${label}</a>`;
+
+  if(user && user.role==='freelancer'){
+    return `
+      ${link('category.html','category','카테고리')}
+      ${link('mypage-fl-services.html','fl-services','내 서비스 관리','nav-primary')}
+      ${link('community.html','community','커뮤니티')}
+      ${link('faq.html','faq','고객센터')}
+    `;
+  }
+  if(user && user.role==='client'){
+    return `
+      ${link('category.html','category','카테고리')}
+      ${link('search.html','search','전문가 찾기')}
+      ${link('project-register.html','project','프로젝트 등록','nav-primary')}
+      ${link('community.html','community','커뮤니티')}
+      ${link('faq.html','faq','고객센터')}
+    `;
+  }
+  return `
+    ${link('category.html','category','카테고리')}
+    ${link('search.html','search','전문가 찾기')}
+    ${link('project-register.html','project','프로젝트 등록')}
+    ${link('community.html','community','커뮤니티')}
+    ${link('faq.html','faq','고객센터')}
+  `;
+}
+
 function freewayHeaderHTML(active){
   const user = FreewayStore.getUser();
   const authArea = user ? `
@@ -44,11 +73,7 @@ function freewayHeaderHTML(active){
   <div class="nav">
     ${freewayLogoHTML()}
     <nav class="nav-links">
-      <a href="category.html" class="${active==='category'?'active':''}">카테고리</a>
-      <a href="search.html" class="${active==='search'?'active':''}">전문가 찾기</a>
-      <a href="project-register.html" class="${active==='project'?'active':''}">프로젝트 등록</a>
-      <a href="community.html" class="${active==='community'?'active':''}">커뮤니티</a>
-      <a href="faq.html" class="${active==='faq'?'active':''}">고객센터</a>
+      ${freewayNavLinksHTML(active, user)}
     </nav>
     <form class="nav-search" onsubmit="event.preventDefault(); location.href='search.html?q='+encodeURIComponent(this.q.value);">
       <span class="icon">🔍</span>

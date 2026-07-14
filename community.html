@@ -8,10 +8,26 @@
 <style>
   .post-row{display:flex; align-items:center; gap:14px; padding:15px 20px; border-bottom:1px solid var(--gray-100); cursor:pointer;}
   .post-row:hover{background:var(--gray-50);}
+  .post-no{width:32px; flex-shrink:0; text-align:center; font-size:12.5px; font-weight:700; color:var(--gray-500);}
   .post-row .title{flex:1; font-weight:600; font-size:14px;}
   .post-row .meta{font-size:12px; color:var(--gray-500); white-space:nowrap;}
   .post-detail{display:none; padding:20px; background:var(--gray-50); border-bottom:1px solid var(--gray-200); font-size:13.5px; line-height:1.8; color:var(--gray-700);}
   .post-detail.open{display:block;}
+  .post-actions{display:flex; gap:8px; margin:14px 0 18px;}
+  .like-btn{display:inline-flex; align-items:center; gap:6px; padding:8px 16px; font-size:13px; font-weight:700; border-radius:100px; border:1.5px solid var(--gray-300); background:#fff; color:var(--gray-700); cursor:pointer; transition:.15s;}
+  .like-btn:hover{border-color:var(--primary); color:var(--primary);}
+  .like-btn.active{background:var(--primary-light); border-color:var(--primary); color:var(--primary);}
+  .comment-section{border-top:1px solid var(--gray-200); padding-top:16px;}
+  .comment-section h4{font-size:13.5px; font-weight:800; color:var(--gray-900); margin-bottom:12px;}
+  .comment-list{display:flex; flex-direction:column; gap:10px; margin-bottom:14px;}
+  .comment-item{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius-sm); padding:10px 14px;}
+  .comment-item b{font-size:12.5px; color:var(--gray-900);}
+  .comment-date{font-size:11.5px; color:var(--gray-500); margin-left:6px;}
+  .comment-item p{margin-top:4px; font-size:13px; line-height:1.6; color:var(--gray-700);}
+  .empty-comment{font-size:12.5px; color:var(--gray-500); margin-bottom:14px;}
+  .comment-form{display:flex; gap:8px;}
+  .comment-form input{flex:1; padding:9px 14px; border:1px solid var(--gray-300); border-radius:var(--radius-sm); font-size:13px; outline:none;}
+  .comment-form input:focus{border-color:var(--primary);}
 </style>
 </head>
 <body>
@@ -24,6 +40,7 @@
   </div>
   <div class="tabs" data-tabs>
     <button class="tab-btn active" data-tab-target="t-all" data-filter="all">전체</button>
+    <button class="tab-btn" data-tab-target="t-all" data-filter="자유게시판">자유게시판</button>
     <button class="tab-btn" data-tab-target="t-all" data-filter="꿀팁공유">꿀팁공유</button>
     <button class="tab-btn" data-tab-target="t-all" data-filter="질문답변">질문답변</button>
     <button class="tab-btn" data-tab-target="t-all" data-filter="공지">공지</button>
@@ -36,7 +53,7 @@
     <button class="modal-close" onclick="closeModal('write-modal')">✕</button>
     <h3>글쓰기</h3>
     <div class="field"><label>카테고리</label>
-      <select id="wr-cat"><option>꿀팁공유</option><option>질문답변</option></select>
+      <select id="wr-cat"><option>자유게시판</option><option>꿀팁공유</option><option>질문답변</option></select>
     </div>
     <div class="field"><label>제목</label><input type="text" id="wr-title" placeholder="제목을 입력하세요"></div>
     <div class="field"><label>내용</label><textarea id="wr-body" placeholder="내용을 입력하세요"></textarea></div>
@@ -56,33 +73,86 @@
 
   function render(){
     const list = posts.filter(p=>currentFilter==='all' || p.cat===currentFilter);
-    document.getElementById('post-list').innerHTML = list.map(p=>`
+    document.getElementById('post-list').innerHTML = list.map((p,i)=>{
+      const liveComments = FreewayStore.getComments(p.id);
+      const totalComments = (p.comments||0) + liveComments.length;
+      const totalViews = p.views + (FreewayStore.getExtraViews()[p.id]||0);
+      const liked = FreewayStore.isLiked(p.id);
+      const totalLikes = (p.likes||0) + (liked?1:0);
+      const isOpen = openId===p.id;
+      const no = list.length - i;
+      return `
       <div>
         <div class="post-row" data-pid="${p.id}">
+          <span class="post-no">${no}</span>
           <span class="badge badge-gray">${p.cat}</span>
           <span class="title">${p.title}</span>
-          <span class="meta">${p.author} · ${p.date} · 조회 ${p.views} · 댓글 ${p.comments}</span>
+          <span class="meta">${p.author} · ${p.date} · 조회 ${totalViews} · 좋아요 ${totalLikes} · 댓글 ${totalComments}</span>
         </div>
-        <div class="post-detail ${openId===p.id?'open':''}" id="detail-${p.id}">${p.body || '내용이 없습니다.'}</div>
-      </div>`).join('') || '<div class="empty-state"><p>게시물이 없습니다.</p></div>';
+        <div class="post-detail ${isOpen?'open':''}" id="detail-${p.id}">
+          <div class="post-body">${p.body || '내용이 없습니다.'}</div>
+          <div class="post-actions">
+            <button class="like-btn ${liked?'active':''}" data-like-id="${p.id}">${liked?'❤️':'🤍'} 좋아요 ${totalLikes}</button>
+          </div>
+          <div class="comment-section">
+            <h4>댓글 ${totalComments}</h4>
+            <div class="comment-list">
+              ${liveComments.map(c=>`<div class="comment-item"><b>${c.author}</b><span class="comment-date">${c.date}</span><p>${c.body}</p></div>`).join('') || '<p class="empty-comment">등록된 댓글이 없습니다. 첫 댓글을 남겨보세요.</p>'}
+            </div>
+            <div class="comment-form">
+              <input type="text" placeholder="댓글을 입력하세요" data-comment-input="${p.id}">
+              <button class="btn btn-sm btn-primary" data-comment-submit="${p.id}">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('') || '<div class="empty-state"><p>게시물이 없습니다.</p></div>';
   }
   render();
 
   document.addEventListener('click', (e)=>{
     const btn = e.target.closest('.tab-btn[data-filter]');
     if(btn){ currentFilter = btn.getAttribute('data-filter'); render(); return; }
+
+    const likeBtn = e.target.closest('[data-like-id]');
+    if(likeBtn){
+      FreewayStore.toggleLike(likeBtn.getAttribute('data-like-id'));
+      render();
+      return;
+    }
+
+    const commentBtn = e.target.closest('[data-comment-submit]');
+    if(commentBtn){
+      const id = commentBtn.getAttribute('data-comment-submit');
+      const input = document.querySelector(`[data-comment-input="${CSS.escape(id)}"]`);
+      const text = input.value.trim();
+      if(!text){ FreewayStore.toast('댓글 내용을 입력해주세요'); return; }
+      FreewayStore.addComment(id, text);
+      render();
+      FreewayStore.toast('댓글이 등록되었습니다');
+      return;
+    }
+
     const row = e.target.closest('.post-row');
     if(row){
       const id = row.getAttribute('data-pid');
-      openId = openId===id ? null : id;
+      const wasOpen = openId===id;
+      openId = wasOpen ? null : id;
+      if(!wasOpen) FreewayStore.addView(id);
       render();
+    }
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && e.target.matches('[data-comment-input]')){
+      e.target.nextElementSibling.click();
     }
   });
 
   document.getElementById('wr-submit').addEventListener('click', ()=>{
     const title = document.getElementById('wr-title').value.trim();
     if(!title){ FreewayStore.toast('제목을 입력해주세요'); return; }
-    posts.unshift({id:'new'+Date.now(), cat: document.getElementById('wr-cat').value, title, author:'나', date:'2026-07-05', views:0, comments:0});
+    posts.unshift({id:'new'+Date.now(), cat: document.getElementById('wr-cat').value, title, author:'나', date:'2026-07-05', views:0, likes:0, comments:0});
     render();
     closeModal('write-modal');
     document.getElementById('wr-title').value=''; document.getElementById('wr-body').value='';
