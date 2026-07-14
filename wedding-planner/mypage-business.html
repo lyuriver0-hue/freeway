@@ -63,6 +63,11 @@
           <div class="field"><label>담당자 연락처</label><input type="tel" value="010-1234-5678"></div>
           <div class="field"><label>업체 소개</label><textarea rows="4" placeholder="업체를 소개해주세요.">자연광 인생샷 전문 스튜디오입니다.</textarea></div>
           <div class="field">
+            <label>웹사이트 (선택)</label>
+            <input type="text" id="biz-website-input" placeholder="예: www.mystudio.com">
+            <p class="hint">등록하면 상세페이지에 "홈페이지 방문하기" 버튼이 노출됩니다.</p>
+          </div>
+          <div class="field">
             <label>업체 지역</label>
             <div class="map-search-row" style="margin-bottom:10px;">
               <input type="text" id="biz-region-query" placeholder="지역/동네를 검색하세요 (예: 서울 강남구)">
@@ -207,6 +212,7 @@
     document.getElementById("mp-avatar").textContent = currentUser.name.charAt(0);
     document.getElementById("biz-name-input").value = currentUser.name;
     if (currentUser.bizNo) document.getElementById("biz-no-display").value = currentUser.bizNo;
+    if (currentUser.website) document.getElementById("biz-website-input").value = currentUser.website;
     weddingRenderHeader();
   }
 
@@ -410,6 +416,7 @@
         user.region = bizRegion;
         user.photos = bizPhotos;
         user.linkedListing = bizLinkedListing;
+        user.website = normalizeUrl(document.getElementById("biz-website-input").value);
         try {
           WeddingStore.setUser(user);
           WeddingStore.saveAccount(user);

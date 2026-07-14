@@ -73,6 +73,13 @@ function formatBizRegNo(raw) {
   return `${d.slice(0, 3)}-${d.slice(3, 5)}-${d.slice(5)}`;
 }
 
+// "www.mystudio.com" 처럼 프로토콜 없이 입력된 URL에 https://를 붙여준다.
+function normalizeUrl(raw) {
+  const trimmed = (raw || "").trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 // 로그인 상태에 따라 헤더 nav-actions 영역을 갱신 (모든 페이지 공통)
 function weddingRenderHeader() {
   const nav = document.querySelector(".nav-actions");

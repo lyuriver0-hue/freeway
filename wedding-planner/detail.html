@@ -42,6 +42,9 @@
           <button type="button" class="heart-btn" id="heart-btn">♡</button>
         </div>
         <div class="detail-loc-row"><span id="detail-loc"></span></div>
+        <div id="detail-website-wrap" class="hidden" style="margin-bottom:24px;">
+          <a id="detail-website-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">🔗 홈페이지 방문하기</a>
+        </div>
 
         <div class="detail-section">
           <h3>상세 소개</h3>
@@ -135,14 +138,12 @@
 <script src="js/store.js"></script>
 <script src="js/listings.js"></script>
 <script>
-  // 마이페이지에서 이 리스팅(type, id)에 자신을 연결하고 사진을 업로드한 기업 계정이 있는지 조회
-  function findLinkedBusinessPhotos(type, id) {
+  // 마이페이지에서 이 리스팅(type, id)에 자신을 연결한 기업 계정이 있는지 조회 (사진·웹사이트 노출용)
+  function findLinkedBusinessAccount(type, id) {
     const accounts = WeddingStore.getAccounts();
-    const match = Object.values(accounts).find(
-      (a) => a.type === "business" && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id &&
-        Array.isArray(a.photos) && a.photos.length > 0
-    );
-    return match ? match.photos : null;
+    return Object.values(accounts).find(
+      (a) => a.type === "business" && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id
+    ) || null;
   }
 
   const params = new URLSearchParams(location.search);
@@ -165,8 +166,14 @@
     document.getElementById("breadcrumb").innerHTML =
       `<a href="index.html">홈</a> / <a href="category.html?cat=${detailType}">${typeLabel}</a> / ${item.name}`;
 
-    // 업체가 마이페이지에서 이 리스팅에 연결해 업로드한 실제 사진이 있으면 그것을 우선 사용
-    const linkedPhotos = findLinkedBusinessPhotos(detailType, detailId);
+    // 업체가 마이페이지에서 이 리스팅에 연결해 업로드한 실제 사진·웹사이트가 있으면 노출
+    const linkedAccount = findLinkedBusinessAccount(detailType, detailId);
+    const linkedPhotos = linkedAccount && Array.isArray(linkedAccount.photos) && linkedAccount.photos.length > 0 ? linkedAccount.photos : null;
+    if (linkedAccount && linkedAccount.website) {
+      const websiteLink = document.getElementById("detail-website-link");
+      websiteLink.href = linkedAccount.website;
+      document.getElementById("detail-website-wrap").classList.remove("hidden");
+    }
     if (linkedPhotos) {
       document.getElementById("gallery").innerHTML = Array.from({ length: 5 }, (_, i) => {
         const src = linkedPhotos[i % linkedPhotos.length];
