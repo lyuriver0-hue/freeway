@@ -402,3 +402,21 @@ footer.site-footer{background:var(--gray-900); color:#C9BEC0; padding:48px 0 28p
   .card-grid{grid-template-columns:1fr;}
   .estimate-banner,.planner-banner{flex-direction:column; text-align:center; padding:36px 24px;}
 }
+
+/* =========================================================
+   카테고리 목록 페이지 (프리웨이 category.html과 동일한 사이드바+필터 구조)
+========================================================= */
+.cat-layout{display:grid; grid-template-columns:220px 1fr; gap:28px; align-items:start;}
+.cat-side{background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:10px; position:sticky; top:calc(var(--header-h) + 20px);}
+.cat-side a{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:9px; font-size:13.5px; font-weight:600; color:var(--gray-700);}
+.cat-side a:hover{background:var(--gray-50);}
+.cat-side a.active{background:var(--primary-light); color:var(--primary-dark); font-weight:800;}
+.filter-bar{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap;}
+.filter-left{display:flex; gap:8px; flex-wrap:wrap;}
+.chip-select{padding:9px 14px; border:1.5px solid var(--gray-300); border-radius:9px; font-size:13px; font-weight:600; background:#fff; cursor:pointer;}
+.result-count{font-size:13.5px; color:var(--gray-500);}
+
+@media (max-width:860px){
+  .cat-layout{grid-template-columns:1fr;}
+  .cat-side{position:static;}
+}

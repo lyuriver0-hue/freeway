@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카테고리 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="category.html?cat=hall">웨딩홀</a>
+      <a href="category.html?cat=studio">스튜디오</a>
+      <a href="category.html?cat=dress">드레스</a>
+      <a href="category.html?cat=makeup">메이크업</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page container">
+  <div class="detail-breadcrumb"><a href="index.html">홈</a> / <span id="crumb-cat">전체 카테고리</span></div>
+  <h1 style="font-size:24px; margin-bottom:24px;">웨딩홀·스드메 둘러보기</h1>
+
+  <div class="cat-layout">
+    <aside class="cat-side" id="cat-side"></aside>
+
+    <div>
+      <div class="filter-bar">
+        <div class="filter-left">
+          <select class="chip-select" id="f-region"></select>
+          <select class="chip-select" id="f-price"></select>
+          <select class="chip-select" id="f-sort">
+            <option value="recommend">추천순</option>
+            <option value="price-asc">낮은 가격순</option>
+            <option value="price-desc">높은 가격순</option>
+          </select>
+        </div>
+        <div class="result-count"><b id="result-num">0</b>개의 업체</div>
+      </div>
+
+      <div class="card-grid" id="listing-grid"></div>
+      <div id="empty" class="empty-box hidden">
+        <div class="emoji">🔍</div>
+        <p>조건에 맞는 업체가 없습니다. 다른 필터를 선택해보세요.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/listings.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  let currentCat = params.get("cat") || "all";
+
+  const CATEGORY_META = [
+    { id: "all", label: "전체 카테고리", emoji: "📋" },
+    { id: "hall", label: "웨딩홀", emoji: "🏛️" },
+    { id: "studio", label: "스튜디오", emoji: "📸" },
+    { id: "dress", label: "드레스", emoji: "👗" },
+    { id: "makeup", label: "메이크업", emoji: "💄" },
+  ];
+
+  const PRICE_RANGES = [
+    { id: "all", label: "전체 가격대" },
+    { id: "0-1000000", label: "~100만원" },
+    { id: "1000000-2000000", label: "100~200만원" },
+    { id: "2000000-3000000", label: "200~300만원" },
+    { id: "3000000-999999999", label: "300만원 이상" },
+  ];
+
+  function renderSidebar() {
+    document.getElementById("cat-side").innerHTML = CATEGORY_META.map((c) => `
+      <a href="category.html?cat=${c.id}" class="${currentCat === c.id ? "active" : ""}">${c.emoji} ${c.label}</a>
+    `).join("");
+    const found = CATEGORY_META.find((c) => c.id === currentCat) || CATEGORY_META[0];
+    document.getElementById("crumb-cat").textContent = found.label;
+    document.title = `${found.label} | 웨딩닷컴`;
+  }
+
+  function baseList() {
+    return currentCat === "all"
+      ? getAllListings()
+      : (LISTINGS[currentCat] || []).map((item, id) => ({ type: currentCat, id, ...item }));
+  }
+
+  function populateRegionFilter() {
+    const select = document.getElementById("f-region");
+    const regions = [...new Set(baseList().map((i) => i.loc))].sort();
+    select.innerHTML = `<option value="all">전체 지역</option>` + regions.map((r) => `<option value="${r}">${r}</option>`).join("");
+  }
+
+  function populatePriceFilter() {
+    document.getElementById("f-price").innerHTML = PRICE_RANGES.map((r) => `<option value="${r.id}">${r.label}</option>`).join("");
+  }
+
+  function applyFilters() {
+    let list = baseList();
+
+    const region = document.getElementById("f-region").value;
+    if (region !== "all") list = list.filter((i) => i.loc === region);
+
+    const priceVal = document.getElementById("f-price").value;
+    if (priceVal !== "all") {
+      const [min, max] = priceVal.split("-").map(Number);
+      list = list.filter((i) => {
+        const v = getPriceValue(i.price);
+        return v !== null && v >= min && v <= max;
+      });
+    }
+
+    const sortVal = document.getElementById("f-sort").value;
+    if (sortVal === "price-asc" || sortVal === "price-desc") {
+      list = list.slice().sort((a, b) => {
+        const av = getPriceValue(a.price);
+        const bv = getPriceValue(b.price);
+        if (av === null) return 1;
+        if (bv === null) return -1;
+        return sortVal === "price-asc" ? av - bv : bv - av;
+      });
+    }
+
+    document.getElementById("listing-grid").innerHTML = list.map((i) => renderListingCard(i.type, i.id, i)).join("");
+    document.getElementById("result-num").textContent = list.length;
+    document.getElementById("empty").classList.toggle("hidden", list.length > 0);
+    document.getElementById("listing-grid").classList.toggle("hidden", list.length === 0);
+  }
+
+  renderSidebar();
+  populateRegionFilter();
+  populatePriceFilter();
+  applyFilters();
+
+  document.getElementById("f-region").addEventListener("change", applyFilters);
+  document.getElementById("f-price").addEventListener("change", applyFilters);
+  document.getElementById("f-sort").addEventListener("change", applyFilters);
+</script>
+</body>
+</html>

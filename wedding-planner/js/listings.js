@@ -102,8 +102,37 @@ const REVIEW_POOL = [
   { name: "정하은", stars: 4, txt: "친절하고 꼼꼼하게 상담해주셔서 좋았어요." },
 ];
 
+const TAG_CLASS = { "BEST": "tag-best", "인기": "tag-hot", "추천": "tag-pick" };
+
 function getListing(type, id) {
   const list = LISTINGS[type];
   if (!list) return null;
   return list[id] || null;
+}
+
+// 전체 카테고리를 하나의 배열로 펼침 — 카테고리 필터 페이지에서 사용
+function getAllListings() {
+  return Object.keys(LISTINGS).flatMap((type) => LISTINGS[type].map((item, id) => ({ type, id, ...item })));
+}
+
+// "1,800,000원~" 같은 가격 문자열에서 정렬/필터용 숫자를 추출. "예식비 문의"처럼 숫자가 없으면 null.
+function getPriceValue(price) {
+  const digits = (price || "").replace(/[^0-9]/g, "");
+  return digits ? Number(digits) : null;
+}
+
+function renderListingCard(type, id, item) {
+  const tagsHtml = item.tags ? `<div class="venue-tags">${item.tags.map((t) => `<span class="${TAG_CLASS[t] || "tag-best"}">${t}</span>`).join("")}</div>` : "";
+  const metaRight = item.views !== undefined
+    ? `<span>조회수 ${item.views}</span><span class="venue-price">${item.price}</span>`
+    : `<span class="venue-price">${item.price}</span>`;
+  return `
+    <a class="venue-card" href="detail.html?type=${type}&id=${id}">
+      <div class="venue-thumb">${tagsHtml}${item.emoji}</div>
+      <div class="venue-body">
+        <div class="venue-loc">${item.loc}</div>
+        <div class="venue-name">${item.name}</div>
+        <div class="venue-meta">${metaRight}</div>
+      </div>
+    </a>`;
 }
