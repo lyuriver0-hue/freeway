@@ -161,6 +161,7 @@
 </footer>
 
 <script src="js/store.js"></script>
+<script src="js/listings.js"></script>
 <script>
   // 로그인 가드: 비로그인 시 로그인 페이지로, 기업 회원이면 파트너센터로 이동
   const currentUser = WeddingStore.getUser();
@@ -174,13 +175,16 @@
     weddingRenderHeader();
   }
 
-  const FAVORITES = [
-    { name: "아펠가모 반포", loc: "서울 서초구", price: "1,800,000원~", emoji: "🏛️" },
-    { name: "클라라웨딩", loc: "서울 강남구", price: "2,050,000원~", emoji: "👗" },
-    { name: "청담 이유", loc: "서울 강남구", price: "920,000원~", emoji: "💄" },
-    { name: "섬스튜디오", loc: "경기 하남시", price: "1,050,000원~", emoji: "📸" },
-    { name: "더채플앳 논현", loc: "서울 강남구", price: "2,100,000원~", emoji: "⛪" },
-  ];
+  // 실제 찜하기 상태(js/store.js의 toggleFavorite/getFavoriteIds)를 그대로 반영
+  function getFavoriteListings() {
+    return getFavoriteIds()
+      .map((key) => {
+        const [type, idStr] = key.split(":");
+        const item = getListing(type, Number(idStr));
+        return item ? { type, id: Number(idStr), key, ...item } : null;
+      })
+      .filter(Boolean);
+  }
 
   const QUOTES = [
     { name: "더채플앳 논현", type: "웨딩홀", budget: "2,000,000원대", date: "2026-06-20", status: "progress", label: "검토중" },
@@ -210,24 +214,35 @@
 
   function populateRegionFilter() {
     const select = document.getElementById("fav-region-filter");
-    const regions = [...new Set(FAVORITES.map(v => v.loc))].sort();
+    const prev = select.value || "all";
+    const regions = [...new Set(getFavoriteListings().map(v => v.loc))].sort();
     select.innerHTML = `<option value="all">전체 지역</option>` + regions.map(r => `<option value="${r}">${r}</option>`).join("");
+    select.value = regions.includes(prev) ? prev : "all";
+  }
+
+  function favoriteCardHTML(v) {
+    return `
+      <div class="venue-card">
+        <a href="detail.html?type=${v.type}&id=${v.id}" style="display:block; color:inherit;">
+          <div class="venue-thumb">
+            <button type="button" class="venue-heart active" data-fav-key="${v.key}">♥</button>
+            ${v.emoji}
+          </div>
+          <div class="venue-body">
+            <div class="venue-loc">${v.loc}</div>
+            <div class="venue-name">${v.name}</div>
+            <div class="venue-meta"><span class="venue-price">${v.price}</span></div>
+          </div>
+        </a>
+      </div>`;
   }
 
   function renderFavorites() {
     const region = document.getElementById("fav-region-filter").value;
-    const items = region === "all" ? FAVORITES : FAVORITES.filter(v => v.loc === region);
+    const all = getFavoriteListings();
+    const items = region === "all" ? all : all.filter(v => v.loc === region);
     const grid = document.getElementById("fav-grid");
-    grid.innerHTML = items.map(v => `
-      <div class="venue-card">
-        <div class="venue-thumb">${v.emoji}</div>
-        <div class="venue-body">
-          <div class="venue-loc">${v.loc}</div>
-          <div class="venue-name">${v.name}</div>
-          <div class="venue-meta"><span class="venue-price">${v.price}</span></div>
-        </div>
-      </div>
-    `).join("");
+    grid.innerHTML = items.map(favoriteCardHTML).join("");
     grid.classList.toggle("hidden", items.length === 0);
     document.getElementById("fav-empty").classList.toggle("hidden", items.length > 0);
     document.getElementById("fav-empty-msg").textContent = region === "all"
@@ -269,6 +284,16 @@
   document.getElementById("fav-region-filter").addEventListener("change", renderFavorites);
 
   document.addEventListener("click", (e) => {
+    const favBtn = e.target.closest("[data-fav-key]");
+    if (favBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(favBtn.dataset.favKey);
+      WeddingStore.toast("찜 목록에서 제거했습니다");
+      populateRegionFilter();
+      renderFavorites();
+      return;
+    }
     const navItem = e.target.closest("#side-nav a");
     if (navItem) {
       document.querySelectorAll("#side-nav a").forEach(a => a.classList.remove("active"));

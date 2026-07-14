@@ -157,6 +157,9 @@ header.site-header{
 .venue-meta{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--gray-500);}
 .venue-price{font-weight:800; color:var(--ink); font-size:13.5px;}
 .venue-badge-row{position:absolute; top:10px; left:10px;}
+.venue-heart{position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; border:none; background:rgba(255,255,255,0.9); color:var(--gray-500); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:2; transition:.15s;}
+.venue-heart:hover{background:#fff;}
+.venue-heart.active{color:#E11D48;}
 
 /* ---------- Sub category tabs (스드메 섹션) ---------- */
 .subtab-group{display:flex; gap:8px; margin-bottom:22px;}
