@@ -17,6 +17,11 @@
   .mini-pro{display:flex; gap:12px; align-items:center; padding:14px 0; border-top:1px solid var(--gray-100); margin-top:14px;}
   .review-item{padding:16px 0; border-bottom:1px solid var(--gray-100);}
   .mobile-bar{display:none;}
+  .mini-pro .avatar img{width:100%; height:100%; object-fit:cover; border-radius:inherit;}
+  .pf-lightbox{position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:3000; padding:24px;}
+  .pf-lightbox.open{display:flex;}
+  .pf-lightbox img{max-width:min(900px,90vw); max-height:85vh; border-radius:8px;}
+  .pf-lightbox .lb-close{position:absolute; top:24px; right:32px; font-size:28px; cursor:pointer; color:#fff;}
   @media (max-width:900px){
     .detail-layout{grid-template-columns:1fr;}
     .sidebar-card{position:static;}
@@ -82,6 +87,11 @@
   <button class="btn btn-primary" onclick="FreewayStore.toast('문의가 전송되었습니다')">문의하기</button>
 </div>
 
+<div class="pf-lightbox" id="pf-lightbox">
+  <span class="lb-close" onclick="closeModal('pf-lightbox')">✕</span>
+  <img id="lb-img">
+</div>
+
 <footer class="site-footer"></footer>
 
 <script src="js/data.js"></script>
@@ -102,11 +112,25 @@
   document.getElementById('detail-heart').setAttribute('data-fav-id', svc.id);
   document.getElementById('mobile-price').textContent = `₩${svc.price.toLocaleString()}~`;
 
-  document.getElementById('portfolio-grid').innerHTML = ['🖼️','🖌️','📐'].map((e,i)=>`
+  const flPortfolio = FreewayStore.getFlPortfolio(fl.id);
+  document.getElementById('portfolio-grid').innerHTML = flPortfolio.length ? flPortfolio.map(p=>`
+    <div class="svc-card" data-pf-view="${p.id}">
+      <div class="svc-thumb" style="padding:0;"><img src="${p.image}" style="width:100%; height:100%; object-fit:cover;"></div>
+      <div class="svc-body"><div class="svc-title">${p.title}</div></div>
+    </div>`).join('') : ['🖼️','🖌️','📐'].map((e,i)=>`
     <a class="svc-card" href="portfolio.html?id=p${i+1}" style="cursor:pointer;">
       <div class="svc-thumb" style="font-size:44px;">${e}</div>
       <div class="svc-body"><div class="svc-title">포트폴리오 예시 ${i+1}</div></div>
     </a>`).join('');
+
+  document.getElementById('portfolio-grid').addEventListener('click', (e)=>{
+    const card = e.target.closest('[data-pf-view]');
+    if(!card) return;
+    const item = flPortfolio.find(p=>p.id===card.getAttribute('data-pf-view'));
+    if(!item) return;
+    document.getElementById('lb-img').src = item.image;
+    openModal('pf-lightbox');
+  });
 
   const tiers = [
     {name:'베이직', desc:'기본 시안 1종 + 수정 1회', mult:1},
@@ -126,8 +150,9 @@
     });
   });
 
+  const flPhoto = FreewayStore.getFlPhoto(fl.id);
   document.getElementById('mini-pro').innerHTML = `
-    <div class="avatar lg">${fl.avatar}</div>
+    <div class="avatar lg">${flPhoto ? `<img src="${flPhoto}">` : fl.avatar}</div>
     <div>
       <div style="font-weight:800; font-size:14.5px; display:flex; align-items:center; gap:5px;">${fl.name} ${fl.verified?'<span class="verified">✔</span>':''}</div>
       <div style="font-size:12px; color:var(--gray-500);">${fl.role} · ${fl.career}</div>
