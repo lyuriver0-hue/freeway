@@ -263,6 +263,7 @@
     const val = e.target.value;
     bizLinkedListing = val ? { type: val.split(":")[0], id: Number(val.split(":")[1]) } : null;
     updateLiveLink();
+    renderBusinessData();
   });
 
   // ---------- 업체 사진 업로드/관리 ----------
@@ -343,64 +344,119 @@
     addPhotoFiles(e.dataTransfer.files);
   });
 
-  const REQUESTS = [
-    { customer: "김민수", content: "본식 스냅 촬영 문의", region: "서울 강남구", budget: "1,000,000원대", date: "2026-07-08", status: "wait", label: "답변대기" },
-    { customer: "이서연", content: "야외 촬영 가능 여부", region: "경기 하남시", budget: "1,500,000원대", date: "2026-07-05", status: "done", label: "답변완료" },
-    { customer: "박준호", content: "주말 예약 문의", region: "서울 서초구", budget: "900,000원대", date: "2026-07-01", status: "done", label: "답변완료" },
-  ];
-
-  const BOOKINGS = [
-    { customer: "이서연", type: "야외 촬영 상담", date: "2026-07-22 15:00", status: "progress", label: "예정" },
-    { customer: "박준호", type: "촬영 컨셉 상담", date: "2026-07-18 10:00", status: "progress", label: "예정" },
-    { customer: "최유리", type: "본식 스냅 촬영", date: "2026-06-14 09:00", status: "done", label: "완료" },
-  ];
-
-  const SALES = [
-    { title: "본식 스냅 촬영", customer: "최유리", amount: "1,200,000원", date: "2026-06-20", status: "done", label: "정산완료" },
-    { title: "야외 촬영 예약금", customer: "이서연", amount: "300,000원", date: "2026-07-15", status: "wait", label: "정산대기" },
-  ];
-
-  const REVIEWS = [
-    { name: "최유리", stars: 5, txt: "사진이 정말 자연스럽게 잘 나왔어요! 스튜디오 분위기도 좋았습니다.", date: "2026-06-25" },
-    { name: "정하은", stars: 4, txt: "친절하게 설명해주셔서 편하게 촬영할 수 있었어요.", date: "2026-06-18" },
-  ];
-
   function statusPill(status, label) {
     return `<span class="status-pill status-${status}">${label}</span>`;
   }
 
+  // 연결된 상세페이지(linkedListing)로 들어온 실제 고객 신청 내역만 조회
+  function myInquiries() {
+    if (!bizLinkedListing) return [];
+    return getInquiries().filter(r => r.type === bizLinkedListing.type && r.listingId === bizLinkedListing.id);
+  }
+
+  function noLinkRow(colspan) {
+    return `<tr><td colspan="${colspan}" style="text-align:center; color:var(--gray-500); padding:30px 0;">업체 정보에서 상세페이지를 먼저 연결해주세요.</td></tr>`;
+  }
+
   function renderRequests() {
-    document.getElementById("requests-body").innerHTML = REQUESTS.map(r => `
-      <tr><td>${r.customer}</td><td>${r.content}</td><td>${r.region}</td><td>${r.budget}</td><td>${r.date}</td><td>${statusPill(r.status, r.label)}</td></tr>
+    const tbody = document.getElementById("requests-body");
+    if (!bizLinkedListing) { tbody.innerHTML = noLinkRow(6); return; }
+    const list = myInquiries();
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 받은 견적 요청이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.slice().reverse().map(r => `
+      <tr>
+        <td>${r.customerName || "익명"}</td>
+        <td>${r.message || "-"}</td>
+        <td>${r.customerRegion || "-"}</td>
+        <td>${r.budget || "미입력"}</td>
+        <td>${r.createdAt}</td>
+        <td>${statusPill("wait", "답변대기")}</td>
+      </tr>
     `).join("");
   }
 
   function renderBookings() {
-    document.getElementById("bookings-body").innerHTML = BOOKINGS.map(b => `
-      <tr><td>${b.customer}</td><td>${b.type}</td><td>${b.date}</td><td>${statusPill(b.status, b.label)}</td></tr>
+    const tbody = document.getElementById("bookings-body");
+    if (!bizLinkedListing) { tbody.innerHTML = noLinkRow(4); return; }
+    const list = myInquiries();
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.slice().reverse().map(r => `
+      <tr>
+        <td>${r.customerName || "익명"}</td>
+        <td>상담 신청</td>
+        <td>${r.preferredDate || r.createdAt}</td>
+        <td>${statusPill("wait", "예정")}</td>
+      </tr>
     `).join("");
   }
 
   function renderSales() {
-    document.getElementById("sales-body").innerHTML = SALES.map(s => `
-      <tr><td>${s.title}</td><td>${s.customer}</td><td>${s.amount}</td><td>${s.date}</td><td>${statusPill(s.status, s.label)}</td></tr>
+    const tbody = document.getElementById("sales-body");
+    const statCards = document.querySelectorAll(".stat-card b");
+    if (!bizLinkedListing) {
+      tbody.innerHTML = noLinkRow(5);
+      statCards[0].textContent = "0원";
+      statCards[1].textContent = "0원";
+      statCards[2].textContent = "0건";
+      return;
+    }
+    const list = myInquiries();
+    const paid = list.filter(r => r.paid);
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const thisMonthTotal = paid.filter(r => (r.paidAt || "").startsWith(thisMonth)).reduce((sum, r) => sum + Number(r.paidAmount || 0), 0);
+    const allTimeTotal = paid.reduce((sum, r) => sum + Number(r.paidAmount || 0), 0);
+    statCards[0].textContent = `${thisMonthTotal.toLocaleString()}원`;
+    statCards[1].textContent = `${allTimeTotal.toLocaleString()}원`;
+    statCards[2].textContent = `${list.length}건`;
+
+    if (paid.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 정산 내역이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = paid.slice().reverse().map(r => `
+      <tr>
+        <td>계약금</td>
+        <td>${r.customerName || "익명"}</td>
+        <td>${Number(r.paidAmount).toLocaleString()}원</td>
+        <td>${r.paidAt}</td>
+        <td>${statusPill("done", "정산완료")}</td>
+      </tr>
     `).join("");
   }
 
   function renderReviews() {
-    document.getElementById("reviews-list").innerHTML = REVIEWS.map(r => `
+    const el = document.getElementById("reviews-list");
+    if (!bizLinkedListing) {
+      el.innerHTML = `<div class="empty-box"><div class="emoji">🔗</div><p>업체 정보에서 상세페이지를 먼저 연결해주세요.</p></div>`;
+      return;
+    }
+    const reviews = getReviews().filter(r => r.type === bizLinkedListing.type && r.listingId === bizLinkedListing.id);
+    if (reviews.length === 0) {
+      el.innerHTML = `<div class="empty-box"><div class="emoji">⭐</div><p>아직 작성된 리뷰가 없어요.</p></div>`;
+      return;
+    }
+    el.innerHTML = reviews.slice().reverse().map(r => `
       <div class="review-item">
         <div class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
         <div class="txt">${r.txt}</div>
-        <div class="meta">${r.name} · ${r.date}</div>
+        <div class="meta">${r.customerName} · ${r.createdAt}</div>
       </div>
     `).join("");
   }
 
-  renderRequests();
-  renderBookings();
-  renderSales();
-  renderReviews();
+  function renderBusinessData() {
+    renderRequests();
+    renderBookings();
+    renderSales();
+    renderReviews();
+  }
+  renderBusinessData();
 
   document.addEventListener("click", (e) => {
     const navItem = e.target.closest("#side-nav a");

@@ -111,6 +111,32 @@ function markInquiryPaid(id, amount) {
   target.paidAt = new Date().toISOString().slice(0, 10);
   localStorage.setItem(INQUIRIES_KEY, JSON.stringify(list));
 }
+function markInquiryReviewed(id) {
+  const list = getInquiries();
+  const target = list.find((r) => r.id === id);
+  if (!target) return;
+  target.reviewed = true;
+  localStorage.setItem(INQUIRIES_KEY, JSON.stringify(list));
+}
+
+// ---------- 리뷰 ----------
+const REVIEWS_KEY = "weddingcom_reviews";
+function getReviews() {
+  try {
+    return JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveReview(review) {
+  const list = getReviews();
+  list.push({
+    id: Date.now(),
+    createdAt: new Date().toISOString().slice(0, 10),
+    ...review,
+  });
+  localStorage.setItem(REVIEWS_KEY, JSON.stringify(list));
+}
 
 // ---------- 1:1 문의 ----------
 const SUPPORT_KEY = "weddingcom_support_tickets";

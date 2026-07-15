@@ -70,7 +70,24 @@
 
         <div class="detail-section" style="margin-bottom:0;">
           <h3>리뷰</h3>
+          <div class="field hidden" id="review-form" style="background:var(--gray-50); border-radius:var(--radius); padding:18px; margin-bottom:18px;">
+            <label>별점</label>
+            <select id="rv-stars">
+              <option value="5">★★★★★ (5점)</option>
+              <option value="4">★★★★☆ (4점)</option>
+              <option value="3">★★★☆☆ (3점)</option>
+              <option value="2">★★☆☆☆ (2점)</option>
+              <option value="1">★☆☆☆☆ (1점)</option>
+            </select>
+            <label style="margin-top:12px;">후기</label>
+            <textarea rows="3" id="rv-text" placeholder="이용 후기를 남겨주세요."></textarea>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-submit-review" style="margin-top:12px;">리뷰 등록하기</button>
+          </div>
           <div id="reviews-list"></div>
+          <div class="empty-box hidden" id="reviews-empty">
+            <div class="emoji">✍️</div>
+            <p>아직 작성된 리뷰가 없습니다.</p>
+          </div>
         </div>
       </div>
 
@@ -81,6 +98,7 @@
         <form id="booking-form">
           <div class="field"><label>이름</label><input type="text" id="bk-name" placeholder="홍길동"></div>
           <div class="field"><label>연락처</label><input type="tel" id="bk-phone" placeholder="010-0000-0000"></div>
+          <div class="field"><label>거주 지역 (선택)</label><input type="text" id="bk-region" placeholder="예: 서울 강남구"></div>
           <div class="field"><label>희망 상담일</label><input type="date" id="bk-date"></div>
           <div class="field"><label>희망 예산 (선택)</label><input type="text" id="bk-budget" placeholder="예: 200만원대"></div>
           <div class="field"><label>문의 내용</label><textarea rows="3" id="bk-msg" placeholder="문의하실 내용을 남겨주세요."></textarea></div>
@@ -210,15 +228,47 @@
 
     initNaverStaticMap("detail-map", item.loc);
 
-    const r1 = REVIEW_POOL[detailId % REVIEW_POOL.length];
-    const r2 = REVIEW_POOL[(detailId + 2) % REVIEW_POOL.length];
-    document.getElementById("reviews-list").innerHTML = [r1, r2].map(r => `
-      <div class="review-item">
-        <div class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
-        <div class="txt">${r.txt}</div>
-        <div class="meta">${r.name}</div>
-      </div>
-    `).join("");
+    function renderReviews() {
+      const reviews = getReviews().filter(r => r.type === detailType && r.listingId === detailId);
+      document.getElementById("reviews-list").innerHTML = reviews.slice().reverse().map(r => `
+        <div class="review-item">
+          <div class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+          <div class="txt">${r.txt}</div>
+          <div class="meta">${r.customerName} · ${r.createdAt}</div>
+        </div>
+      `).join("");
+      document.getElementById("reviews-list").classList.toggle("hidden", reviews.length === 0);
+      document.getElementById("reviews-empty").classList.toggle("hidden", reviews.length > 0);
+    }
+    renderReviews();
+
+    // 마이페이지의 "리뷰 작성" 링크(?reviewFor=신청ID)로 들어온 경우에만, 결제 완료된 본인 신청 건에 한해 작성 폼을 노출
+    const reviewForId = Number(params.get("reviewFor"));
+    const targetInquiry = reviewForId
+      ? getInquiries().find(r => r.id === reviewForId && r.type === detailType && r.listingId === detailId && r.paid && !r.reviewed)
+      : null;
+    if (targetInquiry) {
+      document.getElementById("review-form").classList.remove("hidden");
+      document.getElementById("btn-submit-review").addEventListener("click", () => {
+        const text = document.getElementById("rv-text").value.trim();
+        if (!text) {
+          WeddingStore.toast("후기 내용을 입력해주세요");
+          return;
+        }
+        saveReview({
+          type: detailType,
+          listingId: detailId,
+          businessName: item.name,
+          customerName: targetInquiry.customerName || "익명",
+          stars: Number(document.getElementById("rv-stars").value),
+          txt: text,
+        });
+        markInquiryReviewed(targetInquiry.id);
+        document.getElementById("review-form").classList.add("hidden");
+        WeddingStore.toast("리뷰가 등록되었습니다");
+        renderReviews();
+      });
+    }
 
     const favKey = `${detailType}:${detailId}`;
     const heartBtn = document.getElementById("heart-btn");
@@ -246,6 +296,9 @@
         type: detailType,
         listingId: detailId,
         businessName: item.name,
+        customerName: name,
+        customerPhone: phone,
+        customerRegion: document.getElementById("bk-region").value.trim(),
         budget: document.getElementById("bk-budget").value.trim(),
         preferredDate: document.getElementById("bk-date").value,
         message: document.getElementById("bk-msg").value.trim(),

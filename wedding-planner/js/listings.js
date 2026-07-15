@@ -194,14 +194,6 @@ function renderFairCard(id, fair) {
     </a>`;
 }
 
-const REVIEW_POOL = [
-  { name: "김민지", stars: 5, txt: "정말 만족스러운 진행이었어요! 담당자분이 친절하게 설명해주셔서 편했습니다." },
-  { name: "이수현", stars: 5, txt: "결과물이 기대 이상이었어요. 주변에도 추천하고 싶습니다." },
-  { name: "박서준", stars: 4, txt: "전반적으로 좋았는데 예약이 조금 빡빡했어요. 그래도 만족합니다." },
-  { name: "최유리", stars: 5, txt: "가격 대비 퀄리티가 훌륭했습니다. 다시 이용하고 싶어요." },
-  { name: "정하은", stars: 4, txt: "친절하고 꼼꼼하게 상담해주셔서 좋았어요." },
-];
-
 const TAG_CLASS = { "BEST": "tag-best", "인기": "tag-hot", "추천": "tag-pick" };
 
 function getListing(type, id) {

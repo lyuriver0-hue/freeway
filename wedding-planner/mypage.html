@@ -88,7 +88,7 @@
           <p>상담·촬영·피팅 등 예정된 일정입니다.</p>
         </div>
         <table class="list-table">
-          <thead><tr><th>일정</th><th>업체</th><th>날짜</th><th>상태</th><th>결제</th></tr></thead>
+          <thead><tr><th>일정</th><th>업체</th><th>날짜</th><th>상태</th><th>결제</th><th>리뷰</th></tr></thead>
           <tbody id="bookings-body"></tbody>
         </table>
       </div>
@@ -271,7 +271,7 @@
     const requests = getInquiries();
     const tbody = document.getElementById("bookings-body");
     if (requests.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
       return;
     }
     tbody.innerHTML = requests.slice().reverse().map(r => {
@@ -286,6 +286,12 @@
           ? `<span class="text-muted" style="font-size:12px;">예치금 협의</span>`
           : `<button type="button" class="btn btn-primary btn-sm" data-pay-id="${r.id}" data-pay-amount="${deposit}">계약금 결제 (${deposit.toLocaleString()}원)</button>`;
       }
+      let reviewCell = `<span class="text-muted" style="font-size:12px;">-</span>`;
+      if (r.type !== "fair" && r.paid) {
+        reviewCell = r.reviewed
+          ? `<span class="text-muted" style="font-size:12px;">작성완료</span>`
+          : `<a href="${requestDetailHref(r)}&reviewFor=${r.id}#review-form" class="btn btn-ghost btn-sm">리뷰 작성</a>`;
+      }
       return `
         <tr>
           <td>${r.type === "fair" ? "박람회 사전등록" : "상담 신청"}</td>
@@ -293,6 +299,7 @@
           <td>${r.preferredDate || r.createdAt}</td>
           <td>${statusPill("wait", "예정")}</td>
           <td>${payCell}</td>
+          <td>${reviewCell}</td>
         </tr>`;
     }).join("");
   }
