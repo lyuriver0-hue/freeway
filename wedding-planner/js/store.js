@@ -158,6 +158,82 @@ function saveSupportTicket(ticket) {
   localStorage.setItem(SUPPORT_KEY, JSON.stringify(list));
 }
 
+// ---------- 커뮤니티 ----------
+// 시드 게시글(js/community-data.js)은 고정이고, 사용자가 새로 쓴 글/좋아요/댓글/조회수는
+// 전부 localStorage에 실제로 저장해 새로고침해도 유지되도록 한다.
+const COMMUNITY_POSTS_KEY = "weddingcom_community_posts";
+function getCommunityUserPosts() {
+  try {
+    return JSON.parse(localStorage.getItem(COMMUNITY_POSTS_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+function saveCommunityPost(post) {
+  const list = getCommunityUserPosts();
+  list.unshift({
+    id: `new${Date.now()}`,
+    date: new Date().toISOString().slice(0, 10),
+    views: 0,
+    likes: 0,
+    comments: 0,
+    ...post,
+  });
+  localStorage.setItem(COMMUNITY_POSTS_KEY, JSON.stringify(list));
+}
+
+const COMMUNITY_LIKES_KEY = "weddingcom_community_likes";
+function getCommunityLikes() {
+  try {
+    return JSON.parse(localStorage.getItem(COMMUNITY_LIKES_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+function isCommunityLiked(postId) {
+  return getCommunityLikes().includes(postId);
+}
+function toggleCommunityLike(postId) {
+  const likes = getCommunityLikes();
+  const idx = likes.indexOf(postId);
+  if (idx === -1) likes.push(postId);
+  else likes.splice(idx, 1);
+  localStorage.setItem(COMMUNITY_LIKES_KEY, JSON.stringify(likes));
+  return likes.includes(postId);
+}
+
+const COMMUNITY_COMMENTS_KEY = "weddingcom_community_comments";
+function getAllCommunityComments() {
+  try {
+    return JSON.parse(localStorage.getItem(COMMUNITY_COMMENTS_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function getCommunityComments(postId) {
+  return getAllCommunityComments()[postId] || [];
+}
+function addCommunityComment(postId, author, text) {
+  const all = getAllCommunityComments();
+  if (!all[postId]) all[postId] = [];
+  all[postId].push({ author, date: new Date().toISOString().slice(0, 10), body: text });
+  localStorage.setItem(COMMUNITY_COMMENTS_KEY, JSON.stringify(all));
+}
+
+const COMMUNITY_VIEWS_KEY = "weddingcom_community_views";
+function getCommunityExtraViews() {
+  try {
+    return JSON.parse(localStorage.getItem(COMMUNITY_VIEWS_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function addCommunityView(postId) {
+  const all = getCommunityExtraViews();
+  all[postId] = (all[postId] || 0) + 1;
+  localStorage.setItem(COMMUNITY_VIEWS_KEY, JSON.stringify(all));
+}
+
 // 로그인 상태에 따라 헤더 nav-actions 영역을 갱신 (모든 페이지 공통)
 function weddingRenderHeader() {
   const nav = document.querySelector(".nav-actions");

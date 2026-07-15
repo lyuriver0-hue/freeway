@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>커뮤니티 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">웨딩<span class="dot">닷컴</span></a>
+    <nav class="nav-menu">
+      <a href="category.html?cat=hall">웨딩홀</a>
+      <a href="category.html?cat=studio">스튜디오</a>
+      <a href="category.html?cat=dress">드레스</a>
+      <a href="category.html?cat=makeup">메이크업</a>
+      <a href="fair.html">웨딩박람회</a>
+      <a href="community.html">커뮤니티</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="index.html#planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page container" style="max-width:800px;">
+  <div class="community-head">
+    <h1>커뮤니티</h1>
+    <button type="button" class="btn btn-primary" id="btn-write">✏️ 글쓰기</button>
+  </div>
+
+  <div class="subtab-group" id="cat-tabs">
+    <div class="subtab active" data-filter="all">전체</div>
+    <div class="subtab" data-filter="웨딩후기">웨딩후기</div>
+    <div class="subtab" data-filter="꿀팁공유">꿀팁공유</div>
+    <div class="subtab" data-filter="질문답변">질문답변</div>
+    <div class="subtab" data-filter="공지">공지</div>
+  </div>
+
+  <div class="post-list" id="post-list"></div>
+  <div class="empty-box hidden" id="post-empty">
+    <div class="emoji">📝</div>
+    <p>게시물이 없습니다.</p>
+  </div>
+</main>
+
+<div class="modal-overlay" id="write-modal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" id="btn-close-write">✕</button>
+    <h3>글쓰기</h3>
+    <div class="field">
+      <label>카테고리</label>
+      <select id="wr-cat">
+        <option>웨딩후기</option>
+        <option>꿀팁공유</option>
+        <option>질문답변</option>
+      </select>
+    </div>
+    <div class="field"><label>제목</label><input type="text" id="wr-title" placeholder="제목을 입력하세요"></div>
+    <div class="field" style="margin-bottom:0;"><label>내용</label><textarea rows="5" id="wr-body" placeholder="내용을 입력하세요"></textarea></div>
+    <button type="button" class="btn btn-primary btn-block" id="wr-submit" style="margin-top:18px;">등록하기</button>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">웨딩닷컴</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>웨딩박람회</li>
+          <li>커뮤니티</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/community-data.js"></script>
+<script>
+  let posts = [...getCommunityUserPosts(), ...COMMUNITY_POSTS];
+  let currentFilter = "all";
+  let openId = null;
+
+  function render() {
+    const list = posts.filter(p => currentFilter === "all" || p.cat === currentFilter);
+    document.getElementById("post-list").innerHTML = list.map((p, i) => {
+      const liveComments = getCommunityComments(p.id);
+      const totalComments = (p.comments || 0) + liveComments.length;
+      const totalViews = p.views + (getCommunityExtraViews()[p.id] || 0);
+      const liked = isCommunityLiked(p.id);
+      const totalLikes = (p.likes || 0) + (liked ? 1 : 0);
+      const isOpen = openId === p.id;
+      const no = list.length - i;
+      return `
+      <div>
+        <div class="post-row" data-pid="${p.id}">
+          <span class="post-no">${no}</span>
+          <span class="post-cat-badge${p.cat === "공지" ? " is-notice" : ""}">${p.cat}</span>
+          <span class="title">${p.title}</span>
+          <span class="meta">${p.author} · ${p.date} · 조회 ${totalViews} · 좋아요 ${totalLikes} · 댓글 ${totalComments}</span>
+        </div>
+        <div class="post-detail ${isOpen ? "open" : ""}" id="detail-${p.id}">
+          <div class="post-body">${p.body || "내용이 없습니다."}</div>
+          <div class="post-actions">
+            <button type="button" class="like-btn ${liked ? "active" : ""}" data-like-id="${p.id}">${liked ? "❤️" : "🤍"} 좋아요 ${totalLikes}</button>
+          </div>
+          <div class="comment-section">
+            <h4>댓글 ${liveComments.length}</h4>
+            <div class="comment-list">
+              ${liveComments.map(c => `<div class="comment-item"><b>${c.author}</b><span class="comment-date">${c.date}</span><p>${c.body}</p></div>`).join("") || '<p class="empty-comment">등록된 댓글이 없습니다. 첫 댓글을 남겨보세요.</p>'}
+            </div>
+            <div class="comment-form">
+              <input type="text" placeholder="댓글을 입력하세요" data-comment-input="${p.id}">
+              <button type="button" class="btn btn-sm btn-primary" data-comment-submit="${p.id}">등록</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+    document.getElementById("post-list").classList.toggle("hidden", list.length === 0);
+    document.getElementById("post-empty").classList.toggle("hidden", list.length > 0);
+  }
+  render();
+
+  document.addEventListener("click", (e) => {
+    const tab = e.target.closest("#cat-tabs .subtab");
+    if (tab) {
+      document.querySelectorAll("#cat-tabs .subtab").forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentFilter = tab.dataset.filter;
+      render();
+      return;
+    }
+
+    const likeBtn = e.target.closest("[data-like-id]");
+    if (likeBtn) {
+      toggleCommunityLike(likeBtn.dataset.likeId);
+      render();
+      return;
+    }
+
+    const commentBtn = e.target.closest("[data-comment-submit]");
+    if (commentBtn) {
+      const id = commentBtn.dataset.commentSubmit;
+      const input = document.querySelector(`[data-comment-input="${CSS.escape(id)}"]`);
+      const text = input.value.trim();
+      if (!text) { WeddingStore.toast("댓글 내용을 입력해주세요"); return; }
+      const user = WeddingStore.getUser();
+      if (!user) { WeddingStore.toast("로그인 후 댓글을 남길 수 있습니다"); return; }
+      addCommunityComment(id, user.name, text);
+      render();
+      WeddingStore.toast("댓글이 등록되었습니다");
+      return;
+    }
+
+    if (e.target.closest("#btn-write")) {
+      if (!WeddingStore.getUser()) {
+        WeddingStore.toast("로그인 후 글을 작성할 수 있습니다");
+        setTimeout(() => (location.href = "login.html"), 600);
+        return;
+      }
+      document.getElementById("write-modal").classList.add("open");
+      return;
+    }
+    if (e.target.closest("#btn-close-write")) {
+      document.getElementById("write-modal").classList.remove("open");
+      return;
+    }
+
+    const row = e.target.closest(".post-row");
+    if (row) {
+      const id = row.dataset.pid;
+      const wasOpen = openId === id;
+      openId = wasOpen ? null : id;
+      if (!wasOpen) addCommunityView(id);
+      render();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.matches("[data-comment-input]")) {
+      e.target.nextElementSibling.click();
+    }
+  });
+
+  document.getElementById("wr-submit").addEventListener("click", () => {
+    const title = document.getElementById("wr-title").value.trim();
+    if (!title) { WeddingStore.toast("제목을 입력해주세요"); return; }
+    const user = WeddingStore.getUser();
+    saveCommunityPost({
+      cat: document.getElementById("wr-cat").value,
+      title,
+      body: document.getElementById("wr-body").value.trim(),
+      author: user ? user.name : "익명",
+    });
+    posts = [...getCommunityUserPosts(), ...COMMUNITY_POSTS];
+    render();
+    document.getElementById("write-modal").classList.remove("open");
+    document.getElementById("wr-title").value = "";
+    document.getElementById("wr-body").value = "";
+    WeddingStore.toast("게시글이 등록되었습니다");
+  });
+</script>
+</body>
+</html>
