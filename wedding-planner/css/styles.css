@@ -135,7 +135,7 @@ header.site-header{
 
 /* ---------- Category quick nav ---------- */
 .cat-section{background:#fff; border-top:1px solid var(--gray-200); border-bottom:1px solid var(--gray-200);}
-.cat-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:12px;}
+.cat-grid{display:grid; grid-template-columns:repeat(9,1fr); gap:12px;}
 .cat-card{display:block; background:var(--gray-50); border-radius:16px; padding:20px 10px; border:1px solid var(--gray-200); transition:.2s; cursor:pointer; text-align:center;}
 .cat-card:hover{border-color:var(--primary); background:var(--primary-light); transform:translateY(-3px);}
 .cat-emoji{font-size:26px; margin-bottom:8px;}

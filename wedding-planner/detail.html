@@ -19,7 +19,7 @@
       <a href="fair.html">웨딩박람회</a>
       <a href="community.html">커뮤니티</a>
       <a href="index.html#honeymoon" class="soon">허니문</a>
-      <a href="index.html#planner">웨딩플래너</a>
+      <a href="category.html?cat=planner">웨딩플래너</a>
       <a href="index.html#estimate">셀프견적</a>
     </nav>
     <div class="nav-actions">
@@ -218,7 +218,7 @@
     document.getElementById("detail-desc").textContent = item.desc;
 
     document.getElementById("info-grid").innerHTML = `
-      <div class="info-item"><span>${detailType === "hall" ? "수용 인원" : "소요 시간/구성"}</span><b>${item.capacity}</b></div>
+      <div class="info-item"><span>${detailType === "hall" ? "수용 인원" : detailType === "planner" ? "경력" : "소요 시간/구성"}</span><b>${item.capacity}</b></div>
       <div class="info-item"><span>스타일</span><b>${item.style}</b></div>
     `;
 

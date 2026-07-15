@@ -126,9 +126,27 @@ const LISTINGS = {
       capacity: "커플링 세트", style: "데일리 심플",
       priceTable: [{ item: "커플링 세트", price: "1,250,000원" }, { item: "각인 서비스", price: "무료" }, { item: "보증서 발급", price: "무료" }] },
   ],
+  planner: [
+    { name: "김민정 플래너", loc: "서울 강남구", price: "1,500,000원~", emoji: "👰",
+      desc: "8년차 웨딩플래너로 스몰웨딩부터 대형 컨벤션 웨딩까지 두루 경험했습니다. 예산 관리와 업체 조율에 강점이 있습니다.",
+      capacity: "경력 8년차", style: "토탈 플래닝",
+      priceTable: [{ item: "토탈 플래닝", price: "1,500,000원" }, { item: "부분 컨설팅", price: "500,000원" }, { item: "당일 진행", price: "800,000원" }] },
+    { name: "이수아 플래너", loc: "서울 마포구", price: "900,000원~", emoji: "👰",
+      desc: "합리적인 비용으로 준비하는 스몰웨딩을 전문으로 합니다. 소규모 예식장 및 사진 스팟 추천에 강점이 있습니다.",
+      capacity: "경력 4년차", style: "스몰웨딩 전문",
+      priceTable: [{ item: "토탈 플래닝", price: "900,000원" }, { item: "부분 컨설팅", price: "350,000원" }, { item: "당일 진행", price: "500,000원" }] },
+    { name: "박지현 플래너", loc: "경기 하남시", price: "1,200,000원~", emoji: "👰",
+      desc: "예비부부가 직접 발품 팔지 않아도 되도록, 견적 비교와 일정 관리를 꼼꼼하게 대행해드립니다.",
+      capacity: "경력 6년차", style: "데이신부 컨설팅",
+      priceTable: [{ item: "토탈 플래닝", price: "1,200,000원" }, { item: "부분 컨설팅", price: "450,000원" }, { item: "당일 진행", price: "650,000원" }] },
+    { name: "정다은 플래너", loc: "서울 서초구", price: "2,200,000원~", emoji: "👰",
+      desc: "10년 이상의 경력으로 하이엔드 호텔 웨딩과 프라이빗 웨딩을 전문으로 기획합니다.",
+      capacity: "경력 10년차", style: "럭셔리 웨딩 전문",
+      priceTable: [{ item: "토탈 플래닝", price: "2,200,000원" }, { item: "부분 컨설팅", price: "700,000원" }, { item: "당일 진행", price: "1,000,000원" }] },
+  ],
 };
 
-const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업", suit: "예복", jewelry: "예물", fair: "웨딩박람회" };
+const LISTING_TYPE_LABEL = { hall: "웨딩홀", studio: "스튜디오", dress: "드레스", makeup: "메이크업", suit: "예복", jewelry: "예물", planner: "웨딩플래너", fair: "웨딩박람회" };
 
 // 웨딩박람회 — 업체(가격표·예약) 모델과 달리 날짜·장소·참가업체 중심의 행사 데이터
 const FAIRS = [
