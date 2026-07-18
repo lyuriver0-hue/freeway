@@ -41,6 +41,7 @@
       </div>
       <nav class="side-nav" id="side-nav">
         <a data-target="panel-info" class="active">🏢 업체 정보</a>
+        <a data-target="panel-membership">💳 멤버십 관리</a>
         <a data-target="panel-requests">📥 받은 견적 요청</a>
         <a data-target="panel-bookings">📅 예약 관리</a>
         <a data-target="panel-sales">💰 정산·매출</a>
@@ -104,6 +105,23 @@
           <p class="text-muted" style="font-size:12.5px; margin-bottom:14px;" id="preview-note">고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.</p>
           <div class="detail-gallery" id="preview-gallery"></div>
           <a href="#" id="view-live-link" class="btn btn-ghost btn-sm hidden" style="margin-top:14px;" target="_blank" rel="noopener">실제 상세페이지에서 보기 →</a>
+        </div>
+      </div>
+
+      <!-- 멤버십 관리 -->
+      <div class="mypage-panel" id="panel-membership">
+        <div class="mypage-panel-head">
+          <h2>💳 멤버십 관리</h2>
+          <p>월 회비를 납부하는 동안에만 상세페이지·목록에 업체 사진과 웹사이트가 노출됩니다.</p>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card"><span>이용 상태</span><span id="ms-status-badge" class="status-pill">-</span></div>
+          <div class="stat-card"><span>월 회비</span><b id="ms-fee">-</b></div>
+          <div class="stat-card"><span id="ms-date-label">무료체험 종료일</span><b id="ms-date">-</b></div>
+        </div>
+        <div class="biz-info-card">
+          <p class="text-muted" id="ms-desc" style="font-size:13px; margin-bottom:18px;"></p>
+          <button class="btn btn-primary" id="btn-pay-membership">회비 결제하기</button>
         </div>
       </div>
 
@@ -288,7 +306,14 @@
   function renderPreviewGallery() {
     const el = document.getElementById("preview-gallery");
     if (!el) return;
-    if (bizPhotos.length === 0) {
+    const noteEl = document.getElementById("preview-note");
+    const exposed = isMembershipExposed(currentUser);
+    if (!exposed && bizPhotos.length > 0) {
+      noteEl.textContent = "월 회비 미납 상태라 실제 상세페이지에는 사진 대신 기본 이미지가 노출됩니다. 멤버십 관리에서 회비를 결제하면 아래처럼 실제 사진이 노출됩니다.";
+    } else {
+      noteEl.textContent = "고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.";
+    }
+    if (!exposed || bizPhotos.length === 0) {
       el.innerHTML = Array.from({ length: 5 }, (_, i) => `<div class="g-item${i === 0 ? " g-main" : ""}">🏢</div>`).join("");
       return;
     }
@@ -451,11 +476,46 @@
     `).join("");
   }
 
+  // ---------- 멤버십(월 회비) ----------
+  const MS_STATUS_LABEL = { trial: "무료체험중", active: "정상 이용중", expired: "만료됨" };
+  const MS_STATUS_PILL = { trial: "status-wait", active: "status-done", expired: "status-cancel" };
+
+  function renderMembershipPanel() {
+    const status = getMembershipStatus(currentUser);
+    const badge = document.getElementById("ms-status-badge");
+    badge.textContent = MS_STATUS_LABEL[status.status];
+    badge.className = `status-pill ${MS_STATUS_PILL[status.status]}`;
+    document.getElementById("ms-fee").textContent = `${getMembershipFee().toLocaleString()}원`;
+
+    const dateLabel = document.getElementById("ms-date-label");
+    const dateEl = document.getElementById("ms-date");
+    const desc = document.getElementById("ms-desc");
+    const payBtn = document.getElementById("btn-pay-membership");
+
+    if (status.status === "trial") {
+      dateLabel.textContent = "무료체험 종료일";
+      dateEl.textContent = status.trialEndsAt;
+      desc.textContent = "가입 후 첫 달은 무료로 사진·웹사이트가 노출됩니다. 체험이 끝나기 전에 미리 결제하면 끊김 없이 노출이 이어집니다.";
+      payBtn.textContent = "회비 결제하기 (체험 종료 후 적용)";
+    } else if (status.status === "active") {
+      dateLabel.textContent = "다음 결제일";
+      dateEl.textContent = status.paidUntil;
+      desc.textContent = "회비가 정상 납부되어 상세페이지·목록에 업체 사진과 웹사이트가 노출되고 있습니다.";
+      payBtn.textContent = "다음 달 회비 미리 결제하기";
+    } else {
+      dateLabel.textContent = "체험 종료일";
+      dateEl.textContent = status.trialEndsAt;
+      desc.textContent = "회비 납부가 만료되어 업체 사진·웹사이트 노출이 중단되었습니다. 회비를 결제하면 다시 노출됩니다.";
+      payBtn.textContent = "회비 결제하고 노출 재개하기";
+    }
+  }
+
   function renderBusinessData() {
     renderRequests();
     renderBookings();
     renderSales();
     renderReviews();
+    renderMembershipPanel();
   }
   renderBusinessData();
 
@@ -498,6 +558,17 @@
       WeddingStore.logout();
       WeddingStore.toast("로그아웃 되었습니다");
       setTimeout(() => (location.href = "index.html"), 500);
+      return;
+    }
+    if (e.target.closest("#btn-pay-membership")) {
+      // 데모 로그인 등으로 계정 레지스트리에 아직 저장되지 않은 세션이면 먼저 등록해둔다.
+      if (!WeddingStore.getAccounts()[currentUser.email]) WeddingStore.saveAccount(currentUser);
+      const updated = payMembershipFee(currentUser.email);
+      if (!updated) return;
+      Object.assign(currentUser, updated);
+      renderMembershipPanel();
+      renderPreviewGallery();
+      WeddingStore.toast(`월 회비 ${getMembershipFee().toLocaleString()}원이 결제되었습니다`);
     }
   });
 </script>

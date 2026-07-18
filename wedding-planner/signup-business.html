@@ -262,6 +262,7 @@
       type: "business",
       email: document.getElementById("su-email").value.trim(),
       bizNo: bizNoInput.value,
+      joinedAt: new Date().toISOString().slice(0, 10),
     };
     WeddingStore.setUser(newUser);
     WeddingStore.saveAccount(newUser);

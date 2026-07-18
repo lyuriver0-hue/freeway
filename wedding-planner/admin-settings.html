@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>멤버십 회비 설정 | 웨딩닷컴 내부 시스템</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body class="admin-body">
+<div class="admin-topbar">
+  <span>웨딩닷컴 관리자 시스템</span>
+  <div class="admin-who">
+    <span id="admin-who-text"></span>
+    <button onclick="AdminStore.logout(); location.href='admin-login.html';">로그아웃</button>
+  </div>
+</div>
+
+<div class="admin-wrap">
+  <p style="margin-bottom:14px;"><a href="admin-dashboard.html" style="font-size:13px; color:var(--gray-500);">← 관리자 홈</a></p>
+
+  <div class="admin-panel" style="margin-bottom:20px;">
+    <div class="admin-panel-head">
+      <h1>💳 멤버십 회비 설정</h1>
+    </div>
+    <div style="padding:24px;">
+      <p class="text-muted" style="font-size:13px; margin-bottom:20px;">
+        기업회원이 상세페이지·목록에 실제 사진·웹사이트를 노출하려면 매달 이 금액을 결제해야 합니다.
+        가입 후 첫 달은 금액과 상관없이 무료로 노출되며, 여기서 금액을 바꾸면 이후 결제·노출 계산에 바로 반영됩니다.
+      </p>
+      <div class="field" style="max-width:280px;">
+        <label>월 회비 금액 (원)</label>
+        <input type="number" id="fee-input" min="0" step="100">
+      </div>
+      <button class="admin-btn primary" id="btn-save-fee" style="margin-top:6px;">저장하기</button>
+      <p class="text-muted" id="fee-current" style="font-size:12.5px; margin-top:14px;"></p>
+    </div>
+  </div>
+
+  <div class="admin-panel">
+    <div class="admin-panel-head">
+      <h1>기업회원 멤버십 현황</h1>
+    </div>
+    <table class="list-table">
+      <thead><tr><th>업체명</th><th>이메일</th><th>가입일</th><th>상태</th><th>체험 종료 / 결제 만료일</th></tr></thead>
+      <tbody id="members-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/admin-data.js"></script>
+<script>
+  AdminStore.requireAuth();
+  const session = AdminStore.getSession();
+  if (session) document.getElementById("admin-who-text").textContent = `${session.name} (${session.email})`;
+
+  const STATUS_LABEL = { trial: "무료체험중", active: "정상 이용중", expired: "만료됨" };
+  const STATUS_PILL = { trial: "status-wait", active: "status-done", expired: "status-cancel" };
+
+  function renderFeeInfo() {
+    document.getElementById("fee-input").value = getMembershipFee();
+    document.getElementById("fee-current").textContent = `현재 적용 중인 월 회비: ${getMembershipFee().toLocaleString()}원`;
+  }
+  renderFeeInfo();
+
+  function renderMembers() {
+    const accounts = Object.values(WeddingStore.getAccounts()).filter(a => a.type === "business");
+    const tbody = document.getElementById("members-body");
+    if (accounts.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500);">등록된 기업회원이 없습니다.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = accounts.map(a => {
+      const status = getMembershipStatus(a);
+      const dateShown = status.status === "active" ? status.paidUntil : status.trialEndsAt;
+      return `
+        <tr>
+          <td>${a.name || "-"}</td>
+          <td>${a.email}</td>
+          <td>${a.joinedAt || "-"}</td>
+          <td><span class="status-pill ${STATUS_PILL[status.status]}">${STATUS_LABEL[status.status]}</span></td>
+          <td>${dateShown}</td>
+        </tr>`;
+    }).join("");
+  }
+  renderMembers();
+
+  document.getElementById("btn-save-fee").addEventListener("click", () => {
+    const val = Number(document.getElementById("fee-input").value);
+    if (!Number.isFinite(val) || val < 0) {
+      WeddingStore.toast("올바른 금액을 입력해주세요");
+      return;
+    }
+    setMembershipFee(val);
+    renderFeeInfo();
+    WeddingStore.toast("월 회비 금액이 저장되었습니다");
+  });
+</script>
+</body>
+</html>

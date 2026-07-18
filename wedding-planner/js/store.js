@@ -64,6 +64,67 @@ function findLinkedBusinessAccount(type, id) {
   ) || null;
 }
 
+// ---------- 기업회원 월 회비(멤버십) ----------
+// 업체가 상세페이지·카드에 실제 사진·웹사이트를 노출하려면 매달 회비를 내야 한다.
+// 가입 후 첫 달은 무료로 노출되고, 그 이후부터는 결제해야 노출이 유지된다.
+// 회비 금액은 관리자 콘솔(admin-settings.html)에서만 변경할 수 있다.
+const MEMBERSHIP_FEE_KEY = "weddingcom_membership_fee";
+const DEFAULT_MEMBERSHIP_FEE = 19900;
+
+function getMembershipFee() {
+  const raw = localStorage.getItem(MEMBERSHIP_FEE_KEY);
+  const n = Number(raw);
+  return raw && !Number.isNaN(n) ? n : DEFAULT_MEMBERSHIP_FEE;
+}
+function setMembershipFee(amount) {
+  localStorage.setItem(MEMBERSHIP_FEE_KEY, String(amount));
+}
+
+function addMonths(dateStr, months) {
+  const d = new Date(dateStr);
+  d.setMonth(d.getMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
+// 업체 계정의 멤버십 상태 계산: joinedAt(가입일) 기준 첫 달은 trial(무료),
+// 이후엔 membershipPaidUntil이 오늘 이후여야 active. 둘 다 아니면 expired.
+function getMembershipStatus(account) {
+  const today = new Date().toISOString().slice(0, 10);
+  const joinedAt = (account && account.joinedAt) || today;
+  const trialEndsAt = addMonths(joinedAt, 1);
+  const paidUntil = (account && account.membershipPaidUntil) || null;
+  if (paidUntil && paidUntil >= today) {
+    return { status: "active", trialEndsAt, paidUntil };
+  }
+  if (today <= trialEndsAt) {
+    return { status: "trial", trialEndsAt, paidUntil };
+  }
+  return { status: "expired", trialEndsAt, paidUntil };
+}
+
+// 상세페이지·카드에 실제 사진/웹사이트를 노출해도 되는 상태인지 (체험중 또는 정상 결제중)
+function isMembershipExposed(account) {
+  return !!account && getMembershipStatus(account).status !== "expired";
+}
+
+// 월 회비 결제(모의 처리) — 체험 기간이 남았으면 체험 종료일부터, 이미 결제한 기간이 있으면
+// 그 다음날부터, 둘 다 없으면 오늘부터 1개월을 연장한다.
+function payMembershipFee(email) {
+  const accounts = WeddingStore.getAccounts();
+  const account = accounts[email];
+  if (!account) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const status = getMembershipStatus(account);
+  const base = status.status === "active" ? status.paidUntil : status.status === "trial" ? status.trialEndsAt : today;
+  account.membershipPaidUntil = addMonths(base, 1);
+  account.membershipLastPaidAt = today;
+  account.membershipLastPaidAmount = getMembershipFee();
+  WeddingStore.saveAccount(account);
+  const current = WeddingStore.getUser();
+  if (current && current.email === email) WeddingStore.setUser(account);
+  return account;
+}
+
 // 사업자등록번호 체크섬 검증 (국세청 공개 알고리즘)
 function validateBizRegNo(raw) {
   const d = (raw || "").replace(/[^0-9]/g, "");

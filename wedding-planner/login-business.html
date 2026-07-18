@@ -123,7 +123,7 @@
       const existing = WeddingStore.findAccount(idVal);
       const user = existing && existing.type === "business"
         ? existing
-        : { name: idVal.includes("@") ? idVal.split("@")[0] : "파트너", type: "business", email: idVal.includes("@") ? idVal : "demo@weddingcom.kr" };
+        : { name: idVal.includes("@") ? idVal.split("@")[0] : "파트너", type: "business", email: idVal.includes("@") ? idVal : "demo@weddingcom.kr", joinedAt: new Date().toISOString().slice(0, 10) };
       doLoginSuccess(user);
     }
   });

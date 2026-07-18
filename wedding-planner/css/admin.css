@@ -1,0 +1,30 @@
+/* =========================================================
+   웨딩닷컴 내부 관리자 콘솔 — 일반 고객용 styles.css와 분리된 "백오피스" 톤
+========================================================= */
+body.admin-body{ background:var(--gray-100); padding-top:0; }
+
+.admin-topbar{
+  height:56px; background:#1F2937; color:#fff; display:flex; align-items:center;
+  justify-content:space-between; padding:0 24px; font-weight:800; font-size:15px;
+}
+.admin-topbar .admin-who{display:flex; align-items:center; gap:12px; font-size:13px; font-weight:600; color:#D1D5DB;}
+.admin-topbar button{background:none; border:1px solid #4B5563; color:#D1D5DB; padding:6px 12px; border-radius:7px; font-size:12.5px; cursor:pointer;}
+.admin-topbar button:hover{background:#374151; color:#fff;}
+
+.admin-wrap{max-width:900px; margin:32px auto; padding:0 20px;}
+
+.admin-panel{background:#fff; border:1px solid var(--gray-200); border-radius:12px; overflow:hidden;}
+.admin-panel-head{display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid var(--gray-200);}
+.admin-panel-head h1{font-size:17px; font-weight:800;}
+.admin-panel-head .actions{display:flex; gap:8px;}
+.admin-btn{padding:9px 16px; border-radius:7px; font-size:13px; font-weight:700; cursor:pointer; border:1px solid var(--gray-300); background:#fff; color:var(--gray-700);}
+.admin-btn:hover{background:var(--gray-50);}
+.admin-btn.dark{background:#1F2937; color:#fff; border-color:#1F2937;}
+.admin-btn.dark:hover{background:#111827;}
+.admin-btn.primary{background:var(--primary); color:#fff; border-color:var(--primary);}
+.admin-btn.primary:hover{background:var(--primary-dark);}
+.admin-btn.gray{background:#9CA3AF; color:#fff; border-color:#9CA3AF;}
+.admin-btn.gray:hover{background:#6B7280;}
+
+.admin-login-wrap{max-width:380px; margin:80px auto; padding:0 20px;}
+.admin-login-card{background:#fff; border:1px solid var(--gray-200); border-radius:14px; padding:36px 32px;}

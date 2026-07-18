@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 홈 | 웨딩닷컴 내부 시스템</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+<meta name="robots" content="noindex, nofollow">
+<style>
+  .admin-menu-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px;}
+  .admin-menu-card{background:#fff; border:1px solid var(--gray-200); border-radius:12px; padding:22px; cursor:pointer; transition:.15s;}
+  .admin-menu-card:hover{border-color:var(--primary); box-shadow:var(--shadow);}
+  .admin-menu-card .e{font-size:24px; margin-bottom:10px;}
+  .admin-menu-card h3{font-size:14.5px; margin-bottom:4px;}
+  .admin-menu-card p{font-size:12px; color:var(--gray-500);}
+  @media (max-width:700px){ .admin-menu-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body class="admin-body">
+<div class="admin-topbar">
+  <span>웨딩닷컴 관리자 시스템</span>
+  <div class="admin-who">
+    <span id="admin-who-text"></span>
+    <button onclick="AdminStore.logout(); location.href='admin-login.html';">로그아웃</button>
+  </div>
+</div>
+
+<div class="admin-wrap">
+  <h1 style="font-size:19px; font-weight:800;">관리자 홈</h1>
+  <p class="text-muted" style="font-size:13px; margin-top:6px;">운영 관리 메뉴에 접근할 수 있습니다.</p>
+
+  <div class="admin-menu-grid">
+    <a class="admin-menu-card" href="admin-settings.html">
+      <div class="e">💳</div>
+      <h3>멤버십 회비 설정</h3>
+      <p>기업회원 월 회비 금액을 변경합니다</p>
+    </a>
+    <div class="admin-menu-card" style="opacity:0.5; cursor:not-allowed;">
+      <div class="e">👥</div>
+      <h3>회원 관리</h3>
+      <p>준비중입니다</p>
+    </div>
+    <div class="admin-menu-card" style="opacity:0.5; cursor:not-allowed;">
+      <div class="e">📊</div>
+      <h3>정산·매출 관리</h3>
+      <p>준비중입니다</p>
+    </div>
+  </div>
+</div>
+
+<script src="js/admin-data.js"></script>
+<script>
+  AdminStore.requireAuth();
+  const session = AdminStore.getSession();
+  if (session) {
+    document.getElementById("admin-who-text").textContent = `${session.name} (${session.email})`;
+  }
+</script>
+</body>
+</html>

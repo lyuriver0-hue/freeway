@@ -179,10 +179,12 @@
     document.getElementById("breadcrumb").innerHTML =
       `<a href="index.html">홈</a> / <a href="category.html?cat=${detailType}">${typeLabel}</a> / ${item.name}`;
 
-    // 업체가 마이페이지에서 이 리스팅에 연결해 업로드한 실제 사진·웹사이트가 있으면 노출
+    // 업체가 마이페이지에서 이 리스팅에 연결해 업로드한 실제 사진·웹사이트가 있으면 노출.
+    // 단, 월 회비 무료체험/결제 상태가 만료된 업체는 사진·웹사이트를 노출하지 않는다.
     const linkedAccount = findLinkedBusinessAccount(detailType, detailId);
-    const linkedPhotos = linkedAccount && Array.isArray(linkedAccount.photos) && linkedAccount.photos.length > 0 ? linkedAccount.photos : null;
-    if (linkedAccount && linkedAccount.website) {
+    const exposed = isMembershipExposed(linkedAccount);
+    const linkedPhotos = exposed && Array.isArray(linkedAccount.photos) && linkedAccount.photos.length > 0 ? linkedAccount.photos : null;
+    if (exposed && linkedAccount.website) {
       const websiteLink = document.getElementById("detail-website-link");
       websiteLink.href = linkedAccount.website;
       document.getElementById("detail-website-wrap").classList.remove("hidden");
