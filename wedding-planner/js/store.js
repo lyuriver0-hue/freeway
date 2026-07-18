@@ -54,6 +54,16 @@ const WeddingStore = {
   },
 };
 
+// 리스팅(type, id)에 자신을 연결한 기업 계정 조회 — 연결되어 있으면 그 계정이 업로드한
+// 실제 사진·웹사이트를 상세페이지/카드 썸네일 등 고객이 보는 화면에 노출할 수 있다.
+// 카테고리(hall/studio/dress/...)에 상관없이 항상 동일하게 동작한다.
+function findLinkedBusinessAccount(type, id) {
+  const accounts = WeddingStore.getAccounts();
+  return Object.values(accounts).find(
+    (a) => a.type === "business" && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id
+  ) || null;
+}
+
 // 사업자등록번호 체크섬 검증 (국세청 공개 알고리즘)
 function validateBizRegNo(raw) {
   const d = (raw || "").replace(/[^0-9]/g, "");

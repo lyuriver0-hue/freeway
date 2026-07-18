@@ -245,9 +245,16 @@ function renderListingCard(type, id, item) {
   const metaRight = item.views !== undefined
     ? `<span>조회수 ${item.views}</span><span class="venue-price">${item.price}</span>`
     : `<span class="venue-price">${item.price}</span>`;
+  // 업체가 마이페이지에서 이 리스팅에 연결해 실제 사진을 올려둔 경우, 이모지 대신 그 사진을
+  // 썸네일로 보여준다. 카테고리 종류와 무관하게 findLinkedBusinessAccount가 항상 동일하게 동작한다.
+  const linkedAccount = typeof findLinkedBusinessAccount === "function" ? findLinkedBusinessAccount(type, id) : null;
+  const thumbPhoto = linkedAccount && Array.isArray(linkedAccount.photos) && linkedAccount.photos.length > 0 ? linkedAccount.photos[0] : null;
+  const thumbHtml = thumbPhoto
+    ? `<img src="${thumbPhoto}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">`
+    : item.emoji;
   return `
     <a class="venue-card" href="detail.html?type=${type}&id=${id}">
-      <div class="venue-thumb">${tagsHtml}${item.emoji}</div>
+      <div class="venue-thumb"${thumbPhoto ? ' style="padding:0;"' : ""}>${tagsHtml}${thumbHtml}</div>
       <div class="venue-body">
         <div class="venue-loc">${item.loc}</div>
         <div class="venue-name">${item.name}</div>

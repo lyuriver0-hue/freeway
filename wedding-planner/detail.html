@@ -159,14 +159,6 @@
 <script src="js/store.js"></script>
 <script src="js/listings.js"></script>
 <script>
-  // 마이페이지에서 이 리스팅(type, id)에 자신을 연결한 기업 계정이 있는지 조회 (사진·웹사이트 노출용)
-  function findLinkedBusinessAccount(type, id) {
-    const accounts = WeddingStore.getAccounts();
-    return Object.values(accounts).find(
-      (a) => a.type === "business" && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id
-    ) || null;
-  }
-
   const params = new URLSearchParams(location.search);
   const detailType = params.get("type");
   const detailId = Number(params.get("id"));
