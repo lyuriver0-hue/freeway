@@ -321,7 +321,7 @@ function initNaverRegionPicker(config) {
   function setSelected(text) {
     const label = document.getElementById(labelElId);
     if (label) label.textContent = `📍 선택한 지역: ${text}`;
-    if (typeof onSelect === "function") onSelect(text);
+    if (typeof onSelect === "function") onSelect(text, map);
   }
 
   function search(query) {
@@ -408,6 +408,26 @@ function initNaverStaticMap(mapElId, address) {
     .catch(() => {
       mapEl.innerHTML = `<div class="map-placeholder"><span>⚠️</span><p>지도를 불러오지 못했습니다.</p></div>`;
     });
+}
+
+// ---------- 지도 웨딩홀 핀 메모 ----------
+// 메인페이지 지도에서 핀을 클릭해 남기는 개인 메모. type:id 키로 저장해 다시 클릭하면 그대로 보인다.
+const HALL_MEMOS_KEY = "weddingcom_hall_memos";
+function getHallMemos() {
+  try {
+    return JSON.parse(localStorage.getItem(HALL_MEMOS_KEY)) || {};
+  } catch (e) {
+    return {};
+  }
+}
+function getHallMemo(key) {
+  return getHallMemos()[key] || "";
+}
+function saveHallMemo(key, text) {
+  const all = getHallMemos();
+  if (text) all[key] = text;
+  else delete all[key];
+  localStorage.setItem(HALL_MEMOS_KEY, JSON.stringify(all));
 }
 
 // ---------- 찜하기 (즐겨찾기) ----------
