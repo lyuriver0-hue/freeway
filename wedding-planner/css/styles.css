@@ -2,6 +2,9 @@
    웨딩닷컴 (wedding.com) — 공통 디자인 시스템
    Rose > Gold > White
 ========================================================= */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700;900&display=swap");
+
 :root{
   --primary:#D6336C;
   --primary-dark:#AD1457;
@@ -20,6 +23,7 @@
   --gray-100:#F7F1EE;
   --gray-50:#FDFAF8;
   --white:#FFFFFF;
+  --font-serif:"Noto Serif KR","RIDIBatang",serif;
   --radius-sm:8px;
   --radius:14px;
   --radius-lg:22px;
@@ -44,7 +48,7 @@ button{font-family:inherit;}
 input,textarea,select{font-family:inherit; font-size:14px;}
 .container{max-width:1200px; margin:0 auto; padding:0 24px;}
 .page{padding:40px 0 80px;}
-h1,h2,h3,h4{font-weight:800; letter-spacing:-0.02em; color:var(--gray-900);}
+h1,h2,h3,h4{font-family:var(--font-serif); font-weight:700; letter-spacing:-0.01em; color:var(--gray-900);}
 .text-muted{color:var(--gray-500);}
 .hidden{display:none !important;}
 
