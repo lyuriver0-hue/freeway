@@ -184,6 +184,11 @@
     const linkedAccount = findLinkedBusinessAccount(detailType, detailId);
     const exposed = isMembershipExposed(linkedAccount);
     const linkedPhotos = exposed && Array.isArray(linkedAccount.photos) && linkedAccount.photos.length > 0 ? linkedAccount.photos : null;
+    // 업체가 마이페이지에서 직접 설정한 대표 가격·가격표가 있으면 기본 더미 가격 대신 노출한다.
+    const effectivePrice = exposed && linkedAccount.priceLead ? linkedAccount.priceLead : item.price;
+    const effectivePriceTable = exposed && Array.isArray(linkedAccount.priceTable) && linkedAccount.priceTable.length > 0
+      ? linkedAccount.priceTable
+      : item.priceTable;
     if (exposed && linkedAccount.website) {
       const websiteLink = document.getElementById("detail-website-link");
       websiteLink.href = linkedAccount.website;
@@ -217,9 +222,9 @@
     `;
 
     document.getElementById("price-body").innerHTML =
-      item.priceTable.map(p => `<tr><td>${p.item}</td><td>${p.price}</td></tr>`).join("");
+      effectivePriceTable.map(p => `<tr><td>${p.item}</td><td>${p.price}</td></tr>`).join("");
 
-    document.getElementById("booking-price").innerHTML = `${item.price} <span>부터</span>`;
+    document.getElementById("booking-price").innerHTML = `${effectivePrice} <span>부터</span>`;
 
     initNaverStaticMap("detail-map", item.loc);
 

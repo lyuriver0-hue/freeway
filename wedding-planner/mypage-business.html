@@ -89,6 +89,17 @@
             <p class="hint">웨딩닷컴에 등록된 업체 목록 중 내 업체에 해당하는 페이지를 선택하면, 아래 업로드한 사진이 그 상세페이지 갤러리에 실제로 노출됩니다.</p>
           </div>
           <div class="field">
+            <label>대표 가격</label>
+            <input type="text" id="biz-price-lead" placeholder="예: 1,800,000원~">
+            <p class="hint">목록 카드와 상세페이지 상단 상담 신청 영역에 노출되는 가격입니다. 비워두면 기본 등록 정보가 그대로 노출됩니다.</p>
+          </div>
+          <div class="field">
+            <label>가격표</label>
+            <div class="price-edit-list" id="price-edit-list"></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-add-price-row">+ 항목 추가</button>
+            <p class="hint">상세페이지의 "가격표"에 그대로 노출됩니다. (예: 대관료 / 2,000,000원)</p>
+          </div>
+          <div class="field">
             <label>업체 사진 (최대 6장, 장당 800KB 이하)</label>
             <div class="photo-upload-zone" id="photo-upload-zone">
               <input type="file" id="photo-input" accept="image/*" multiple style="display:none;">
@@ -233,6 +244,7 @@
     document.getElementById("biz-name-input").value = currentUser.name;
     if (currentUser.bizNo) document.getElementById("biz-no-display").value = currentUser.bizNo;
     if (currentUser.website) document.getElementById("biz-website-input").value = currentUser.website;
+    if (currentUser.priceLead) document.getElementById("biz-price-lead").value = currentUser.priceLead;
     weddingRenderHeader();
   }
 
@@ -284,6 +296,42 @@
     updateLiveLink();
     renderBusinessData();
   });
+
+  // ---------- 가격 설정 ----------
+  // 업체가 직접 대표 가격·가격표를 입력하면, 연결된 상세페이지·목록 카드에서
+  // js/listings.js의 기본 더미 가격 대신 이 값이 노출된다 (사진·웹사이트와 동일한 방식).
+  let bizPriceTable = (currentUser && currentUser.priceTable) || [];
+
+  function escapeAttr(str) {
+    return (str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // 행 추가/삭제 전에 현재 입력창에 타이핑된 값을 상태 배열에 먼저 반영해,
+  // 다른 행을 편집 중이던 내용이 날아가지 않게 한다.
+  function syncPriceRowsFromDom() {
+    const rows = document.querySelectorAll("#price-edit-list .price-edit-row");
+    if (rows.length === 0) return;
+    bizPriceTable = [...rows].map((row) => ({
+      item: row.querySelector("[data-price-item]").value,
+      price: row.querySelector("[data-price-value]").value,
+    }));
+  }
+
+  function renderPriceEditList() {
+    const wrap = document.getElementById("price-edit-list");
+    if (bizPriceTable.length === 0) {
+      wrap.innerHTML = `<p class="text-muted" style="font-size:12.5px;">등록된 가격표 항목이 없습니다. "+ 항목 추가"를 눌러 추가해보세요.</p>`;
+      return;
+    }
+    wrap.innerHTML = bizPriceTable.map((p, i) => `
+      <div class="price-edit-row" data-row="${i}">
+        <input type="text" data-price-item value="${escapeAttr(p.item)}" placeholder="항목 (예: 대관료)">
+        <input type="text" data-price-value value="${escapeAttr(p.price)}" placeholder="가격 (예: 2,000,000원)">
+        <button type="button" class="remove-btn" data-remove-price-row="${i}">✕</button>
+      </div>
+    `).join("");
+  }
+  renderPriceEditList();
 
   // ---------- 업체 사진 업로드/관리 ----------
   // 백엔드 없이 브라우저에서만 동작하는 프로토타입: 이미지를 data URL로 변환해 계정 정보에 저장한다.
@@ -535,6 +583,9 @@
         user.photos = bizPhotos;
         user.linkedListing = bizLinkedListing;
         user.website = normalizeUrl(document.getElementById("biz-website-input").value);
+        user.priceLead = document.getElementById("biz-price-lead").value.trim();
+        syncPriceRowsFromDom();
+        user.priceTable = bizPriceTable.filter((p) => p.item.trim() || p.price.trim());
         try {
           WeddingStore.setUser(user);
           WeddingStore.saveAccount(user);
@@ -552,6 +603,19 @@
       const idx = Number(removePhotoBtn.dataset.removePhoto);
       bizPhotos.splice(idx, 1);
       renderPhotoGrid();
+      return;
+    }
+    if (e.target.closest("#btn-add-price-row")) {
+      syncPriceRowsFromDom();
+      bizPriceTable.push({ item: "", price: "" });
+      renderPriceEditList();
+      return;
+    }
+    const removePriceBtn = e.target.closest("[data-remove-price-row]");
+    if (removePriceBtn) {
+      syncPriceRowsFromDom();
+      bizPriceTable.splice(Number(removePriceBtn.dataset.removePriceRow), 1);
+      renderPriceEditList();
       return;
     }
     if (e.target.closest("#btn-logout-side")) {

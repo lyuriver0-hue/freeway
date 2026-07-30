@@ -256,18 +256,19 @@ function getMealPriceValue(item) {
 
 function renderListingCard(type, id, item) {
   const tagsHtml = item.tags ? `<div class="venue-tags">${item.tags.map((t) => `<span class="${TAG_CLASS[t] || "tag-best"}">${t}</span>`).join("")}</div>` : "";
-  const metaRight = item.views !== undefined
-    ? `<span>조회수 ${item.views}</span><span class="venue-price">${item.price}</span>`
-    : `<span class="venue-price">${item.price}</span>`;
-  // 업체가 마이페이지에서 이 리스팅에 연결해 실제 사진을 올려둔 경우, 이모지 대신 그 사진을
-  // 썸네일로 보여준다. 카테고리 종류와 무관하게 findLinkedBusinessAccount가 항상 동일하게 동작한다.
-  // 단, 월 회비 무료체험/결제 상태(isMembershipExposed)가 만료된 업체는 노출하지 않는다.
+  // 업체가 마이페이지에서 이 리스팅에 연결해 실제 사진·가격을 올려둔 경우, 기본 더미 데이터 대신
+  // 그 값을 보여준다. 카테고리 종류와 무관하게 findLinkedBusinessAccount가 항상 동일하게 동작하고,
+  // 월 회비 무료체험/결제 상태(isMembershipExposed)가 만료된 업체는 노출하지 않는다.
   const linkedAccount = typeof findLinkedBusinessAccount === "function" ? findLinkedBusinessAccount(type, id) : null;
   const exposed = linkedAccount && typeof isMembershipExposed === "function" ? isMembershipExposed(linkedAccount) : false;
   const thumbPhoto = exposed && Array.isArray(linkedAccount.photos) && linkedAccount.photos.length > 0 ? linkedAccount.photos[0] : null;
   const thumbHtml = thumbPhoto
     ? `<img src="${thumbPhoto}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">`
     : item.emoji;
+  const displayPrice = exposed && linkedAccount.priceLead ? linkedAccount.priceLead : item.price;
+  const metaRight = item.views !== undefined
+    ? `<span>조회수 ${item.views}</span><span class="venue-price">${displayPrice}</span>`
+    : `<span class="venue-price">${displayPrice}</span>`;
   return `
     <a class="venue-card" href="detail.html?type=${type}&id=${id}">
       <div class="venue-thumb"${thumbPhoto ? ' style="padding:0;"' : ""}>${tagsHtml}${thumbHtml}</div>
