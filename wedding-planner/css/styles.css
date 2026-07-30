@@ -85,8 +85,8 @@ header.site-header{
   border-bottom:1px solid var(--gray-200);
 }
 .nav{display:flex; align-items:center; justify-content:space-between; height:var(--header-h); max-width:1200px; margin:0 auto; padding:0 24px; gap:24px;}
-.logo{display:flex; align-items:center; gap:8px; color:var(--ink); flex-shrink:0; font-weight:900; font-size:21px; letter-spacing:-0.03em;}
-.logo .dot{color:var(--primary);}
+.logo{display:flex; align-items:center; gap:0; color:var(--primary); flex-shrink:0; font-weight:900; font-size:21px; letter-spacing:-0.03em;}
+.logo .dot{color:var(--primary-dark);}
 .nav-menu{display:flex; align-items:center; gap:30px; flex:1; justify-content:center;}
 .nav-menu a{font-size:14.5px; font-weight:600; color:var(--gray-700); position:relative; padding:6px 0;}
 .nav-menu a:hover{color:var(--primary);}
