@@ -169,12 +169,14 @@
 <script src="js/store.js"></script>
 <script src="js/listings.js"></script>
 <script>
-  // 로그인 가드: 비로그인 시 로그인 페이지로, 기업 회원이면 파트너센터로 이동
+  // 로그인 가드: 비로그인 시 로그인 페이지로, 기업/플래너 회원이면 각자의 파트너센터로 이동
   const currentUser = WeddingStore.getUser();
   if (!currentUser) {
     location.href = "login.html";
   } else if (currentUser.type === "business") {
     location.href = "mypage-business.html";
+  } else if (currentUser.type === "planner") {
+    location.href = "mypage-planner.html";
   } else {
     document.getElementById("mp-name").textContent = currentUser.name + "님";
     document.getElementById("mp-avatar").textContent = currentUser.name.charAt(0);

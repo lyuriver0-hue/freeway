@@ -66,10 +66,10 @@
   renderFeeInfo();
 
   function renderMembers() {
-    const accounts = Object.values(WeddingStore.getAccounts()).filter(a => a.type === "business");
+    const accounts = Object.values(WeddingStore.getAccounts()).filter(a => a.type === "business" || a.type === "planner");
     const tbody = document.getElementById("members-body");
     if (accounts.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500);">등록된 기업회원이 없습니다.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500);">등록된 기업/플래너 회원이 없습니다.</td></tr>`;
       return;
     }
     tbody.innerHTML = accounts.map(a => {

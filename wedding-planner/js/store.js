@@ -60,7 +60,7 @@ const WeddingStore = {
 function findLinkedBusinessAccount(type, id) {
   const accounts = WeddingStore.getAccounts();
   return Object.values(accounts).find(
-    (a) => a.type === "business" && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id
+    (a) => (a.type === "business" || a.type === "planner") && a.linkedListing && a.linkedListing.type === type && a.linkedListing.id === id
   ) || null;
 }
 
@@ -149,6 +149,16 @@ function normalizeUrl(raw) {
   const trimmed = (raw || "").trim();
   if (!trimmed) return "";
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
+// "@my_handle" / "my_handle" / "instagram.com/my_handle" 등 다양한 입력을
+// 실제 인스타그램 프로필 URL(https://instagram.com/my_handle)로 정규화한다.
+function normalizeInstagram(raw) {
+  let trimmed = (raw || "").trim();
+  if (!trimmed) return "";
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  trimmed = trimmed.replace(/^@/, "").replace(/^instagram\.com\//i, "");
+  return `https://instagram.com/${trimmed}`;
 }
 
 // ---------- 상담 신청 / 견적 문의 ----------
@@ -311,9 +321,11 @@ function weddingRenderHeader() {
   if (!nav) return;
   const user = WeddingStore.getUser();
   if (user) {
-    const mypageHref = user.type === "business" ? "mypage-business.html" : "mypage.html";
+    const mypageHref = user.type === "business" ? "mypage-business.html" : user.type === "planner" ? "mypage-planner.html" : "mypage.html";
+    const icon = user.type === "business" ? "🏢" : user.type === "planner" ? "💐" : "💍";
+    const isPro = user.type === "business" || user.type === "planner";
     nav.innerHTML = `
-      <a href="${mypageHref}" class="nav-user">${user.type === "business" ? "🏢" : "💍"} ${user.name}${user.type === "business" ? "" : "님"}</a>
+      <a href="${mypageHref}" class="nav-user">${icon} ${user.name}${isPro ? "" : "님"}</a>
       <button type="button" class="btn btn-ghost btn-sm" id="btn-logout">로그아웃</button>
     `;
   } else {

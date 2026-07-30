@@ -44,8 +44,9 @@
           <button type="button" class="heart-btn" id="heart-btn">♡</button>
         </div>
         <div class="detail-loc-row"><span id="detail-loc"></span></div>
-        <div id="detail-website-wrap" class="hidden" style="margin-bottom:24px;">
-          <a id="detail-website-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">🔗 홈페이지 방문하기</a>
+        <div id="detail-website-wrap" class="hidden" style="margin-bottom:24px; display:flex; gap:8px;">
+          <a id="detail-website-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm hidden">🔗 홈페이지 방문하기</a>
+          <a id="detail-instagram-link" href="#" target="_blank" rel="noopener" class="btn btn-ghost btn-sm hidden">📷 인스타그램 보기</a>
         </div>
 
         <div class="detail-section">
@@ -192,6 +193,14 @@
     if (exposed && linkedAccount.website) {
       const websiteLink = document.getElementById("detail-website-link");
       websiteLink.href = linkedAccount.website;
+      websiteLink.classList.remove("hidden");
+    }
+    if (exposed && linkedAccount.instagram) {
+      const instagramLink = document.getElementById("detail-instagram-link");
+      instagramLink.href = linkedAccount.instagram;
+      instagramLink.classList.remove("hidden");
+    }
+    if (exposed && (linkedAccount.website || linkedAccount.instagram)) {
       document.getElementById("detail-website-wrap").classList.remove("hidden");
     }
     if (linkedPhotos) {

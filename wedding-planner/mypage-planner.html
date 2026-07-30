@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파트너센터 | 웨딩닷컴</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav">
+    <a href="index.html" class="logo">Wedding<span class="dot">.com</span></a>
+    <nav class="nav-menu">
+      <a href="category.html?cat=hall">웨딩홀</a>
+      <a href="category.html?cat=studio">스튜디오</a>
+      <a href="category.html?cat=dress">드레스</a>
+      <a href="category.html?cat=makeup">메이크업</a>
+      <a href="fair.html">웨딩박람회</a>
+      <a href="community.html">커뮤니티</a>
+      <a href="index.html#honeymoon" class="soon">허니문</a>
+      <a href="category.html?cat=planner">웨딩플래너</a>
+      <a href="index.html#estimate">셀프견적</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login.html">로그인</a>
+      <a href="signup.html" class="btn btn-primary btn-sm">회원가입</a>
+    </div>
+  </div>
+</header>
+
+<main class="page mypage-page">
+  <div class="container mypage-grid">
+    <aside class="mypage-side">
+      <div class="mypage-who">
+        <div class="mypage-avatar" id="mp-avatar">?</div>
+        <div>
+          <b id="mp-name">웨딩플래너</b>
+          <span id="mp-region-tag">플래너 회원</span>
+        </div>
+      </div>
+      <nav class="side-nav" id="side-nav">
+        <a data-target="panel-info" class="active">🏢 업체 정보</a>
+        <a data-target="panel-membership">💳 멤버십 관리</a>
+        <a data-target="panel-requests">📥 받은 견적 요청</a>
+        <a data-target="panel-bookings">📅 예약 관리</a>
+        <a data-target="panel-sales">💰 정산·매출</a>
+        <a data-target="panel-reviews">⭐ 리뷰 관리</a>
+      </nav>
+      <button class="btn btn-ghost btn-block btn-sm" id="btn-logout-side">로그아웃</button>
+    </aside>
+
+    <div class="mypage-content">
+      <!-- 업체 정보 -->
+      <div class="mypage-panel active" id="panel-info">
+        <div class="mypage-panel-head">
+          <h2>🏢 업체 정보</h2>
+          <p>고객에게 노출되는 업체 정보를 관리하세요.</p>
+        </div>
+        <div class="biz-info-card">
+          <div class="field"><label>업체명</label><input type="text" id="biz-name-input" value="웨딩닷컴 플래너"></div>
+          <div class="field"><label>대표자</label><input type="text" value="홍길동"></div>
+          <div class="field"><label>담당자 연락처</label><input type="tel" value="010-1234-5678"></div>
+          <div class="field"><label>업체 소개</label><textarea rows="4" placeholder="업체를 소개해주세요.">꼼꼼한 예산 관리와 업체 조율이 강점인 웨딩플래너입니다.</textarea></div>
+          <div class="field">
+            <label>인스타그램 (선택)</label>
+            <input type="text" id="biz-instagram-input" placeholder="예: @my_wedding_planner 또는 instagram.com/my_wedding_planner">
+            <p class="hint">등록하면 상세페이지에 "인스타그램 보기" 버튼이 노출됩니다.</p>
+          </div>
+          <div class="field">
+            <label>업체 지역</label>
+            <div class="map-search-row" style="margin-bottom:10px;">
+              <input type="text" id="biz-region-query" placeholder="지역/동네를 검색하세요 (예: 서울 강남구)">
+              <button type="button" class="btn btn-primary btn-sm" id="biz-region-search-btn">검색</button>
+            </div>
+            <div id="biz-region-map" class="naver-map-box" style="height:220px;">
+              <div class="map-placeholder"><span>🗺️</span><p>네이버 지도를 불러오는 중입니다…</p></div>
+            </div>
+            <div class="map-selected" id="biz-region-label">📍 지도를 검색하거나 클릭해서 업체 지역을 선택하세요.</div>
+          </div>
+          <div class="field">
+            <label>연결된 상세페이지</label>
+            <select id="linked-listing-select">
+              <option value="">연결 안 함</option>
+            </select>
+            <p class="hint">웨딩닷컴에 등록된 웨딩플래너 목록 중 본인에 해당하는 페이지를 선택하면, 아래 업로드한 사진이 그 상세페이지 갤러리에 실제로 노출됩니다.</p>
+          </div>
+          <div class="field">
+            <label>대표 가격</label>
+            <input type="text" id="biz-price-lead" placeholder="예: 1,500,000원~">
+            <p class="hint">목록 카드와 상세페이지 상단 상담 신청 영역에 노출되는 가격입니다. 비워두면 기본 등록 정보가 그대로 노출됩니다.</p>
+          </div>
+          <div class="field">
+            <label>가격표</label>
+            <div class="price-edit-list" id="price-edit-list"></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-add-price-row">+ 항목 추가</button>
+            <p class="hint">상세페이지의 "가격표"에 그대로 노출됩니다. (예: 토탈 플래닝 / 1,500,000원)</p>
+          </div>
+          <div class="field">
+            <label>업체 사진 (최대 6장, 장당 800KB 이하)</label>
+            <div class="photo-upload-zone" id="photo-upload-zone">
+              <input type="file" id="photo-input" accept="image/*" multiple style="display:none;">
+              📷 클릭해서 사진을 업로드하세요
+            </div>
+            <div class="photo-grid" id="photo-grid"></div>
+            <div class="photo-count" id="photo-count">0 / 6장</div>
+          </div>
+          <button class="btn btn-primary" id="btn-save-info">저장하기</button>
+        </div>
+
+        <div class="detail-section" style="margin-top:28px; margin-bottom:0;">
+          <h3>상세페이지 노출 미리보기</h3>
+          <p class="text-muted" style="font-size:12.5px; margin-bottom:14px;" id="preview-note">고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.</p>
+          <div class="detail-gallery" id="preview-gallery"></div>
+          <a href="#" id="view-live-link" class="btn btn-ghost btn-sm hidden" style="margin-top:14px;" target="_blank" rel="noopener">실제 상세페이지에서 보기 →</a>
+        </div>
+      </div>
+
+      <!-- 멤버십 관리 -->
+      <div class="mypage-panel" id="panel-membership">
+        <div class="mypage-panel-head">
+          <h2>💳 멤버십 관리</h2>
+          <p>월 회비를 납부하는 동안에만 상세페이지·목록에 업체 사진과 인스타그램이 노출됩니다.</p>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card"><span>이용 상태</span><span id="ms-status-badge" class="status-pill">-</span></div>
+          <div class="stat-card"><span>월 회비</span><b id="ms-fee">-</b></div>
+          <div class="stat-card"><span id="ms-date-label">무료체험 종료일</span><b id="ms-date">-</b></div>
+        </div>
+        <div class="biz-info-card">
+          <p class="text-muted" id="ms-desc" style="font-size:13px; margin-bottom:18px;"></p>
+          <button class="btn btn-primary" id="btn-pay-membership">회비 결제하기</button>
+        </div>
+      </div>
+
+      <!-- 받은 견적 요청 -->
+      <div class="mypage-panel" id="panel-requests">
+        <div class="mypage-panel-head">
+          <h2>📥 받은 견적 요청</h2>
+          <p>고객이 보낸 견적 요청에 답변해보세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>고객명</th><th>요청내용</th><th>지역</th><th>희망 예산</th><th>요청일</th><th>상태</th></tr></thead>
+          <tbody id="requests-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 예약 관리 -->
+      <div class="mypage-panel" id="panel-bookings">
+        <div class="mypage-panel-head">
+          <h2>📅 예약 관리</h2>
+          <p>고객 상담·촬영 예약 일정을 확인하세요.</p>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>고객명</th><th>예약 종류</th><th>일시</th><th>상태</th></tr></thead>
+          <tbody id="bookings-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 정산·매출 -->
+      <div class="mypage-panel" id="panel-sales">
+        <div class="mypage-panel-head">
+          <h2>💰 정산·매출</h2>
+          <p>이번 달 매출과 정산 현황입니다.</p>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card"><span>이번 달 매출</span><b>4,850,000원</b></div>
+          <div class="stat-card"><span>정산 예정 금액</span><b>1,200,000원</b></div>
+          <div class="stat-card"><span>누적 견적 문의</span><b>128건</b></div>
+        </div>
+        <table class="list-table">
+          <thead><tr><th>내역</th><th>고객명</th><th>금액</th><th>정산일</th><th>상태</th></tr></thead>
+          <tbody id="sales-body"></tbody>
+        </table>
+      </div>
+
+      <!-- 리뷰 관리 -->
+      <div class="mypage-panel" id="panel-reviews">
+        <div class="mypage-panel-head">
+          <h2>⭐ 리뷰 관리</h2>
+          <p>고객이 남긴 리뷰를 확인하세요.</p>
+        </div>
+        <div id="reviews-list"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">Wedding.com</div>
+        <p style="font-size:13px; line-height:1.7;">결혼 준비의 모든 순간을 연결합니다.<br>웨딩홀 · 스드메 · 허니문까지, 웨딩닷컴 하나로.</p>
+      </div>
+      <div>
+        <h5>서비스</h5>
+        <ul>
+          <li>웨딩홀</li>
+          <li>스튜디오·드레스·메이크업</li>
+          <li>셀프견적</li>
+          <li>허니문 (준비중)</li>
+        </ul>
+      </div>
+      <div>
+        <h5>고객지원</h5>
+        <ul>
+          <li>공지사항</li>
+          <li>자주 묻는 질문</li>
+          <li>1:1 문의</li>
+        </ul>
+      </div>
+      <div>
+        <h5>회사</h5>
+        <ul>
+          <li>회사소개</li>
+          <li>채용안내</li>
+          <li>이용약관</li>
+          <li>개인정보처리방침</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 웨딩닷컴(wedding.com). All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/listings.js"></script>
+<script>
+  // 로그인 가드: 비로그인 시 플래너 로그인 페이지로, 다른 회원 타입이면 개인 마이페이지로 이동
+  const currentUser = WeddingStore.getUser();
+  if (!currentUser) {
+    location.href = "login-planner.html";
+  } else if (currentUser.type !== "planner") {
+    location.href = "mypage.html";
+  } else {
+    document.getElementById("mp-name").textContent = currentUser.name;
+    document.getElementById("mp-avatar").textContent = currentUser.name.charAt(0);
+    document.getElementById("biz-name-input").value = currentUser.name;
+    if (currentUser.instagram) document.getElementById("biz-instagram-input").value = currentUser.instagram;
+    if (currentUser.priceLead) document.getElementById("biz-price-lead").value = currentUser.priceLead;
+    weddingRenderHeader();
+  }
+
+  // 업체 지역 설정 (네이버 지도 검색 위젯 재사용)
+  let bizRegion = (currentUser && currentUser.region) || "";
+  if (bizRegion) {
+    document.getElementById("biz-region-label").textContent = `📍 선택한 지역: ${bizRegion}`;
+    document.getElementById("mp-region-tag").textContent = `플래너 회원 · ${bizRegion}`;
+  }
+  initNaverRegionPicker({
+    mapElId: "biz-region-map",
+    queryInputId: "biz-region-query",
+    searchBtnId: "biz-region-search-btn",
+    labelElId: "biz-region-label",
+    onSelect: (text) => { bizRegion = text; },
+  });
+
+  // ---------- 연결된 상세페이지 선택 ----------
+  // 상세페이지는 정적 더미 데이터(js/listings.js)로 만들어져 있어 계정과 자동으로 연결되지 않는다.
+  // 플래너는 자신에 해당하는 "웨딩플래너" 카테고리 리스팅만 연결할 수 있다.
+  let bizLinkedListing = (currentUser && currentUser.linkedListing) || null; // { type: "planner", id }
+
+  function populateLinkedListingSelect() {
+    const select = document.getElementById("linked-listing-select");
+    const options = LISTINGS.planner.map((listing, id) => `<option value="planner:${id}">${listing.name}</option>`).join("");
+    select.innerHTML = `<option value="">연결 안 함</option>${options}`;
+    if (bizLinkedListing) select.value = `${bizLinkedListing.type}:${bizLinkedListing.id}`;
+  }
+
+  function updateLiveLink() {
+    const link = document.getElementById("view-live-link");
+    if (bizLinkedListing) {
+      link.href = `detail.html?type=${bizLinkedListing.type}&id=${bizLinkedListing.id}`;
+      link.classList.remove("hidden");
+    } else {
+      link.classList.add("hidden");
+    }
+  }
+
+  populateLinkedListingSelect();
+  updateLiveLink();
+
+  document.getElementById("linked-listing-select").addEventListener("change", (e) => {
+    const val = e.target.value;
+    bizLinkedListing = val ? { type: val.split(":")[0], id: Number(val.split(":")[1]) } : null;
+    updateLiveLink();
+    renderBusinessData();
+  });
+
+  // ---------- 가격 설정 ----------
+  // 업체가 직접 대표 가격·가격표를 입력하면, 연결된 상세페이지·목록 카드에서
+  // js/listings.js의 기본 더미 가격 대신 이 값이 노출된다 (사진·인스타그램과 동일한 방식).
+  let bizPriceTable = (currentUser && currentUser.priceTable) || [];
+
+  function escapeAttr(str) {
+    return (str || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // 행 추가/삭제 전에 현재 입력창에 타이핑된 값을 상태 배열에 먼저 반영해,
+  // 다른 행을 편집 중이던 내용이 날아가지 않게 한다.
+  function syncPriceRowsFromDom() {
+    const rows = document.querySelectorAll("#price-edit-list .price-edit-row");
+    if (rows.length === 0) return;
+    bizPriceTable = [...rows].map((row) => ({
+      item: row.querySelector("[data-price-item]").value,
+      price: row.querySelector("[data-price-value]").value,
+    }));
+  }
+
+  function renderPriceEditList() {
+    const wrap = document.getElementById("price-edit-list");
+    if (bizPriceTable.length === 0) {
+      wrap.innerHTML = `<p class="text-muted" style="font-size:12.5px;">등록된 가격표 항목이 없습니다. "+ 항목 추가"를 눌러 추가해보세요.</p>`;
+      return;
+    }
+    wrap.innerHTML = bizPriceTable.map((p, i) => `
+      <div class="price-edit-row" data-row="${i}">
+        <input type="text" data-price-item value="${escapeAttr(p.item)}" placeholder="항목 (예: 토탈 플래닝)">
+        <input type="text" data-price-value value="${escapeAttr(p.price)}" placeholder="가격 (예: 1,500,000원)">
+        <button type="button" class="remove-btn" data-remove-price-row="${i}">✕</button>
+      </div>
+    `).join("");
+  }
+  renderPriceEditList();
+
+  // ---------- 업체 사진 업로드/관리 ----------
+  // 백엔드 없이 브라우저에서만 동작하는 프로토타입: 이미지를 data URL로 변환해 계정 정보에 저장한다.
+  // localStorage 용량 제한 때문에 장수/용량을 제한한다.
+  const PHOTO_MAX_COUNT = 6;
+  const PHOTO_MAX_SIZE = 800 * 1024; // 800KB
+  let bizPhotos = (currentUser && currentUser.photos) || [];
+
+  function renderPhotoGrid() {
+    document.getElementById("photo-grid").innerHTML = bizPhotos.map((src, i) => `
+      <div class="photo-thumb">
+        <img src="${src}" alt="업체 사진 ${i + 1}">
+        <button type="button" class="remove-btn" data-remove-photo="${i}">✕</button>
+      </div>
+    `).join("");
+    document.getElementById("photo-count").textContent = `${bizPhotos.length} / ${PHOTO_MAX_COUNT}장`;
+    renderPreviewGallery();
+  }
+
+  function renderPreviewGallery() {
+    const el = document.getElementById("preview-gallery");
+    if (!el) return;
+    const noteEl = document.getElementById("preview-note");
+    const exposed = isMembershipExposed(currentUser);
+    if (!exposed && bizPhotos.length > 0) {
+      noteEl.textContent = "월 회비 미납 상태라 실제 상세페이지에는 사진 대신 기본 이미지가 노출됩니다. 멤버십 관리에서 회비를 결제하면 아래처럼 실제 사진이 노출됩니다.";
+    } else {
+      noteEl.textContent = "고객이 업체 상세페이지에서 실제로 보게 될 사진 갤러리입니다.";
+    }
+    if (!exposed || bizPhotos.length === 0) {
+      el.innerHTML = Array.from({ length: 5 }, (_, i) => `<div class="g-item${i === 0 ? " g-main" : ""}">🏢</div>`).join("");
+      return;
+    }
+    const tiles = [];
+    for (let i = 0; i < 5; i++) {
+      const src = bizPhotos[i % bizPhotos.length];
+      tiles.push(`<div class="g-item${i === 0 ? " g-main" : ""}" style="padding:0;"><img src="${src}" alt="업체 사진"></div>`);
+    }
+    el.innerHTML = tiles.join("");
+  }
+
+  function addPhotoFiles(files) {
+    // FileReader는 비동기라, forEach 도중엔 bizPhotos.length가 아직 갱신되지 않는다.
+    // 배치로 여러 장을 한 번에 선택해도 최대 장수를 넘기지 않도록 별도 카운터로 자리를 미리 예약한다.
+    let reserved = bizPhotos.length;
+    [...files].forEach((file) => {
+      if (reserved >= PHOTO_MAX_COUNT) {
+        WeddingStore.toast(`사진은 최대 ${PHOTO_MAX_COUNT}장까지 업로드할 수 있습니다`);
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        WeddingStore.toast(`${file.name}은(는) 이미지 파일이 아닙니다`);
+        return;
+      }
+      if (file.size > PHOTO_MAX_SIZE) {
+        WeddingStore.toast(`${file.name}은(는) 800KB를 초과해 업로드할 수 없습니다`);
+        return;
+      }
+      reserved++;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        bizPhotos.push(e.target.result);
+        renderPhotoGrid();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  renderPhotoGrid();
+
+  document.getElementById("photo-upload-zone").addEventListener("click", () => {
+    document.getElementById("photo-input").click();
+  });
+  document.getElementById("photo-input").addEventListener("change", (e) => {
+    addPhotoFiles(e.target.files);
+    e.target.value = "";
+  });
+  const uploadZone = document.getElementById("photo-upload-zone");
+  uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.classList.add("dragover"); });
+  uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+  uploadZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove("dragover");
+    addPhotoFiles(e.dataTransfer.files);
+  });
+
+  function statusPill(status, label) {
+    return `<span class="status-pill status-${status}">${label}</span>`;
+  }
+
+  // 연결된 상세페이지(linkedListing)로 들어온 실제 고객 신청 내역만 조회
+  function myInquiries() {
+    if (!bizLinkedListing) return [];
+    return getInquiries().filter(r => r.type === bizLinkedListing.type && r.listingId === bizLinkedListing.id);
+  }
+
+  function noLinkRow(colspan) {
+    return `<tr><td colspan="${colspan}" style="text-align:center; color:var(--gray-500); padding:30px 0;">업체 정보에서 상세페이지를 먼저 연결해주세요.</td></tr>`;
+  }
+
+  function renderRequests() {
+    const tbody = document.getElementById("requests-body");
+    if (!bizLinkedListing) { tbody.innerHTML = noLinkRow(6); return; }
+    const list = myInquiries();
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 받은 견적 요청이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.slice().reverse().map(r => `
+      <tr>
+        <td>${r.customerName || "익명"}</td>
+        <td>${r.message || "-"}</td>
+        <td>${r.customerRegion || "-"}</td>
+        <td>${r.budget || "미입력"}</td>
+        <td>${r.createdAt}</td>
+        <td>${statusPill("wait", "답변대기")}</td>
+      </tr>
+    `).join("");
+  }
+
+  function renderBookings() {
+    const tbody = document.getElementById("bookings-body");
+    if (!bizLinkedListing) { tbody.innerHTML = noLinkRow(4); return; }
+    const list = myInquiries();
+    if (list.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 예약된 일정이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.slice().reverse().map(r => `
+      <tr>
+        <td>${r.customerName || "익명"}</td>
+        <td>상담 신청</td>
+        <td>${r.preferredDate || r.createdAt}</td>
+        <td>${statusPill("wait", "예정")}</td>
+      </tr>
+    `).join("");
+  }
+
+  function renderSales() {
+    const tbody = document.getElementById("sales-body");
+    const statCards = document.querySelectorAll(".stat-card b");
+    if (!bizLinkedListing) {
+      tbody.innerHTML = noLinkRow(5);
+      statCards[0].textContent = "0원";
+      statCards[1].textContent = "0원";
+      statCards[2].textContent = "0건";
+      return;
+    }
+    const list = myInquiries();
+    const paid = list.filter(r => r.paid);
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    const thisMonthTotal = paid.filter(r => (r.paidAt || "").startsWith(thisMonth)).reduce((sum, r) => sum + Number(r.paidAmount || 0), 0);
+    const allTimeTotal = paid.reduce((sum, r) => sum + Number(r.paidAmount || 0), 0);
+    statCards[0].textContent = `${thisMonthTotal.toLocaleString()}원`;
+    statCards[1].textContent = `${allTimeTotal.toLocaleString()}원`;
+    statCards[2].textContent = `${list.length}건`;
+
+    if (paid.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:30px 0;">아직 정산 내역이 없어요.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = paid.slice().reverse().map(r => `
+      <tr>
+        <td>계약금</td>
+        <td>${r.customerName || "익명"}</td>
+        <td>${Number(r.paidAmount).toLocaleString()}원</td>
+        <td>${r.paidAt}</td>
+        <td>${statusPill("done", "정산완료")}</td>
+      </tr>
+    `).join("");
+  }
+
+  function renderReviews() {
+    const el = document.getElementById("reviews-list");
+    if (!bizLinkedListing) {
+      el.innerHTML = `<div class="empty-box"><div class="emoji">🔗</div><p>업체 정보에서 상세페이지를 먼저 연결해주세요.</p></div>`;
+      return;
+    }
+    const reviews = getReviews().filter(r => r.type === bizLinkedListing.type && r.listingId === bizLinkedListing.id);
+    if (reviews.length === 0) {
+      el.innerHTML = `<div class="empty-box"><div class="emoji">⭐</div><p>아직 작성된 리뷰가 없어요.</p></div>`;
+      return;
+    }
+    el.innerHTML = reviews.slice().reverse().map(r => `
+      <div class="review-item">
+        <div class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+        <div class="txt">${r.txt}</div>
+        <div class="meta">${r.customerName} · ${r.createdAt}</div>
+      </div>
+    `).join("");
+  }
+
+  // ---------- 멤버십(월 회비) ----------
+  const MS_STATUS_LABEL = { trial: "무료체험중", active: "정상 이용중", expired: "만료됨" };
+  const MS_STATUS_PILL = { trial: "status-wait", active: "status-done", expired: "status-cancel" };
+
+  function renderMembershipPanel() {
+    const status = getMembershipStatus(currentUser);
+    const badge = document.getElementById("ms-status-badge");
+    badge.textContent = MS_STATUS_LABEL[status.status];
+    badge.className = `status-pill ${MS_STATUS_PILL[status.status]}`;
+    document.getElementById("ms-fee").textContent = `${getMembershipFee().toLocaleString()}원`;
+
+    const dateLabel = document.getElementById("ms-date-label");
+    const dateEl = document.getElementById("ms-date");
+    const desc = document.getElementById("ms-desc");
+    const payBtn = document.getElementById("btn-pay-membership");
+
+    if (status.status === "trial") {
+      dateLabel.textContent = "무료체험 종료일";
+      dateEl.textContent = status.trialEndsAt;
+      desc.textContent = "가입 후 첫 달은 무료로 사진·인스타그램이 노출됩니다. 체험이 끝나기 전에 미리 결제하면 끊김 없이 노출이 이어집니다.";
+      payBtn.textContent = "회비 결제하기 (체험 종료 후 적용)";
+    } else if (status.status === "active") {
+      dateLabel.textContent = "다음 결제일";
+      dateEl.textContent = status.paidUntil;
+      desc.textContent = "회비가 정상 납부되어 상세페이지·목록에 업체 사진과 인스타그램이 노출되고 있습니다.";
+      payBtn.textContent = "다음 달 회비 미리 결제하기";
+    } else {
+      dateLabel.textContent = "체험 종료일";
+      dateEl.textContent = status.trialEndsAt;
+      desc.textContent = "회비 납부가 만료되어 업체 사진·인스타그램 노출이 중단되었습니다. 회비를 결제하면 다시 노출됩니다.";
+      payBtn.textContent = "회비 결제하고 노출 재개하기";
+    }
+  }
+
+  function renderBusinessData() {
+    renderRequests();
+    renderBookings();
+    renderSales();
+    renderReviews();
+    renderMembershipPanel();
+  }
+  renderBusinessData();
+
+  document.addEventListener("click", (e) => {
+    const navItem = e.target.closest("#side-nav a");
+    if (navItem) {
+      document.querySelectorAll("#side-nav a").forEach(a => a.classList.remove("active"));
+      navItem.classList.add("active");
+      document.querySelectorAll(".mypage-panel").forEach(p => p.classList.remove("active"));
+      document.getElementById(navItem.dataset.target).classList.add("active");
+      return;
+    }
+    if (e.target.closest("#btn-save-info")) {
+      const user = WeddingStore.getUser();
+      if (user) {
+        user.region = bizRegion;
+        user.photos = bizPhotos;
+        user.linkedListing = bizLinkedListing;
+        user.instagram = normalizeInstagram(document.getElementById("biz-instagram-input").value);
+        user.priceLead = document.getElementById("biz-price-lead").value.trim();
+        syncPriceRowsFromDom();
+        user.priceTable = bizPriceTable.filter((p) => p.item.trim() || p.price.trim());
+        try {
+          WeddingStore.setUser(user);
+          WeddingStore.saveAccount(user);
+        } catch (err) {
+          WeddingStore.toast("사진 용량이 너무 커서 저장하지 못했습니다. 사진 수나 크기를 줄여주세요.");
+          return;
+        }
+      }
+      document.getElementById("mp-region-tag").textContent = bizRegion ? `플래너 회원 · ${bizRegion}` : "플래너 회원";
+      WeddingStore.toast("업체 정보가 저장되었습니다");
+      return;
+    }
+    const removePhotoBtn = e.target.closest("[data-remove-photo]");
+    if (removePhotoBtn) {
+      const idx = Number(removePhotoBtn.dataset.removePhoto);
+      bizPhotos.splice(idx, 1);
+      renderPhotoGrid();
+      return;
+    }
+    if (e.target.closest("#btn-add-price-row")) {
+      syncPriceRowsFromDom();
+      bizPriceTable.push({ item: "", price: "" });
+      renderPriceEditList();
+      return;
+    }
+    const removePriceBtn = e.target.closest("[data-remove-price-row]");
+    if (removePriceBtn) {
+      syncPriceRowsFromDom();
+      bizPriceTable.splice(Number(removePriceBtn.dataset.removePriceRow), 1);
+      renderPriceEditList();
+      return;
+    }
+    if (e.target.closest("#btn-logout-side")) {
+      WeddingStore.logout();
+      WeddingStore.toast("로그아웃 되었습니다");
+      setTimeout(() => (location.href = "index.html"), 500);
+      return;
+    }
+    if (e.target.closest("#btn-pay-membership")) {
+      // 데모 로그인 등으로 계정 레지스트리에 아직 저장되지 않은 세션이면 먼저 등록해둔다.
+      if (!WeddingStore.getAccounts()[currentUser.email]) WeddingStore.saveAccount(currentUser);
+      const updated = payMembershipFee(currentUser.email);
+      if (!updated) return;
+      Object.assign(currentUser, updated);
+      renderMembershipPanel();
+      renderPreviewGallery();
+      WeddingStore.toast(`월 회비 ${getMembershipFee().toLocaleString()}원이 결제되었습니다`);
+    }
+  });
+</script>
+</body>
+</html>
