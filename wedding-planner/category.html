@@ -38,9 +38,10 @@
 
     <div>
       <div class="filter-bar">
-        <div class="filter-left">
+        <div class="filter-left" id="filter-left">
           <select class="chip-select" id="f-region"></select>
           <select class="chip-select" id="f-price"></select>
+          <span id="hall-extra-filters"></span>
           <select class="chip-select" id="f-sort">
             <option value="recommend">추천순</option>
             <option value="price-asc">낮은 가격순</option>
@@ -124,6 +125,23 @@
     { id: "3000000-999999999", label: "300만원 이상" },
   ];
 
+  // 웨딩홀 카테고리 전용 필터 — 지역/가격대는 위의 공용 필터를 그대로 쓰고,
+  // 웨딩홀 유형·식사 메뉴·제휴 및 혜택은 실제 데이터에서 옵션을 뽑아내고,
+  // 식대·하객인원은 구간(bucket)으로 나눠서 선택하게 한다.
+  const HALL_MEAL_PRICE_RANGES = [
+    { id: "all", label: "식대 전체" },
+    { id: "0-70000", label: "~7만원" },
+    { id: "70000-80000", label: "7~8만원" },
+    { id: "80000-90000", label: "8~9만원" },
+    { id: "90000-999999999", label: "9만원 이상" },
+  ];
+  const HALL_CAPACITY_RANGES = [
+    { id: "all", label: "하객인원 전체" },
+    { id: "0-200", label: "~200명" },
+    { id: "200-300", label: "200~300명" },
+    { id: "300-999999", label: "300명 이상" },
+  ];
+
   function renderSidebar() {
     document.getElementById("cat-side").innerHTML = CATEGORY_META.map((c) => `
       <a href="category.html?cat=${c.id}" class="${currentCat === c.id ? "active" : ""}">${c.emoji} ${c.label}</a>
@@ -149,6 +167,40 @@
     document.getElementById("f-price").innerHTML = PRICE_RANGES.map((r) => `<option value="${r.id}">${r.label}</option>`).join("");
   }
 
+  // 웨딩홀 카테고리에서만 유형/식사메뉴/식대/하객인원/제휴혜택 필터를 추가로 노출한다.
+  function renderHallFilters() {
+    const wrap = document.getElementById("hall-extra-filters");
+    if (currentCat !== "hall") {
+      wrap.innerHTML = "";
+      return;
+    }
+    const halls = LISTINGS.hall;
+    const hallTypes = [...new Set(halls.map((h) => h.style))].sort();
+    const mealMenus = [...new Set(halls.map((h) => h.mealMenu))].sort();
+    const benefits = [...new Set(halls.flatMap((h) => h.benefits || []))].sort();
+
+    wrap.innerHTML = `
+      <select class="chip-select" id="f-hall-type">
+        <option value="all">웨딩홀 유형 전체</option>
+        ${hallTypes.map((t) => `<option value="${t}">${t}</option>`).join("")}
+      </select>
+      <select class="chip-select" id="f-meal-menu">
+        <option value="all">식사 메뉴 전체</option>
+        ${mealMenus.map((m) => `<option value="${m}">${m}</option>`).join("")}
+      </select>
+      <select class="chip-select" id="f-meal-price">
+        ${HALL_MEAL_PRICE_RANGES.map((r) => `<option value="${r.id}">${r.label}</option>`).join("")}
+      </select>
+      <select class="chip-select" id="f-capacity">
+        ${HALL_CAPACITY_RANGES.map((r) => `<option value="${r.id}">${r.label}</option>`).join("")}
+      </select>
+      <select class="chip-select" id="f-benefit">
+        <option value="all">제휴 및 혜택 전체</option>
+        ${benefits.map((b) => `<option value="${b}">${b}</option>`).join("")}
+      </select>
+    `;
+  }
+
   function applyFilters() {
     let list = baseList();
 
@@ -162,6 +214,35 @@
         const v = getPriceValue(i.price);
         return v !== null && v >= min && v <= max;
       });
+    }
+
+    if (currentCat === "hall") {
+      const hallType = document.getElementById("f-hall-type").value;
+      if (hallType !== "all") list = list.filter((i) => i.style === hallType);
+
+      const mealMenu = document.getElementById("f-meal-menu").value;
+      if (mealMenu !== "all") list = list.filter((i) => i.mealMenu === mealMenu);
+
+      const mealPriceVal = document.getElementById("f-meal-price").value;
+      if (mealPriceVal !== "all") {
+        const [min, max] = mealPriceVal.split("-").map(Number);
+        list = list.filter((i) => {
+          const v = getMealPriceValue(i);
+          return v !== null && v >= min && v <= max;
+        });
+      }
+
+      const capacityVal = document.getElementById("f-capacity").value;
+      if (capacityVal !== "all") {
+        const [min, max] = capacityVal.split("-").map(Number);
+        list = list.filter((i) => {
+          const v = getCapacityValue(i.capacity);
+          return v !== null && v >= min && v <= max;
+        });
+      }
+
+      const benefit = document.getElementById("f-benefit").value;
+      if (benefit !== "all") list = list.filter((i) => (i.benefits || []).includes(benefit));
     }
 
     const sortVal = document.getElementById("f-sort").value;
@@ -184,11 +265,10 @@
   renderSidebar();
   populateRegionFilter();
   populatePriceFilter();
+  renderHallFilters();
   applyFilters();
 
-  document.getElementById("f-region").addEventListener("change", applyFilters);
-  document.getElementById("f-price").addEventListener("change", applyFilters);
-  document.getElementById("f-sort").addEventListener("change", applyFilters);
+  document.getElementById("filter-left").addEventListener("change", applyFilters);
 </script>
 </body>
 </html>

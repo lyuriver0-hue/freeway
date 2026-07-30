@@ -5,35 +5,35 @@ const LISTINGS = {
   hall: [
     { name: "라마다신도림호텔", loc: "서울 구로구", views: 162, tags: ["BEST"], price: "예식비 문의", emoji: "🏨",
       desc: "도심 접근성이 뛰어난 호텔 웨딩홀로, 넉넉한 주차 공간과 품격 있는 연회장을 갖추고 있습니다.",
-      capacity: "최대 300명", style: "호텔 웨딩",
+      capacity: "최대 300명", style: "호텔 웨딩", mealMenu: "뷔페", benefits: ["무료주차", "신부대기실"],
       priceTable: [{ item: "대관료", price: "2,000,000원" }, { item: "식대(1인)", price: "68,000원~" }, { item: "주차", price: "무료 200대" }] },
     { name: "아펠가모 반포", loc: "서울 서초구", views: 208, tags: ["인기", "BEST"], price: "1,800,000원~", emoji: "🏛️",
       desc: "채광이 아름다운 홀로 자연광 웨딩 사진을 선호하는 신랑신부에게 인기가 높습니다.",
-      capacity: "최대 250명", style: "채플 웨딩",
+      capacity: "최대 250명", style: "채플 웨딩", mealMenu: "코스요리", benefits: ["폐백실", "웨딩카 제공"],
       priceTable: [{ item: "대관료", price: "1,800,000원" }, { item: "식대(1인)", price: "75,000원~" }, { item: "폐백실", price: "300,000원" }] },
     { name: "더링크호텔", loc: "서울 강남구", views: 127, tags: ["BEST"], price: "2,200,000원~", emoji: "🏨",
       desc: "강남 중심가에 위치한 프리미엄 호텔 웨딩홀로 고급스러운 인테리어가 특징입니다.",
-      capacity: "최대 280명", style: "호텔 웨딩",
+      capacity: "최대 280명", style: "호텔 웨딩", mealMenu: "뷔페", benefits: ["무료주차", "원스탑 진행"],
       priceTable: [{ item: "대관료", price: "2,200,000원" }, { item: "식대(1인)", price: "88,000원~" }, { item: "주차", price: "무료 150대" }] },
     { name: "라브르에드니아", loc: "서울 강남구", views: 160, tags: ["BEST", "추천"], price: "2,500,000원~", emoji: "🏛️",
       desc: "유럽풍 인테리어와 대형 샹들리에가 인상적인 프리미엄 웨딩홀입니다.",
-      capacity: "최대 320명", style: "컨벤션 웨딩",
+      capacity: "최대 320명", style: "컨벤션 웨딩", mealMenu: "뷔페", benefits: ["웨딩카 제공", "혼구용품 제공"],
       priceTable: [{ item: "대관료", price: "2,500,000원" }, { item: "식대(1인)", price: "82,000원~" }, { item: "웨딩카 서비스", price: "무료" }] },
     { name: "빌라드지디 수서", loc: "서울 강남구", views: 143, tags: ["BEST"], price: "1,950,000원~", emoji: "🏛️",
       desc: "가든 테라스가 있는 세미 야외형 웨딩홀로 사계절 다른 분위기를 연출할 수 있습니다.",
-      capacity: "최대 200명", style: "가든 웨딩",
+      capacity: "최대 200명", style: "가든 웨딩", mealMenu: "한정식", benefits: ["신부대기실", "원스탑 진행"],
       priceTable: [{ item: "대관료", price: "1,950,000원" }, { item: "식대(1인)", price: "78,000원~" }, { item: "테라스 이용료", price: "포함" }] },
     { name: "더채플앳 논현", loc: "서울 강남구", views: 157, tags: ["인기", "BEST"], price: "2,100,000원~", emoji: "⛪",
       desc: "높은 층고와 스테인드글라스가 아름다운 채플형 웨딩홀입니다.",
-      capacity: "최대 220명", style: "채플 웨딩",
+      capacity: "최대 220명", style: "채플 웨딩", mealMenu: "코스요리", benefits: ["폐백실", "혼구용품 제공"],
       priceTable: [{ item: "대관료", price: "2,100,000원" }, { item: "식대(1인)", price: "80,000원~" }, { item: "부케 서비스", price: "무료" }] },
     { name: "더컨벤션 반포", loc: "서울 서초구", views: 129, tags: ["BEST"], price: "1,700,000원~", emoji: "🏛️",
       desc: "넓은 로비와 다목적 홀을 갖춘 컨벤션형 웨딩홀로 대규모 하객 초대에 적합합니다.",
-      capacity: "최대 350명", style: "컨벤션 웨딩",
+      capacity: "최대 350명", style: "컨벤션 웨딩", mealMenu: "뷔페", benefits: ["무료주차", "웨딩카 제공"],
       priceTable: [{ item: "대관료", price: "1,700,000원" }, { item: "식대(1인)", price: "70,000원~" }, { item: "주차", price: "무료 250대" }] },
     { name: "L65호텔웨딩컨벤션", loc: "서울 영등포구", views: 88, tags: ["인기", "BEST"], price: "1,600,000원~", emoji: "🏨",
       desc: "한강뷰가 보이는 호텔 웨딩컨벤션으로 야경 웨딩 촬영이 인기입니다.",
-      capacity: "최대 260명", style: "호텔 웨딩",
+      capacity: "최대 260명", style: "호텔 웨딩", mealMenu: "뷔페+한정식", benefits: ["무료주차", "신부대기실"],
       priceTable: [{ item: "대관료", price: "1,600,000원" }, { item: "식대(1인)", price: "72,000원~" }, { item: "한강뷰 라운지", price: "300,000원" }] },
   ],
   studio: [
@@ -237,6 +237,20 @@ function getAllListings() {
 // "1,800,000원~" 같은 가격 문자열에서 정렬/필터용 숫자를 추출. "예식비 문의"처럼 숫자가 없으면 null.
 function getPriceValue(price) {
   const digits = (price || "").replace(/[^0-9]/g, "");
+  return digits ? Number(digits) : null;
+}
+
+// "최대 300명" 같은 하객인원 문자열에서 필터용 숫자를 추출 (웨딩홀 카테고리 필터에서 사용)
+function getCapacityValue(capacity) {
+  const digits = (capacity || "").replace(/[^0-9]/g, "");
+  return digits ? Number(digits) : null;
+}
+
+// priceTable에서 "식대(1인)" 항목의 가격을 숫자로 추출 (웨딩홀 카테고리 필터에서 사용)
+function getMealPriceValue(item) {
+  const entry = (item.priceTable || []).find((p) => p.item.includes("식대"));
+  if (!entry) return null;
+  const digits = (entry.price || "").replace(/[^0-9]/g, "");
   return digits ? Number(digits) : null;
 }
 
