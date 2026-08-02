@@ -80,9 +80,9 @@
     <div class="wizard-panel" data-panel="2">
       <div style="text-align:center; padding:20px 0;">
         <div style="font-size:44px; margin-bottom:14px;">🎉</div>
-        <h3 style="margin-bottom:8px;">회원가입이 완료되었습니다!</h3>
-        <p class="text-muted" style="margin-bottom:24px;">이제 웨딩닷컴에서 웨딩홀과 스드메를 둘러보고 견적을 받아보세요.</p>
-        <a href="index.html" class="btn btn-primary btn-lg">시작하기</a>
+        <h3 style="margin-bottom:8px;" id="done-title">회원가입이 완료되었습니다!</h3>
+        <p class="text-muted" style="margin-bottom:24px;" id="done-desc">이제 웨딩닷컴에서 웨딩홀과 스드메를 둘러보고 견적을 받아보세요.</p>
+        <a href="index.html" class="btn btn-primary btn-lg" id="done-link">시작하기</a>
       </div>
     </div>
 
@@ -130,6 +130,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
 <script src="js/store.js"></script>
 <script>
   let currentStep = 0;
@@ -193,12 +195,46 @@
     })
   );
 
-  document.getElementById("btn-to-2").addEventListener("click", () => {
+  document.getElementById("btn-to-2").addEventListener("click", async () => {
     const name = document.getElementById("su-name").value.trim() || "회원";
-    const newUser = { name, type: "user", email: document.getElementById("su-email").value.trim() };
-    WeddingStore.setUser(newUser);
-    WeddingStore.saveAccount(newUser);
-    weddingRenderHeader();
+    const email = document.getElementById("su-email").value.trim();
+    const pw = document.getElementById("su-pw").value;
+    const phone = document.getElementById("su-phone").value.trim();
+    const btn = document.getElementById("btn-to-2");
+    btn.disabled = true;
+
+    // Supabase Auth로 실제 계정을 생성 (이메일/비밀번호는 Supabase가 검증·저장)
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password: pw,
+      options: { data: { name, phone } },
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      WeddingStore.toast(
+        /already registered|already been registered/i.test(error.message)
+          ? "이미 가입된 이메일입니다"
+          : `가입에 실패했습니다: ${error.message}`
+      );
+      return;
+    }
+
+    if (data.session) {
+      // 이메일 확인 없이 바로 로그인되는 설정인 경우 — 사이트에도 바로 로그인 상태로 반영
+      const newUser = { name, type: "user", email };
+      WeddingStore.setUser(newUser);
+      WeddingStore.saveAccount(newUser);
+      weddingRenderHeader();
+    } else {
+      // 이메일 확인이 필요한 설정인 경우 — 아직 로그인 상태로 만들지 않고 안내만 표시
+      document.getElementById("done-title").textContent = "가입 확인 이메일을 보냈습니다!";
+      document.getElementById("done-desc").textContent = "받으신 이메일의 인증 링크를 눌러 확인을 완료한 뒤 로그인해주세요.";
+      const link = document.getElementById("done-link");
+      link.textContent = "로그인하러 가기";
+      link.href = "login.html";
+    }
     goStep(2);
   });
 

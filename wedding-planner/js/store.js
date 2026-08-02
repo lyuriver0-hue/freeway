@@ -17,6 +17,7 @@ const WeddingStore = {
   },
   logout() {
     localStorage.removeItem(this.KEY);
+    if (typeof supabaseClient !== "undefined") supabaseClient.auth.signOut();
   },
   toast(msg) {
     let t = document.getElementById("wc-toast");

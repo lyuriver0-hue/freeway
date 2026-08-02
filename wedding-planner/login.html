@@ -104,6 +104,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
 <script src="js/store.js"></script>
 <script>
   function setFieldError(id, hasError) {
@@ -120,7 +122,7 @@
     doLoginSuccess({ name: provider + " 사용자", type: "user", email: "demo@weddingcom.kr" });
   }
 
-  document.getElementById("login-form").addEventListener("submit", (e) => {
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = e.target.email.value.trim();
     const pw = e.target.password.value;
@@ -128,12 +130,28 @@
     const pwOk = pw.length >= 6;
     setFieldError("f-email", !emailOk);
     setFieldError("f-password", !pwOk);
-    if (emailOk && pwOk) {
-      // 가입 시 저장된 계정이 있으면 그 정보로 로그인, 없으면 데모 계정 생성 (프로토타입 모의 인증)
-      const existing = WeddingStore.findAccount(email);
-      const user = existing && existing.type === "user" ? existing : { name: email.split("@")[0], type: "user", email };
-      doLoginSuccess(user);
+    if (!emailOk || !pwOk) return;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
+    // Supabase Auth로 실제 이메일/비밀번호 검증
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pw });
+
+    submitBtn.disabled = false;
+
+    if (error) {
+      setFieldError("f-password", true);
+      WeddingStore.toast("이메일 또는 비밀번호가 올바르지 않습니다");
+      return;
     }
+
+    // 가입 시 저장해둔 프로필(이름 등)이 있으면 그대로, 없으면 Supabase에 저장된 이름 사용
+    const existing = WeddingStore.findAccount(email);
+    const user = existing && existing.type === "user"
+      ? existing
+      : { name: data.user.user_metadata?.name || email.split("@")[0], type: "user", email };
+    doLoginSuccess(user);
   });
 </script>
 </body>
