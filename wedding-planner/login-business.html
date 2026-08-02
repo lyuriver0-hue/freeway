@@ -130,7 +130,7 @@
     doLoginSuccess(user);
   }
 
-  document.getElementById("login-form").addEventListener("submit", (e) => {
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     const idVal = e.target.email.value.trim();
     const pw = e.target.password.value;
@@ -138,14 +138,34 @@
     const pwOk = pw.length >= 6;
     setFieldError("f-email", !idOk);
     setFieldError("f-password", !pwOk);
-    if (idOk && pwOk) {
-      // 이메일 또는 사업자등록번호로 가입된 계정을 조회, 없으면 데모 계정 생성 (프로토타입 모의 인증)
-      const existing = WeddingStore.findAccount(idVal);
-      const user = existing && existing.type === "business"
-        ? existing
-        : { name: idVal.includes("@") ? idVal.split("@")[0] : "파트너", type: "business", email: idVal.includes("@") ? idVal : "demo@weddingcom.kr", joinedAt: new Date().toISOString().slice(0, 10) };
-      doLoginSuccess(user);
+    if (!idOk || !pwOk) return;
+
+    // 사업자등록번호로 입력했으면 가입 시 저장해둔 계정에서 실제 이메일을 찾아온다
+    // (Supabase 로그인은 이메일 기준이라, 등록번호로는 직접 로그인할 수 없다).
+    const existing = WeddingStore.findAccount(idVal);
+    const email = idVal.includes("@") ? idVal : existing ? existing.email : null;
+    if (!email) {
+      setFieldError("f-email", true);
+      WeddingStore.toast("가입된 사업자등록번호를 찾을 수 없습니다. 이메일로 로그인해주세요");
+      return;
     }
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pw });
+    submitBtn.disabled = false;
+
+    if (error) {
+      setFieldError("f-password", true);
+      WeddingStore.toast("이메일/사업자등록번호 또는 비밀번호가 올바르지 않습니다");
+      return;
+    }
+
+    const meta = data.user.user_metadata || {};
+    const user = existing && existing.type === "business"
+      ? existing
+      : { name: meta.name || email.split("@")[0], type: "business", email, bizNo: meta.bizNo, joinedAt: meta.joinedAt || new Date().toISOString().slice(0, 10) };
+    doLoginSuccess(user);
   });
 </script>
 </body>

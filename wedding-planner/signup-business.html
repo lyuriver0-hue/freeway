@@ -99,9 +99,9 @@
     <div class="wizard-panel" data-panel="3">
       <div style="text-align:center; padding:20px 0;">
         <div style="font-size:44px; margin-bottom:14px;">🎉</div>
-        <h3 style="margin-bottom:8px;">기업 회원가입이 완료되었습니다!</h3>
-        <p class="text-muted" style="margin-bottom:24px;">담당자 승인 후 웨딩닷컴 파트너 센터를 이용하실 수 있습니다.</p>
-        <a href="index.html" class="btn btn-primary btn-lg">시작하기</a>
+        <h3 style="margin-bottom:8px;" id="done-title">기업 회원가입이 완료되었습니다!</h3>
+        <p class="text-muted" style="margin-bottom:24px;" id="done-desc">담당자 승인 후 웨딩닷컴 파트너 센터를 이용하실 수 있습니다.</p>
+        <a href="index.html" class="btn btn-primary btn-lg" id="done-link">시작하기</a>
       </div>
     </div>
 
@@ -235,6 +235,11 @@
     btn.addEventListener("click", () => goStep(+btn.getAttribute("data-back")));
   });
 
+  document.getElementById("btn-to-2").addEventListener("click", () => {
+    if (!bizVerified) return;
+    goStep(2);
+  });
+
   const agreeAll = document.getElementById("agree-all");
   const agreeItems = document.querySelectorAll(".agree-item");
   const agreeRequired = document.querySelectorAll(".agree-required");
@@ -253,23 +258,53 @@
     })
   );
 
-  document.getElementById("btn-to-3").addEventListener("click", () => {
+  document.getElementById("btn-to-3").addEventListener("click", async () => {
     if (!bizVerified) {
       WeddingStore.toast("사업자 인증을 먼저 완료해주세요");
       goStep(1);
       return;
     }
     const name = document.getElementById("su-biz-name").value.trim() || "파트너 업체";
-    const newUser = {
-      name,
-      type: "business",
-      email: document.getElementById("su-email").value.trim(),
-      bizNo: bizNoInput.value,
-      joinedAt: new Date().toISOString().slice(0, 10),
-    };
-    WeddingStore.setUser(newUser);
-    WeddingStore.saveAccount(newUser);
-    weddingRenderHeader();
+    const email = document.getElementById("su-email").value.trim();
+    const pw = document.getElementById("su-pw").value;
+    const phone = document.getElementById("su-phone").value.trim();
+    const bizNo = bizNoInput.value;
+    const joinedAt = new Date().toISOString().slice(0, 10);
+    const btn = document.getElementById("btn-to-3");
+    btn.disabled = true;
+
+    // Supabase Auth로 실제 계정을 생성하고, 마이페이지 라우팅에 쓰이는 type/bizNo 등은
+    // user_metadata에 함께 저장해 로그인 시 그대로 복원한다.
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password: pw,
+      options: { data: { name, phone, type: "business", bizNo, joinedAt } },
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      WeddingStore.toast(
+        /already registered|already been registered/i.test(error.message)
+          ? "이미 가입된 이메일입니다"
+          : `가입에 실패했습니다: ${error.message}`
+      );
+      return;
+    }
+
+    const newUser = { name, type: "business", email, bizNo, joinedAt };
+    if (data.session) {
+      WeddingStore.setUser(newUser);
+      WeddingStore.saveAccount(newUser);
+      weddingRenderHeader();
+    } else {
+      WeddingStore.saveAccount(newUser);
+      document.getElementById("done-title").textContent = "가입 확인 이메일을 보냈습니다!";
+      document.getElementById("done-desc").textContent = "받으신 이메일의 인증 링크를 눌러 확인을 완료한 뒤 기업 로그인해주세요.";
+      const link = document.getElementById("done-link");
+      link.textContent = "로그인하러 가기";
+      link.href = "login-business.html";
+    }
     goStep(3);
   });
 </script>

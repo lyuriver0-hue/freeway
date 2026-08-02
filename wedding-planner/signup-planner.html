@@ -76,9 +76,9 @@
     <div class="wizard-panel" data-panel="2">
       <div style="text-align:center; padding:20px 0;">
         <div style="font-size:44px; margin-bottom:14px;">🎉</div>
-        <h3 style="margin-bottom:8px;">웨딩플래너 회원가입이 완료되었습니다!</h3>
-        <p class="text-muted" style="margin-bottom:24px;">담당자 승인 후 웨딩닷컴 파트너 센터를 이용하실 수 있습니다.</p>
-        <a href="index.html" class="btn btn-primary btn-lg">시작하기</a>
+        <h3 style="margin-bottom:8px;" id="done-title">웨딩플래너 회원가입이 완료되었습니다!</h3>
+        <p class="text-muted" style="margin-bottom:24px;" id="done-desc">담당자 승인 후 웨딩닷컴 파트너 센터를 이용하실 수 있습니다.</p>
+        <a href="index.html" class="btn btn-primary btn-lg" id="done-link">시작하기</a>
       </div>
     </div>
 
@@ -191,18 +191,45 @@
     })
   );
 
-  document.getElementById("btn-to-2").addEventListener("click", () => {
+  document.getElementById("btn-to-2").addEventListener("click", async () => {
     const name = document.getElementById("su-planner-name").value.trim() || "웨딩플래너";
-    const newUser = {
-      name,
-      type: "planner",
-      email: document.getElementById("su-email").value.trim(),
-      phone: document.getElementById("su-phone").value.trim(),
-      joinedAt: new Date().toISOString().slice(0, 10),
-    };
-    WeddingStore.setUser(newUser);
-    WeddingStore.saveAccount(newUser);
-    weddingRenderHeader();
+    const email = document.getElementById("su-email").value.trim();
+    const pw = document.getElementById("su-pw").value;
+    const phone = document.getElementById("su-phone").value.trim();
+    const joinedAt = new Date().toISOString().slice(0, 10);
+    const btn = document.getElementById("btn-to-2");
+    btn.disabled = true;
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password: pw,
+      options: { data: { name, phone, type: "planner", joinedAt } },
+    });
+
+    btn.disabled = false;
+
+    if (error) {
+      WeddingStore.toast(
+        /already registered|already been registered/i.test(error.message)
+          ? "이미 가입된 이메일입니다"
+          : `가입에 실패했습니다: ${error.message}`
+      );
+      return;
+    }
+
+    const newUser = { name, type: "planner", email, phone, joinedAt };
+    if (data.session) {
+      WeddingStore.setUser(newUser);
+      WeddingStore.saveAccount(newUser);
+      weddingRenderHeader();
+    } else {
+      WeddingStore.saveAccount(newUser);
+      document.getElementById("done-title").textContent = "가입 확인 이메일을 보냈습니다!";
+      document.getElementById("done-desc").textContent = "받으신 이메일의 인증 링크를 눌러 확인을 완료한 뒤 로그인해주세요.";
+      const link = document.getElementById("done-link");
+      link.textContent = "로그인하러 가기";
+      link.href = "login-planner.html";
+    }
     goStep(2);
   });
 </script>

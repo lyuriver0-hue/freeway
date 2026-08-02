@@ -130,22 +130,33 @@
     doLoginSuccess(user);
   }
 
-  document.getElementById("login-form").addEventListener("submit", (e) => {
+  document.getElementById("login-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const idVal = e.target.email.value.trim();
+    const email = e.target.email.value.trim();
     const pw = e.target.password.value;
-    const idOk = idVal.length > 0;
+    const emailOk = email.length > 0;
     const pwOk = pw.length >= 6;
-    setFieldError("f-email", !idOk);
+    setFieldError("f-email", !emailOk);
     setFieldError("f-password", !pwOk);
-    if (idOk && pwOk) {
-      // 가입 시 저장된 계정이 있으면 그 정보로 로그인, 없으면 데모 계정 생성 (프로토타입 모의 인증)
-      const existing = WeddingStore.findAccount(idVal);
-      const user = existing && existing.type === "planner"
-        ? existing
-        : { name: idVal.includes("@") ? idVal.split("@")[0] : "웨딩플래너", type: "planner", email: idVal.includes("@") ? idVal : "demo-planner@weddingcom.kr", joinedAt: new Date().toISOString().slice(0, 10) };
-      doLoginSuccess(user);
+    if (!emailOk || !pwOk) return;
+
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pw });
+    submitBtn.disabled = false;
+
+    if (error) {
+      setFieldError("f-password", true);
+      WeddingStore.toast("이메일 또는 비밀번호가 올바르지 않습니다");
+      return;
     }
+
+    const meta = data.user.user_metadata || {};
+    const existing = WeddingStore.findAccount(email);
+    const user = existing && existing.type === "planner"
+      ? existing
+      : { name: meta.name || email.split("@")[0], type: "planner", email, phone: meta.phone, joinedAt: meta.joinedAt || new Date().toISOString().slice(0, 10) };
+    doLoginSuccess(user);
   });
 </script>
 </body>
