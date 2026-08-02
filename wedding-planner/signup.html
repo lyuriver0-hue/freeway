@@ -57,6 +57,11 @@
       <div class="wizard-actions" style="justify-content:flex-end;">
         <button class="btn btn-primary" id="btn-to-1">다음</button>
       </div>
+
+      <div class="divider">또는</div>
+      <button type="button" class="social-btn" onclick="doSocialSignup('구글')">🔵 구글로 3초 만에 가입하기</button>
+      <button type="button" class="social-btn" onclick="doSocialSignup('카카오')">💛 카카오로 3초 만에 가입하기</button>
+      <button type="button" class="social-btn" onclick="doSocialSignup('네이버')">🟢 네이버로 3초 만에 가입하기</button>
     </div>
 
     <!-- Step 1: 약관동의 -->
@@ -196,6 +201,17 @@
     weddingRenderHeader();
     goStep(2);
   });
+
+  // 소셜 간편가입 (프로토타입용 모의 인증) — 프로바이더 인증이 끝났다고 가정하고
+  // 받아온 이름/이메일로 바로 계정을 만들어 가입을 완료 처리한다.
+  function doSocialSignup(provider) {
+    const newUser = { name: provider + " 사용자", type: "user", email: `${provider}_${Date.now()}@weddingcom.kr` };
+    WeddingStore.setUser(newUser);
+    WeddingStore.saveAccount(newUser);
+    weddingRenderHeader();
+    WeddingStore.toast(`${provider} 계정으로 가입이 완료되었습니다`);
+    goStep(2);
+  }
 </script>
 </body>
 </html>
