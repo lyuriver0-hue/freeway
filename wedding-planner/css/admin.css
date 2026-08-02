@@ -2,6 +2,11 @@
    웨딩닷컴 내부 관리자 콘솔 — 일반 고객용 styles.css와 분리된 "백오피스" 톤
 ========================================================= */
 body.admin-body{ background:var(--gray-100); padding-top:0; }
+/* 고객용 페이지의 세리프 제목 스타일은 관리자 콘솔의 "백오피스" 톤과 맞지 않아 원래의 산세리프로 되돌린다. */
+body.admin-body h1, body.admin-body h2, body.admin-body h3, body.admin-body h4{
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",-apple-system,sans-serif;
+  font-weight:800; letter-spacing:-0.02em;
+}
 
 .admin-topbar{
   height:56px; background:#1F2937; color:#fff; display:flex; align-items:center;
